@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using WebApp.SharedKernel.Models;
+using WebApp.SharedKernel.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
@@ -14,6 +15,11 @@ builder.Services
 builder.Services
     .AddOptions<JwtOptions>()
     .BindConfiguration(JwtOptions.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services
+    .AddOptions<PersistenceOptions>()
+    .BindConfiguration(PersistenceOptions.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -32,6 +38,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         };
     }
 });
+builder.Services.AddPersistence(builder.Configuration
+    .GetRequiredSection(PersistenceOptions.Section)
+    .Get<PersistenceOptions>() ?? throw new NullReferenceException("PersistenceOptions must be configured"));
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints((options) =>
 {

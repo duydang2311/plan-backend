@@ -6,3 +6,5 @@ build:
 run:
     dotnet run --project WebApp.Host
 
+ef +rest:
+    dotnet ef {{rest}} --project WebApp.Host
