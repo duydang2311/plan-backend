@@ -20,11 +20,11 @@ public sealed class Endpoint : Endpoint<Request, Results>
     {
         var result = await new AuthenticateCommand(request.Email!, request.Password!).ExecuteAsync(ct).ConfigureAwait(false);
         return result.Match<Results>(
-            (a) => a,
-            (a) => TypedResults.Ok(new Response(
-                a.AccessToken,
-                a.RefreshToken,
-                a.AccessTokenMaxAge,
-                a.RefreshTokenMaxAge)));
+            (errors) => errors.ToProblemDetails(400),
+            (result) => TypedResults.Ok(new Response(
+                result.AccessToken,
+                result.RefreshToken,
+                result.AccessTokenMaxAge,
+                result.RefreshTokenMaxAge)));
     }
 }

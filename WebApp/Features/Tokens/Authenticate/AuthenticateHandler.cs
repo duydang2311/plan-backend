@@ -7,27 +7,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using WebApp.SharedKernel.Models;
-using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace WebApp.Features.Tokens.Authenticate;
 
-public sealed class AuthenticateHandler(IOptions<JwtOptions> jwtOptions) : ICommandHandler<AuthenticateCommand, OneOf<ProblemDetails, AuthenticateResult>>
+using Result = OneOf<IEnumerable<ValidationError>, AuthenticateResult>;
+
+public sealed class AuthenticateHandler(IOptions<JwtOptions> jwtOptions) : ICommandHandler<AuthenticateCommand, Result>
 {
-    public async Task<OneOf<ProblemDetails, AuthenticateResult>> ExecuteAsync(AuthenticateCommand command, CancellationToken ct)
+    public async Task<Result> ExecuteAsync(AuthenticateCommand command, CancellationToken ct)
     {
-        if (command.Email != "test@gmail.com" || command.Password != "123456")
+        if (command is not { Email: "test@gmail.com", Password: "123456" })
         {
-            return new ProblemDetails(
-            [
-                new ValidationFailure("email", "Authentication credentials is invalid")
-                {
-                    ErrorCode ="invalid_credentials"
-                },
-                new ValidationFailure("password", "Authentication credentials is invalid")
-                {
-                    ErrorCode ="invalid_credentials"
-                }
-            ], 400);
+            return new[]
+            {
+                new ValidationError("email", "Authentication credentials is invalid", "invalid_credentials"),
+                new ValidationError("password", "Authentication credentials is invalid", "invalid_credentials")
+            };
         }
 
         var generateRefreshTokenTask = Nanoid.GenerateAsync();
