@@ -4,4 +4,5 @@ public sealed record class AuthenticateResult(
     string AccessToken,
     string RefreshToken,
     int AccessTokenMaxAge,
-    int RefreshTokenMaxAge);
+    int RefreshTokenMaxAge
+);

@@ -18,13 +18,20 @@ public sealed class Endpoint : Endpoint<Request, Results>
 
     public override async Task<Results> ExecuteAsync(Request request, CancellationToken ct)
     {
-        var result = await new AuthenticateCommand(request.Email!, request.Password!).ExecuteAsync(ct).ConfigureAwait(false);
+        var result = await new AuthenticateCommand(request.Email!, request.Password!)
+            .ExecuteAsync(ct)
+            .ConfigureAwait(false);
         return result.Match<Results>(
             (errors) => errors.ToProblemDetails(400),
-            (result) => TypedResults.Ok(new Response(
-                result.AccessToken,
-                result.RefreshToken,
-                result.AccessTokenMaxAge,
-                result.RefreshTokenMaxAge)));
+            (result) =>
+                TypedResults.Ok(
+                    new Response(
+                        result.AccessToken,
+                        result.RefreshToken,
+                        result.AccessTokenMaxAge,
+                        result.RefreshTokenMaxAge
+                    )
+                )
+        );
     }
 }

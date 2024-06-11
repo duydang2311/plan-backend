@@ -6,5 +6,6 @@ public class FastEndpointsOptions
 {
     public const string Section = "FastEndpoints";
 
-    [Required] public required string[] Assemblies { get; set; }
+    [Required]
+    public required string[] Assemblies { get; set; }
 }

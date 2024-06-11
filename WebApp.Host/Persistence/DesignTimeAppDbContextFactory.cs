@@ -11,14 +11,23 @@ public sealed class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+            .AddJsonFile(
+                $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
+                optional: true
+            )
             .Build();
 
-        var options = configuration.GetSection(PersistenceOptions.Section).Get<PersistenceOptions>() ?? throw new NullReferenceException("PersistenceOptions must be configured");
+        var options =
+            configuration.GetSection(PersistenceOptions.Section).Get<PersistenceOptions>()
+            ?? throw new NullReferenceException("PersistenceOptions must be configured");
         return new AppDbContext(
             new DbContextOptionsBuilder<AppDbContext>()
-                .UseNpgsql(options.ConnectionString, builder => builder.MigrationsAssembly(options.MigrationsAssembly))
+                .UseNpgsql(
+                    options.ConnectionString,
+                    builder => builder.MigrationsAssembly(options.MigrationsAssembly)
+                )
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                .Options);
+                .Options
+        );
     }
 }
