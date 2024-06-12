@@ -448,8 +448,6 @@ dotnet_diagnostic.CA2016.severity = suggestion
 dotnet_diagnostic.CA1822.severity = silent
 # IDE0011: Use braces
 dotnet_diagnostic.IDE0011.severity = silent
-# IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = silent
 # IDE0060: Remove unused parameters
 dotnet_diagnostic.IDE0060.severity = silent
 # IDE0062: Make local function static
