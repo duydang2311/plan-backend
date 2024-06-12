@@ -16,6 +16,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" />
     <PackageReference Include="OneOf" />
+    <PackageReference Include="Norgerman.Cryptography.Scrypt" />
   </ItemGroup>
 
 </Project>

@@ -12,6 +12,7 @@
     </PackageVersion>
     <PackageVersion Include="Nanoid" Version="3.0.0" />
     <PackageVersion Include="NodaTime" Version="3.1.11" />
+    <PackageVersion Include="Norgerman.Cryptography.Scrypt" Version="2.4.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="8.0.4" />
     <PackageVersion Include="OneOf" Version="3.0.271" />

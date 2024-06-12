@@ -1,13 +1,9 @@
-using System.Diagnostics;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +50,8 @@ builder.Services.AddPersistence(
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
         ?? throw new InvalidOperationException("PersistenceOptions must be configured")
 );
+builder.Services.AddHashers();
+builder.Services.AddJwts();
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints(
     (options) =>
@@ -83,5 +81,4 @@ app.UseFastEndpoints(
     }
 );
 
-// ScryptUtil.Scrypt("hello world", salt, N: 131072, r: 8, p: 1, dkLen: 64)
 app.Run();
