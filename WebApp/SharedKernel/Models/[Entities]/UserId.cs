@@ -1,6 +1,6 @@
 namespace WebApp.SharedKernel.Models;
 
-public record UserId(string Value)
+public readonly record struct UserId(Guid Value)
 {
-    public static readonly UserId Empty = new(string.Empty);
+    public static readonly UserId Empty = new(Guid.Empty);
 }

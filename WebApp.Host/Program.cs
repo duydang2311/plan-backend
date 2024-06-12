@@ -1,9 +1,13 @@
+using System.Diagnostics;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.SharedKernel.Models;
+using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +52,7 @@ builder
     });
 builder.Services.AddPersistence(
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
-        ?? throw new NullReferenceException("PersistenceOptions must be configured")
+        ?? throw new InvalidOperationException("PersistenceOptions must be configured")
 );
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints(
@@ -58,8 +62,7 @@ builder.Services.AddFastEndpoints(
             .Configuration.GetRequiredSection(FastEndpointsOptions.Section)
             .Get<FastEndpointsOptions>();
         options.DisableAutoDiscovery = true;
-        options.Assemblies =
-            fastEndpointsOptions?.Assemblies?.Select(Assembly.Load).ToArray() ?? [];
+        options.Assemblies = fastEndpointsOptions?.Assemblies?.Select(Assembly.Load).ToArray() ?? [];
     }
 );
 
@@ -79,4 +82,6 @@ app.UseFastEndpoints(
         config.Errors.ProducesMetadataType = typeof(ProblemDetails);
     }
 );
+
+// ScryptUtil.Scrypt("hello world", salt, N: 131072, r: 8, p: 1, dkLen: 64)
 app.Run();

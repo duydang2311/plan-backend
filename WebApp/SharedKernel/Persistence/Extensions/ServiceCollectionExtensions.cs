@@ -6,20 +6,27 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static partial class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection serviceCollection, PersistenceOptions persistenceOptions)
+    public static IServiceCollection AddPersistence(
+        this IServiceCollection serviceCollection,
+        PersistenceOptions persistenceOptions
+    )
     {
-        serviceCollection.AddDbContextPool<AppDbContext>((builder) =>
-        {
-            builder
-                .UseNpgsql(
-                    persistenceOptions.ConnectionString,
-                    builder => builder.MigrationsAssembly(persistenceOptions.MigrationsAssembly))
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+        serviceCollection.AddDbContextPool<AppDbContext>(
+            (builder) =>
+            {
+                builder
+                    .UseNpgsql(
+                        persistenceOptions.ConnectionString,
+                        builder => builder.UseNodaTime().MigrationsAssembly(persistenceOptions.MigrationsAssembly)
+                    )
+                    .UseSnakeCaseNamingConvention()
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
 #if DEBUG
-                .EnableSensitiveDataLogging()
+                    .EnableSensitiveDataLogging()
 #endif
-                .EnableDetailedErrors();
-        });
+                    .EnableDetailedErrors();
+            }
+        );
         return serviceCollection;
     }
 }

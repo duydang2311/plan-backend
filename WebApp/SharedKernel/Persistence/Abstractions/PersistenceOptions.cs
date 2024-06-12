@@ -7,10 +7,8 @@ public sealed record class PersistenceOptions
     public const string Section = "Persistence";
 
     [Required]
-    [MinLength(1)]
-    public required string ConnectionString { get; set; }
+    public required string ConnectionString { get; init; }
 
     [Required]
-    [MinLength(1)]
-    public required string MigrationsAssembly { get; set; }
+    public required string MigrationsAssembly { get; init; }
 }

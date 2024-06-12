@@ -19,13 +19,14 @@ public sealed class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<
 
         var options =
             configuration.GetSection(PersistenceOptions.Section).Get<PersistenceOptions>()
-            ?? throw new NullReferenceException("PersistenceOptions must be configured");
+            ?? throw new InvalidOperationException("PersistenceOptions must be configured");
         return new AppDbContext(
             new DbContextOptionsBuilder<AppDbContext>()
                 .UseNpgsql(
                     options.ConnectionString,
-                    builder => builder.MigrationsAssembly(options.MigrationsAssembly)
+                    builder => builder.UseNodaTime().MigrationsAssembly(options.MigrationsAssembly)
                 )
+                .UseSnakeCaseNamingConvention()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                 .Options
         );

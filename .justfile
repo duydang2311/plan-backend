@@ -1,4 +1,4 @@
-default: run
+default: build run
 
 build:
     dotnet build WebApp.Host
@@ -8,3 +8,8 @@ run:
 
 ef +rest:
     dotnet ef {{rest}} --project WebApp.Host
+
+ensuredb +rest:
+    just ef database drop
+    just ef migrations remove
+    just ef migrations add {{rest}}
