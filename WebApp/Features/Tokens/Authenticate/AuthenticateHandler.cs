@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FastEndpoints;
 using Microsoft.Extensions.Options;
-using NanoidDotNet;
 using OneOf;
 using WebApp.SharedKernel.Jwts.Abstractions;
 using WebApp.SharedKernel.Models;
@@ -26,7 +25,7 @@ public sealed class AuthenticateHandler(IOptions<JwtOptions> options, IJwtServic
         }
 
         var o = options.Value;
-        var generateRefreshTokenTask = Nanoid.GenerateAsync();
+        var refreshToken = Guid.NewGuid();
         var now = DateTime.UtcNow;
         var accessTokenMaxAge = TimeSpan.FromMinutes(5);
         var accessToken = jwtService.CreateToken(
@@ -40,7 +39,7 @@ public sealed class AuthenticateHandler(IOptions<JwtOptions> options, IJwtServic
 
         return new AuthenticateResult(
             jwtService.WriteToken(accessToken),
-            await generateRefreshTokenTask.ConfigureAwait(false),
+            refreshToken,
             (int)accessTokenMaxAge.TotalSeconds,
             (int)TimeSpan.FromDays(1).TotalSeconds
         );
