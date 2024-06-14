@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.SharedKernel.Persistence.Configurations;
@@ -16,14 +15,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Email).HasMaxLength(254);
         builder.Property(x => x.Salt);
         builder.Property(x => x.PasswordHash);
+        builder.Property(x => x.IsVerified).HasDefaultValue(false);
 
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.Email).IsUnique();
     }
-}
-
-public sealed class UserIdToGuidConverter : ValueConverter<UserId, Guid>
-{
-    public UserIdToGuidConverter()
-        : base(value => value.Value, (value) => new UserId(value)) { }
 }

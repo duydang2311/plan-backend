@@ -10,4 +10,5 @@ public sealed record class User
     public string Email { get; init; } = string.Empty;
     public byte[] Salt { get; init; } = [];
     public byte[] PasswordHash { get; init; } = [];
+    public bool IsVerified { get; init; }
 }

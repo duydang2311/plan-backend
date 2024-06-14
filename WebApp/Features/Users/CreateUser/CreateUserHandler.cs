@@ -8,7 +8,7 @@ using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Users.CreateUser;
 
-using Result = OneOf<IEnumerable<ValidationError>, User>;
+using Result = OneOf<IEnumerable<ValidationError>, CreateUserResult>;
 
 public sealed class CreateUserHandler(IHasher hasher, AppDbContext dbContext)
     : ICommandHandler<CreateUserCommand, Result>
@@ -31,9 +31,11 @@ public sealed class CreateUserHandler(IHasher hasher, AppDbContext dbContext)
             PasswordHash = hasher.Hash(command.Password, salt),
             Salt = salt,
         };
+        var userVerificationToken = new UserVerificationToken { User = user, Token = Guid.NewGuid(), };
 
         dbContext.Add(user);
+        dbContext.Add(userVerificationToken);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
-        return user;
+        return new CreateUserResult(user, userVerificationToken);
     }
 }

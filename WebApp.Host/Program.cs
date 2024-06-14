@@ -2,8 +2,12 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
+using WebApp.Host.Commons;
+using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
+using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +19,11 @@ builder
 builder
     .Services.AddOptions<JwtOptions>()
     .BindConfiguration(JwtOptions.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder
+    .Services.AddOptions<MailOptions>()
+    .BindConfiguration(MailOptions.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder
@@ -52,7 +61,10 @@ builder.Services.AddPersistence(
 );
 builder.Services.AddHashers();
 builder.Services.AddJwts();
+builder.Services.AddMails();
 builder.Services.AddAuthorization();
+builder.Services.Configure<JsonOptions>(x => x.SerializerOptions.Converters.Add(new GuidToBase64JsonConverter()));
+builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
     (options) =>
     {
@@ -78,7 +90,13 @@ app.UseFastEndpoints(
             config.IndicateErrorCode = true;
         });
         config.Errors.ProducesMetadataType = typeof(ProblemDetails);
+        config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
     }
 );
+app.UseJobQueues(options =>
+{
+    options.MaxConcurrency = 4;
+    options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
+});
 
 app.Run();

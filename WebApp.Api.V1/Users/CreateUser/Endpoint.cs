@@ -1,5 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using OneOf;
+using WebApp.Features.Emails.SendUserVerificationMail;
 using WebApp.Features.Users.CreateUser;
 
 namespace WebApp.Api.V1.Users.CreateUser;
@@ -19,6 +21,16 @@ public sealed class Endpoint : Endpoint<Request, Results>
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
         var result = await new CreateUserCommand(req.Email!, req.Password!).ExecuteAsync(ct).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(req.VerificationUrl) && result.TryGetT1(out var createUserResult))
+        {
+            await new SendUserVerificationMailCommand(
+                createUserResult.User.Email,
+                req.VerificationUrl,
+                createUserResult.UserVerificationToken.Token
+            )
+                .QueueJobAsync(ct: ct)
+                .ConfigureAwait(false);
+        }
         return result.Match<Results>((errors) => errors.ToProblemDetails(400), (_) => TypedResults.NoContent());
     }
 }

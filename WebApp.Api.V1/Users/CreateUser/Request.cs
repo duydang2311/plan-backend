@@ -7,6 +7,7 @@ public sealed record class Request
 {
     public string? Email { get; init; }
     public string? Password { get; init; }
+    public string? VerificationUrl { get; init; }
 }
 
 public sealed class RequestValidator : Validator<Request>

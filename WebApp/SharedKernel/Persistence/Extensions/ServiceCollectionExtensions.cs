@@ -11,22 +11,23 @@ public static partial class ServiceCollectionExtensions
         PersistenceOptions persistenceOptions
     )
     {
-        serviceCollection.AddDbContextPool<AppDbContext>(
-            (builder) =>
-            {
-                builder
-                    .UseNpgsql(
-                        persistenceOptions.ConnectionString,
-                        builder => builder.UseNodaTime().MigrationsAssembly(persistenceOptions.MigrationsAssembly)
-                    )
-                    .UseSnakeCaseNamingConvention()
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-#if DEBUG
-                    .EnableSensitiveDataLogging()
-#endif
-                    .EnableDetailedErrors();
-            }
-        );
+        serviceCollection.AddPooledDbContextFactory<AppDbContext>((builder) => Configure(builder, persistenceOptions));
+        serviceCollection.AddDbContextPool<AppDbContext>((builder) => Configure(builder, persistenceOptions));
         return serviceCollection;
+    }
+
+    private static void Configure(DbContextOptionsBuilder builder, PersistenceOptions persistenceOptions)
+    {
+        builder
+            .UseNpgsql(
+                persistenceOptions.ConnectionString,
+                builder => builder.UseNodaTime().MigrationsAssembly(persistenceOptions.MigrationsAssembly)
+            )
+            .UseSnakeCaseNamingConvention()
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+#if DEBUG
+            .EnableSensitiveDataLogging()
+#endif
+            .EnableDetailedErrors();
     }
 }
