@@ -10,7 +10,7 @@ public sealed class JobRecordConfiguration : IEntityTypeConfiguration<JobRecord>
     {
         builder.ToTable("job_records");
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        builder.Property(x => x.QueueID);
+        builder.Property(x => x.QueueID).HasMaxLength(32);
         builder.Property(x => x.CommandJson).HasColumnType("jsonb");
         builder.Property(x => x.ExecuteAfter);
         builder.Property(x => x.ExpireOn);
