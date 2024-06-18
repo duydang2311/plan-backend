@@ -1,13 +1,13 @@
 default: build run
 
 build:
-    dotnet build WebApp.Host
+    dotnet build WebApp.AppHost
 
 run:
-    dotnet run --project WebApp.Host
+    dotnet run --project WebApp.AppHost
 
 ef +rest:
-    dotnet ef {{rest}} --project WebApp.Host
+    dotnet ef {{rest}} --project WebApp.Api.V1
 
 ensuredb +rest:
     just ef database drop

@@ -4,13 +4,14 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
-using WebApp.Host.Commons;
+using WebApp.Host.Commons.Converters;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 builder
     .Services.AddOptions<FastEndpointsOptions>()
     .BindConfiguration(FastEndpointsOptions.Section)
@@ -77,6 +78,11 @@ builder.Services.AddFastEndpoints(
 );
 
 var app = builder.Build();
+app.UseDefaultExceptionHandler();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(
@@ -93,6 +99,7 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
     }
 );
+app.MapDefaultEndpoints();
 app.UseJobQueues(options =>
 {
     options.MaxConcurrency = 4;
