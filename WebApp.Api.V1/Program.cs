@@ -4,7 +4,7 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
-using WebApp.Host.Commons.Converters;
+using WebApp.Api.V1.Commons.Converters;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;

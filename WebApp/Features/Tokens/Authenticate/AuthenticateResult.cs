@@ -1,8 +1,10 @@
+using WebApp.SharedKernel.Models;
+
 namespace WebApp.Features.Tokens.Authenticate;
 
 public sealed record class AuthenticateResult(
     string AccessToken,
-    Guid RefreshToken,
+    RefreshToken RefreshToken,
     int AccessTokenMaxAge,
     int RefreshTokenMaxAge
 );

@@ -38,7 +38,7 @@ public sealed class AsymmetricJwtService(IOptions<JwtOptions> options) : IJwtSer
             notBefore: notBefore,
             expires: expires,
             issuedAt: issuedAt,
-            signingCredentials: signingCredentials ?? new SigningCredentials(_x509Key, SecurityAlgorithms.RsaSha256)
+            signingCredentials: signingCredentials ?? new SigningCredentials(_x509Key, SecurityAlgorithms.RsaSha512)
         );
     }
 

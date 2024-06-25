@@ -25,7 +25,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
                 TypedResults.Ok(
                     new Response(
                         result.AccessToken,
-                        result.RefreshToken,
+                        result.RefreshToken.Value,
                         result.AccessTokenMaxAge,
                         result.RefreshTokenMaxAge
                     )

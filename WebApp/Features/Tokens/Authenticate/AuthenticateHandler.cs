@@ -47,8 +47,11 @@ public sealed class AuthenticateHandler(
             };
         }
 
+        var userRefreshToken = new UserRefreshToken { UserId = user.Id };
+        dbContext.Add(userRefreshToken);
+
         var o = options.Value;
-        var refreshToken = Guid.NewGuid();
+        var task = dbContext.SaveChangesAsync(ct);
         var now = DateTime.UtcNow;
         var accessTokenMaxAge = TimeSpan.FromMinutes(5);
         var accessToken = jwtService.CreateToken(
@@ -60,9 +63,11 @@ public sealed class AuthenticateHandler(
             issuedAt: now
         );
 
+        await task.ConfigureAwait(false);
+
         return new AuthenticateResult(
             jwtService.WriteToken(accessToken),
-            refreshToken,
+            userRefreshToken.Token,
             (int)accessTokenMaxAge.TotalSeconds,
             (int)TimeSpan.FromDays(1).TotalSeconds
         );
