@@ -6,8 +6,8 @@
     <PackageVersion Include="Casbin.NET" Version="2.9.0" />
     <PackageVersion Include="Casbin.NET.Adapter.EFCore" Version="2.5.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
-    <PackageVersion Include="FastEndpoints" Version="5.26.0" />
-    <PackageVersion Include="MailKit" Version="4.6.0" />
+    <PackageVersion Include="FastEndpoints" Version="5.27.0" />
+    <PackageVersion Include="MailKit" Version="4.7.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,8 +19,8 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="8.0.4" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <!-- Aspire -->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="8.0.1" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="8.0.2" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
