@@ -1,10 +1,12 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using Casbin.Persist.Adapter.EFCore;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Api.V1.Commons.Converters;
+using WebApp.SharedKernel.Casbins.Abstractions;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
@@ -56,9 +58,14 @@ builder
             };
         }
     });
+
 builder.Services.AddPersistence(
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
         ?? throw new InvalidOperationException("PersistenceOptions must be configured")
+);
+builder.Services.AddCasbin(
+    builder.Configuration.GetRequiredSection(CasbinOptions.Section).Get<CasbinOptions>()
+        ?? throw new InvalidOperationException("CasbinOptions must be configured")
 );
 builder.Services.AddHashers();
 builder.Services.AddJwts();
@@ -105,5 +112,10 @@ app.UseJobQueues(options =>
     options.MaxConcurrency = 4;
     options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<CasbinDbContext<int>>().Database.EnsureCreated();
+}
 
 app.Run();

@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalyzerVersion>latest-Default</AnalyzerVersion>
+    <UserSecretsId>80d5e6e3-1c8a-4cf4-a91b-817f5bfa6f30</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\casbin_model.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
