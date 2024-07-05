@@ -7,7 +7,7 @@ run:
     dotnet run --project WebApp.AppHost
 
 ef +rest:
-    dotnet ef {{rest}} --project WebApp.Api.V1
+    dotnet ef {{rest}} --project WebApp.Api.V1 --context AppDbContext
 
 ensuredb +rest:
     just ef database drop
