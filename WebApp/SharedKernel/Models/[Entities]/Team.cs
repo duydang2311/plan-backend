@@ -1,0 +1,17 @@
+using NodaTime;
+
+namespace WebApp.SharedKernel.Models;
+
+public sealed record class Team
+{
+    public Instant CreatedTime { get; init; }
+    public Instant UpdatedTime { get; init; }
+    public WorkspaceId WorkspaceId { get; init; } = WorkspaceId.Empty;
+    public Workspace Workspace { get; init; } = null!;
+    public TeamId Id { get; init; } = TeamId.Empty;
+    public string Name { get; init; } = string.Empty;
+    public string Identifier { get; init; } = string.Empty;
+
+    // Relationships
+    public ICollection<User> Members { get; set; } = null!;
+}
