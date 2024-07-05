@@ -1,3 +1,4 @@
+using Casbin;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.SharedKernel.Models;
@@ -7,9 +8,10 @@ namespace WebApp.Features.Workspaces.HasWorkspace;
 
 using Result = bool;
 
-public sealed class HasWorkspaceHandler(AppDbContext dbContext) : ICommandHandler<HasWorkspaceCommand, Result>
+public sealed class HasWorkspaceHandler(AppDbContext dbContext, IEnforcer enforcer)
+    : ICommandHandler<HasWorkspaceCommand, Result>
 {
-    public Task<Result> ExecuteAsync(HasWorkspaceCommand command, CancellationToken ct)
+    public async Task<Result> ExecuteAsync(HasWorkspaceCommand command, CancellationToken ct)
     {
         IQueryable<Workspace> query = dbContext.Workspaces;
         if (command.Id is not null)
@@ -20,6 +22,14 @@ public sealed class HasWorkspaceHandler(AppDbContext dbContext) : ICommandHandle
         {
             query = query.Where(x => x.Path.Equals(command.Path));
         }
-        return query.AnyAsync(ct);
+        var workspace = await query.Select(x => new { x.Id }).FirstOrDefaultAsync(ct).ConfigureAwait(false);
+        if (workspace is null)
+        {
+            return false;
+        }
+
+        return await enforcer
+            .EnforceAsync(command.UserId.ToString(), workspace.Id.ToString(), workspace.Id.ToString(), "read")
+            .ConfigureAwait(false);
     }
 }

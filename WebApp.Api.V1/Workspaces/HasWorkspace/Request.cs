@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
 
@@ -5,6 +6,9 @@ namespace WebApp.Api.V1.Workspaces.HasWorkspace;
 
 public sealed record class Request
 {
+    [FromClaim(ClaimTypes.NameIdentifier)]
+    public Guid Sub { get; init; }
+
     [QueryParam]
     public Guid? Id { get; init; }
 
