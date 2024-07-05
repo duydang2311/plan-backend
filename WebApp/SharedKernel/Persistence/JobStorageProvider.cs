@@ -7,6 +7,12 @@ namespace WebApp.SharedKernel.Persistence;
 public sealed record class JobStorageProvider(IDbContextFactory<AppDbContext> dbContextFactory)
     : IJobStorageProvider<JobRecord>
 {
+    public async Task CancelJobAsync(Guid trackingId, CancellationToken ct)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await dbContext.JobRecords.Where(x => x.TrackingID == trackingId).ExecuteDeleteAsync(ct).ConfigureAwait(false);
+    }
+
     public async Task<IEnumerable<JobRecord>> GetNextBatchAsync(PendingJobSearchParams<JobRecord> parameters)
     {
         await using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);

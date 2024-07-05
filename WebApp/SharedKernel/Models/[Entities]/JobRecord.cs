@@ -5,7 +5,7 @@ namespace WebApp.SharedKernel.Models;
 
 public sealed record class JobRecord : IJobStorageRecord
 {
-    public Guid Id { get; set; }
+    public Guid TrackingID { get; set; }
     public string QueueID { get; set; } = default!;
     public DateTime ExecuteAfter { get; set; }
     public DateTime ExpireOn { get; set; }

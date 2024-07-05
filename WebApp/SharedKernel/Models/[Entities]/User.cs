@@ -11,4 +11,7 @@ public sealed record class User
     public byte[] Salt { get; init; } = [];
     public byte[] PasswordHash { get; init; } = [];
     public bool IsVerified { get; init; }
+
+    // Relationships
+    public ICollection<Team> Teams { get; init; } = null!;
 }
