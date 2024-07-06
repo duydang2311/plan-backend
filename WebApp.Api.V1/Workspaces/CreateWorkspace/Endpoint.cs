@@ -1,5 +1,4 @@
 using FastEndpoints;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Features.Workspaces.CreateWorkspace;
 using WebApp.SharedKernel.Models;

@@ -6,12 +6,10 @@ using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Workspaces.HasWorkspace;
 
-using Result = bool;
-
 public sealed class HasWorkspaceHandler(AppDbContext dbContext, IEnforcer enforcer)
-    : ICommandHandler<HasWorkspaceCommand, Result>
+    : ICommandHandler<HasWorkspaceCommand, bool>
 {
-    public async Task<Result> ExecuteAsync(HasWorkspaceCommand command, CancellationToken ct)
+    public async Task<bool> ExecuteAsync(HasWorkspaceCommand command, CancellationToken ct)
     {
         IQueryable<Workspace> query = dbContext.Workspaces;
         if (command.Id is not null)

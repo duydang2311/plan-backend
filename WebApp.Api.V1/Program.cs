@@ -5,14 +5,23 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
+using Oakton.Resources;
 using WebApp.Api.V1.Commons.Converters;
 using WebApp.SharedKernel.Casbins.Abstractions;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var persistenceOptions =
+    builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
+    ?? throw new InvalidOperationException("PersistenceOptions must be configured");
+
 builder.AddServiceDefaults();
 builder
     .Services.AddOptions<FastEndpointsOptions>()
@@ -59,10 +68,7 @@ builder
         }
     });
 
-builder.Services.AddPersistence(
-    builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
-        ?? throw new InvalidOperationException("PersistenceOptions must be configured")
-);
+builder.Services.AddPersistence(persistenceOptions);
 builder.Services.AddCasbin(
     builder.Configuration.GetRequiredSection(CasbinOptions.Section).Get<CasbinOptions>()
         ?? throw new InvalidOperationException("CasbinOptions must be configured")
@@ -83,6 +89,16 @@ builder.Services.AddFastEndpoints(
         options.Assemblies = fastEndpointsOptions?.Assemblies?.Select(Assembly.Load).ToArray() ?? [];
     }
 );
+
+builder.Host.UseWolverine(x =>
+{
+    x.Discovery.IncludeAssembly(Assembly.Load("WebApp"));
+    x.PersistMessagesWithPostgresql(persistenceOptions.ConnectionString, "wolverine");
+    x.UseEntityFrameworkCoreTransactions();
+    x.Policies.AutoApplyTransactions();
+});
+
+builder.Host.UseResourceSetupOnStartup();
 
 var app = builder.Build();
 app.UseDefaultExceptionHandler();

@@ -1,6 +1,9 @@
+using System.Drawing;
 using Casbin;
+using Casbin.Model;
 using Casbin.Persist;
 using Casbin.Persist.Adapter.EFCore;
+using Casbin.Persist.Adapter.EFCore.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApp.SharedKernel.Casbins.Abstractions;
 
