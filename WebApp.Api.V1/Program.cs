@@ -1,13 +1,11 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using Casbin.Persist.Adapter.EFCore;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using Oakton.Resources;
 using WebApp.Api.V1.Commons.Converters;
-using WebApp.SharedKernel.Casbins.Abstractions;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
@@ -68,15 +66,13 @@ builder
         }
     });
 
-builder.Services.AddPersistence(persistenceOptions);
-builder.Services.AddCasbin(
-    builder.Configuration.GetRequiredSection(CasbinOptions.Section).Get<CasbinOptions>()
-        ?? throw new InvalidOperationException("CasbinOptions must be configured")
-);
-builder.Services.AddHashers();
-builder.Services.AddJwts();
-builder.Services.AddMails();
-builder.Services.AddAuthorization();
+builder
+    .Services.AddPersistence(persistenceOptions)
+    .AddHashers()
+    .AddJwts()
+    .AddMails()
+    .AddAuthorization()
+    .AddAppAuthorization();
 builder.Services.Configure<JsonOptions>(x => x.SerializerOptions.Converters.Add(new GuidToBase64JsonConverter()));
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -96,6 +92,10 @@ builder.Host.UseWolverine(x =>
     x.PersistMessagesWithPostgresql(persistenceOptions.ConnectionString, "wolverine");
     x.UseEntityFrameworkCoreTransactions();
     x.Policies.AutoApplyTransactions();
+    if (builder.Environment.IsDevelopment())
+    {
+        x.Durability.Mode = DurabilityMode.Solo;
+    }
 });
 
 builder.Host.UseResourceSetupOnStartup();
@@ -128,10 +128,5 @@ app.UseJobQueues(options =>
     options.MaxConcurrency = 4;
     options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
 });
-
-using (var scope = app.Services.CreateScope())
-{
-    scope.ServiceProvider.GetRequiredService<CasbinDbContext<int>>().Database.EnsureCreated();
-}
 
 app.Run();

@@ -1,6 +1,6 @@
-using Casbin;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.SharedKernel.Authorization.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
@@ -27,7 +27,7 @@ public sealed class HasWorkspaceHandler(AppDbContext dbContext, IEnforcer enforc
         }
 
         return await enforcer
-            .EnforceAsync(command.UserId.ToString(), workspace.Id.ToString(), workspace.Id.ToString(), "read")
+            .EnforceAsync(command.UserId.ToString(), workspace.Id.ToString(), "read")
             .ConfigureAwait(false);
     }
 }

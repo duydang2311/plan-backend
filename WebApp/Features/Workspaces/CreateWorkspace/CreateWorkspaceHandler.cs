@@ -1,8 +1,8 @@
-using Casbin;
 using FastEndpoints;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.SharedKernel.Authorization.Abstractions;
 using WebApp.SharedKernel.Helpers;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
@@ -28,31 +28,16 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IEnforcer enf
             Path = command.Path,
         };
         dbContext.Add(workspace);
-
-        await Task.WhenAll(dbContext.SaveChangesAsync(ct), CreatePoliciesAsync(command.UserId, workspace.Id))
-            .ConfigureAwait(false);
+        AddPolicies(command.UserId, workspace.Id);
+        await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
         return workspace;
     }
 
-    private async Task CreatePoliciesAsync(UserId userId, WorkspaceId workspaceId)
+    private void AddPolicies(UserId userId, WorkspaceId workspaceId)
     {
-        var dom = workspaceId.ToString();
-        var sub = dom;
-        await enforcer
-            .AddPoliciesAsync(
-                [
-                    ["member", dom, sub, "read"],
-                    ["admin", dom, sub, "write"],
-                ]
-            )
-            .ConfigureAwait(false);
-        await enforcer
-            .AddGroupingPoliciesAsync(
-                [
-                    ["admin", "member", dom],
-                    [userId.ToString(), "admin", dom],
-                ]
-            )
-            .ConfigureAwait(false);
+        var sub = userId.ToString();
+        var obj = workspaceId.ToString();
+        enforcer.Add(sub, obj, "write");
+        enforcer.Add(sub, obj, "read");
     }
 }
