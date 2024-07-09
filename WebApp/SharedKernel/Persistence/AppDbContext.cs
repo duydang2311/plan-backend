@@ -9,7 +9,9 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<JobRecord> JobRecords => Set<JobRecord>();
     public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
     public DbSet<Workspace> Workspaces => Set<Workspace>();
-    public DbSet<Policy> UserPolicies => Set<Policy>();
+    public DbSet<Policy> Policies => Set<Policy>();
+    public DbSet<Team> Teams => Set<Team>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

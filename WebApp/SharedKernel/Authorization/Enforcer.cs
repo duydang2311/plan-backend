@@ -20,7 +20,7 @@ public sealed class Enforcer(AppDbContext dbContext) : IEnforcer
 
     public Task<bool> EnforceAsync(Expression<Func<Policy, bool>> predicate)
     {
-        return dbContext.UserPolicies.AnyAsync(predicate);
+        return dbContext.Policies.AnyAsync(predicate);
     }
 
     public Policy Add(string subject, string obj, string action, string? domain = null)

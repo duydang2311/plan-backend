@@ -1,18 +1,15 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using FastEndpoints;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
-using Oakton.Resources;
 using WebApp.Api.V1.Commons.Converters;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
-using Wolverine;
-using Wolverine.EntityFrameworkCore;
-using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,19 +83,22 @@ builder.Services.AddFastEndpoints(
     }
 );
 
-builder.Host.UseWolverine(x =>
-{
-    x.Discovery.IncludeAssembly(Assembly.Load("WebApp"));
-    x.PersistMessagesWithPostgresql(persistenceOptions.ConnectionString, "wolverine");
-    x.UseEntityFrameworkCoreTransactions();
-    x.Policies.AutoApplyTransactions();
-    if (builder.Environment.IsDevelopment())
+builder.Services.AddMassTransit(
+    (x) =>
     {
-        x.Durability.Mode = DurabilityMode.Solo;
+        x.SetKebabCaseEndpointNameFormatter();
+        x.UsingInMemory(
+            (context, cfg) =>
+            {
+                cfg.ConfigureEndpoints(context);
+            }
+        );
+        x.AddMediator(cfg =>
+        {
+            cfg.AddConsumers(Assembly.Load("WebApp"));
+        });
     }
-});
-
-builder.Host.UseResourceSetupOnStartup();
+);
 
 var app = builder.Build();
 app.UseDefaultExceptionHandler();
