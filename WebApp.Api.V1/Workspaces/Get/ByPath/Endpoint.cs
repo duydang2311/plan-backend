@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Features.Workspaces.Get;
 using WebApp.SharedKernel.Authorization.Abstractions;
-using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Api.V1.Workspaces.Get.ByPath;
