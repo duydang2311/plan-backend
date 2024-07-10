@@ -5,6 +5,8 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Commons.Converters;
 using WebApp.SharedKernel.Mails.Abstractions;
 using WebApp.SharedKernel.Models;
@@ -70,7 +72,11 @@ builder
     .AddMails()
     .AddAuthorization()
     .AddAppAuthorization();
-builder.Services.Configure<JsonOptions>(x => x.SerializerOptions.Converters.Add(new GuidToBase64JsonConverter()));
+builder.Services.Configure<JsonOptions>(x =>
+{
+    x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+    x.SerializerOptions.Converters.Add(new GuidToBase64JsonConverter());
+});
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
     (options) =>

@@ -12,7 +12,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="8.4.3" />
     <PackageVersion Include="NodaTime" Version="3.1.11" />
+    <PackageVersion Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
     <PackageVersion Include="Norgerman.Cryptography.Scrypt" Version="2.4.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="8.0.4" />

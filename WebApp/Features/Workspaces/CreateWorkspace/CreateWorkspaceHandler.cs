@@ -37,6 +37,7 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IEnforcer enf
     {
         var sub = userId.ToString();
         var obj = workspaceId.ToString();
+        enforcer.Add(sub, obj, Permit.Read);
         enforcer.Add(sub, obj, Permit.CreateTeam);
     }
 }
