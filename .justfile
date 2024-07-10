@@ -1,10 +1,10 @@
 default: build run
 
 build:
-    dotnet build WebApp.AppHost
+    dotnet build WebApp.Api.V1
 
 run:
-    dotnet run --project WebApp.AppHost
+    dotnet run --project WebApp.Api.V1
 
 ef +rest:
     dotnet ef {{rest}} --project WebApp.Api.V1 --context AppDbContext
