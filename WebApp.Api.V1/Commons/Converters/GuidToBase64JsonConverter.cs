@@ -8,6 +8,8 @@ namespace WebApp.Api.V1.Commons.Converters;
 
 public sealed class GuidToBase64JsonConverter : JsonConverter<Guid>
 {
+    public static readonly GuidToBase64JsonConverter Instance = new();
+
     public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.String)

@@ -75,7 +75,10 @@ builder
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-    x.SerializerOptions.Converters.Add(new GuidToBase64JsonConverter());
+    x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
+    x.SerializerOptions.Converters.Add(new UserIdJsonConverter());
+    x.SerializerOptions.Converters.Add(new WorkspaceIdJsonConverter());
+    x.SerializerOptions.Converters.Add(new TeamIdJsonConverter());
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -126,6 +129,9 @@ app.UseFastEndpoints(
         });
         config.Errors.ProducesMetadataType = typeof(ProblemDetails);
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
+        config.Binding.ValueParserFor<UserId>(UserIdJsonConverter.ValueParser);
+        config.Binding.ValueParserFor<WorkspaceId>(WorkspaceIdJsonConverter.ValueParser);
+        config.Binding.ValueParserFor<TeamId>(TeamIdJsonConverter.ValueParser);
     }
 );
 app.MapDefaultEndpoints();
