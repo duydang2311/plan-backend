@@ -14,7 +14,7 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 {
     public override void Configure()
     {
-        Post("{WorkspaceId}/teams");
+        Post("teams");
         Verbs(Http.POST);
         Version(1);
     }
@@ -24,9 +24,9 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
         if (
             !await enforcer
                 .EnforceAsync(
-                    req.UserId!.Value.ToString(),
-                    req.WorkspaceId.ToString(),
-                    req.WorkspaceId.ToString(),
+                    req.UserId.ToString(),
+                    req.WorkspaceId!.Value.ToString(),
+                    req.WorkspaceId.Value.ToString(),
                     Permit.WriteTeam
                 )
                 .ConfigureAwait(false)
@@ -37,8 +37,8 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 
         var oneOf = await new CreateTeam
         {
-            UserId = new UserId(req.UserId.Value),
-            WorkspaceId = new WorkspaceId(req.WorkspaceId),
+            UserId = new UserId(req.UserId),
+            WorkspaceId = new WorkspaceId(req.WorkspaceId.Value),
             Name = req.QualifiedName!,
             Identifier = req.QualifiedIdentifier!,
         }

@@ -73,6 +73,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new UserIdJsonConverter());
     x.SerializerOptions.Converters.Add(new WorkspaceIdJsonConverter());
     x.SerializerOptions.Converters.Add(new TeamIdJsonConverter());
+    x.SerializerOptions.Converters.Add(new OrderableArrayJsonConverter());
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -126,6 +127,7 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<UserId>(UserIdJsonConverter.ValueParser);
         config.Binding.ValueParserFor<WorkspaceId>(WorkspaceIdJsonConverter.ValueParser);
         config.Binding.ValueParserFor<TeamId>(TeamIdJsonConverter.ValueParser);
+        config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
     }
 );
 app.MapDefaultEndpoints();
