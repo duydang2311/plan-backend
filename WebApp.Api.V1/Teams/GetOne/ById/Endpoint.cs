@@ -1,8 +1,9 @@
+using Casbin;
 using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Features.Teams.GetOne;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 
 namespace WebApp.Api.V1.Teams.GetOne.ById;
 
@@ -19,7 +20,11 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        if (!await enforcer.EnforceAsync(req.UserId.ToString(), req.Id.ToString(), Permit.Read).ConfigureAwait(false))
+        if (
+            !await enforcer
+                .EnforceAsync(req.UserId.ToString(), string.Empty, req.Id.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }

@@ -1,8 +1,9 @@
+using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Features.Workspaces.Get;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Api.V1.Workspaces.Get.ByPath;
@@ -25,7 +26,11 @@ public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpo
             .Select(x => x.Id)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-        if (!await enforcer.EnforceAsync(req.UserId.ToString(), workspaceId.ToString(), "read").ConfigureAwait(false))
+        if (
+            !await enforcer
+                .EnforceAsync(req.UserId.ToString(), workspaceId.ToString(), workspaceId.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }

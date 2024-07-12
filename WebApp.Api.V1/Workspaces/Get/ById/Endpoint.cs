@@ -1,7 +1,8 @@
+using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Features.Workspaces.Get;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Workspaces.Get.ById;
@@ -21,7 +22,12 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
     {
         if (
             !await enforcer
-                .EnforceAsync(req.UserId.ToString(), req.WorkspaceId.ToString(), "read")
+                .EnforceAsync(
+                    req.UserId.ToString(),
+                    req.WorkspaceId.ToString(),
+                    req.WorkspaceId.ToString(),
+                    Permit.Read
+                )
                 .ConfigureAwait(false)
         )
         {

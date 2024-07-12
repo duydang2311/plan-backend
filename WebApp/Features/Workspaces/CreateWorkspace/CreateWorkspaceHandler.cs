@@ -1,8 +1,9 @@
+using Casbin;
 using FastEndpoints;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Helpers;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
@@ -37,7 +38,7 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IEnforcer enf
     {
         var sub = userId.ToString();
         var obj = workspaceId.ToString();
-        enforcer.Add(sub, obj, Permit.Read);
-        enforcer.Add(sub, obj, Permit.CreateTeam);
+        enforcer.AddPolicy(sub, obj, obj, Permit.Read);
+        enforcer.AddPolicy(sub, obj, obj, Permit.WriteTeam);
     }
 }

@@ -13,15 +13,15 @@ using WebApp.SharedKernel.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240707105001_010_policy")]
-    partial class _010_policy
+    [Migration("20240712141346_010_team-member")]
+    partial class _010_teammember
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -62,56 +62,6 @@ namespace WebApp.Host.Migrations
                     b.ToTable("job_records", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.Policy", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("action");
-
-                    b.Property<string>("Domain")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("domain");
-
-                    b.Property<string>("Object")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("object");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("subject");
-
-                    b.HasKey("Id")
-                        .HasName("pk_policies");
-
-                    b.HasIndex("Action")
-                        .HasDatabaseName("ix_policies_action");
-
-                    b.HasIndex("Domain")
-                        .HasDatabaseName("ix_policies_domain");
-
-                    b.HasIndex("Object")
-                        .HasDatabaseName("ix_policies_object");
-
-                    b.HasIndex("Subject")
-                        .HasDatabaseName("ix_policies_subject");
-
-                    b.ToTable("policies", (string)null);
-                });
-
             modelBuilder.Entity("WebApp.SharedKernel.Models.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -127,8 +77,10 @@ namespace WebApp.Host.Migrations
 
                     b.Property<string>("Identifier")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("identifier");
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("identifier")
+                        .UseCollation("case_insensitive");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -148,10 +100,42 @@ namespace WebApp.Host.Migrations
                     b.HasKey("Id")
                         .HasName("pk_teams");
 
-                    b.HasIndex("WorkspaceId")
-                        .HasDatabaseName("ix_teams_workspace_id");
+                    b.HasIndex("WorkspaceId", "Identifier")
+                        .IsUnique()
+                        .HasDatabaseName("ix_teams_workspace_id_identifier");
 
                     b.ToTable("teams", (string)null);
+                });
+
+            modelBuilder.Entity("WebApp.SharedKernel.Models.TeamMember", b =>
+                {
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("team_id");
+
+                    b.Property<Guid>("MemberId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("member_id");
+
+                    b.Property<Instant>("CreatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_time")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Instant>("UpdatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_time")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("TeamId", "MemberId")
+                        .HasName("pk_team_members");
+
+                    b.HasIndex("MemberId")
+                        .HasDatabaseName("ix_team_members_member_id");
+
+                    b.ToTable("team_members", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.SharedKernel.Models.User", b =>
@@ -300,25 +284,6 @@ namespace WebApp.Host.Migrations
                     b.ToTable("workspaces", (string)null);
                 });
 
-            modelBuilder.Entity("team_members", b =>
-                {
-                    b.Property<Guid>("MembersId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("members_id");
-
-                    b.Property<Guid>("TeamsId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("teams_id");
-
-                    b.HasKey("MembersId", "TeamsId")
-                        .HasName("pk_team_members");
-
-                    b.HasIndex("TeamsId")
-                        .HasDatabaseName("ix_team_members_teams_id");
-
-                    b.ToTable("team_members", (string)null);
-                });
-
             modelBuilder.Entity("WebApp.SharedKernel.Models.Team", b =>
                 {
                     b.HasOne("WebApp.SharedKernel.Models.Workspace", "Workspace")
@@ -329,6 +294,27 @@ namespace WebApp.Host.Migrations
                         .HasConstraintName("fk_teams_workspaces_workspace_id");
 
                     b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("WebApp.SharedKernel.Models.TeamMember", b =>
+                {
+                    b.HasOne("WebApp.SharedKernel.Models.User", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_team_members_users_member_id");
+
+                    b.HasOne("WebApp.SharedKernel.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_team_members_teams_team_id");
+
+                    b.Navigation("Member");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("WebApp.SharedKernel.Models.UserRefreshToken", b =>
@@ -353,23 +339,6 @@ namespace WebApp.Host.Migrations
                         .HasConstraintName("fk_user_verification_tokens_users_user_id");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("team_members", b =>
-                {
-                    b.HasOne("WebApp.SharedKernel.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("MembersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_team_members_users_members_id");
-
-                    b.HasOne("WebApp.SharedKernel.Models.Team", null)
-                        .WithMany()
-                        .HasForeignKey("TeamsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_team_members_teams_teams_id");
                 });
 #pragma warning restore 612, 618
         }

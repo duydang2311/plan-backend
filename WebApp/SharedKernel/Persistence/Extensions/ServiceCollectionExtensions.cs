@@ -1,3 +1,7 @@
+using Casbin;
+using Casbin.Model;
+using Casbin.Persist;
+using Casbin.Persist.Adapter.EFCore;
 using Microsoft.EntityFrameworkCore;
 using WebApp.SharedKernel.Persistence;
 using WebApp.SharedKernel.Persistence.Abstractions;
@@ -13,6 +17,13 @@ public static partial class ServiceCollectionExtensions
     {
         serviceCollection.AddPooledDbContextFactory<AppDbContext>((builder) => Configure(builder, persistenceOptions));
         serviceCollection.AddDbContextPool<AppDbContext>((builder) => Configure(builder, persistenceOptions));
+        serviceCollection.AddScoped<IAdapter>(provider => new EFCoreAdapter<int>(
+            provider.GetRequiredService<AppDbContext>()
+        ));
+        serviceCollection.AddScoped<IEnforcer>(provider => new Enforcer(
+            "Resources/casbin_model.conf",
+            provider.GetRequiredService<IAdapter>()
+        ));
         return serviceCollection;
     }
 

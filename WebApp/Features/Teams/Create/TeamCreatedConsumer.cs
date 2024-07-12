@@ -1,6 +1,7 @@
+using Casbin;
 using MassTransit;
 using WebApp.Domain.Events;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
@@ -10,7 +11,12 @@ public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforc
 {
     public Task Consume(ConsumeContext<TeamCreated> context)
     {
-        enforcer.Add(context.Message.UserId.ToString(), context.Message.Team.Id.ToString(), Permit.Read);
+        enforcer.AddPolicy(
+            context.Message.UserId.ToString(),
+            string.Empty,
+            context.Message.Team.Id.ToString(),
+            Permit.Read
+        );
         dbContext.Add(new TeamMember { Team = context.Message.Team, MemberId = context.Message.UserId });
         return Task.CompletedTask;
     }

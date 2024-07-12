@@ -6,7 +6,7 @@ using NodaTime;
 namespace WebApp.Host.Migrations
 {
     /// <inheritdoc />
-    public partial class _011_teammember : Migration
+    public partial class _010_teammember : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,9 +1,10 @@
+using Casbin;
 using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Features.Teams.GetOne;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
@@ -32,7 +33,11 @@ public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpo
             return TypedResults.NotFound();
         }
 
-        if (!await enforcer.EnforceAsync(req.UserId.ToString(), teamId.ToString(), Permit.Read).ConfigureAwait(false))
+        if (
+            !await enforcer
+                .EnforceAsync(req.UserId.ToString(), string.Empty, teamId.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }

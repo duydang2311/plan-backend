@@ -65,13 +65,7 @@ builder
         }
     });
 
-builder
-    .Services.AddPersistence(persistenceOptions)
-    .AddHashers()
-    .AddJwts()
-    .AddMails()
-    .AddAuthorization()
-    .AddAppAuthorization();
+builder.Services.AddPersistence(persistenceOptions).AddHashers().AddJwts().AddMails().AddAuthorization();
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

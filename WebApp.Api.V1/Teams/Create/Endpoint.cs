@@ -1,8 +1,9 @@
+using Casbin;
 using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Features.Teams.Create;
-using WebApp.SharedKernel.Authorization.Abstractions;
+using WebApp.SharedKernel.Constants;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Teams.Create;
@@ -22,7 +23,12 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
     {
         if (
             !await enforcer
-                .EnforceAsync(req.UserId!.Value.ToString(), req.WorkspaceId.ToString(), "team:write")
+                .EnforceAsync(
+                    req.UserId!.Value.ToString(),
+                    req.WorkspaceId.ToString(),
+                    req.WorkspaceId.ToString(),
+                    Permit.WriteTeam
+                )
                 .ConfigureAwait(false)
         )
         {

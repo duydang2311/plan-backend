@@ -18,10 +18,74 @@ namespace WebApp.Host.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Casbin.Persist.Adapter.EFCore.Entities.EFCorePersistPolicy<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("ptype");
+
+                    b.Property<string>("Value1")
+                        .HasColumnType("text")
+                        .HasColumnName("v0");
+
+                    b.Property<string>("Value2")
+                        .HasColumnType("text")
+                        .HasColumnName("v1");
+
+                    b.Property<string>("Value3")
+                        .HasColumnType("text")
+                        .HasColumnName("v2");
+
+                    b.Property<string>("Value4")
+                        .HasColumnType("text")
+                        .HasColumnName("v3");
+
+                    b.Property<string>("Value5")
+                        .HasColumnType("text")
+                        .HasColumnName("v4");
+
+                    b.Property<string>("Value6")
+                        .HasColumnType("text")
+                        .HasColumnName("v5");
+
+                    b.HasKey("Id")
+                        .HasName("pk_policies");
+
+                    b.HasIndex("Type")
+                        .HasDatabaseName("ix_policies_ptype");
+
+                    b.HasIndex("Value1")
+                        .HasDatabaseName("ix_policies_v0");
+
+                    b.HasIndex("Value2")
+                        .HasDatabaseName("ix_policies_v1");
+
+                    b.HasIndex("Value3")
+                        .HasDatabaseName("ix_policies_v2");
+
+                    b.HasIndex("Value4")
+                        .HasDatabaseName("ix_policies_v3");
+
+                    b.HasIndex("Value5")
+                        .HasDatabaseName("ix_policies_v4");
+
+                    b.HasIndex("Value6")
+                        .HasDatabaseName("ix_policies_v5");
+
+                    b.ToTable("policies", (string)null);
+                });
 
             modelBuilder.Entity("WebApp.SharedKernel.Models.JobRecord", b =>
                 {
@@ -57,56 +121,6 @@ namespace WebApp.Host.Migrations
                         .HasName("pk_job_records");
 
                     b.ToTable("job_records", (string)null);
-                });
-
-            modelBuilder.Entity("WebApp.SharedKernel.Models.Policy", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("action");
-
-                    b.Property<string>("Domain")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("domain");
-
-                    b.Property<string>("Object")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("object");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("subject");
-
-                    b.HasKey("Id")
-                        .HasName("pk_policies");
-
-                    b.HasIndex("Action")
-                        .HasDatabaseName("ix_policies_action");
-
-                    b.HasIndex("Domain")
-                        .HasDatabaseName("ix_policies_domain");
-
-                    b.HasIndex("Object")
-                        .HasDatabaseName("ix_policies_object");
-
-                    b.HasIndex("Subject")
-                        .HasDatabaseName("ix_policies_subject");
-
-                    b.ToTable("policies", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.SharedKernel.Models.Team", b =>
