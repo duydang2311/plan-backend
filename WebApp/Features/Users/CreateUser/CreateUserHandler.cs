@@ -3,6 +3,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using WebApp.SharedKernel.Hashers.Abstractions;
+using WebApp.SharedKernel.Helpers;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
@@ -31,7 +32,7 @@ public sealed class CreateUserHandler(IHasher hasher, AppDbContext dbContext)
             PasswordHash = hasher.Hash(command.Password, salt),
             Salt = salt,
         };
-        var userVerificationToken = new UserVerificationToken { User = user, Token = Guid.NewGuid(), };
+        var userVerificationToken = new UserVerificationToken { User = user, Token = IdHelper.NewGuid(), };
 
         dbContext.Add(user);
         dbContext.Add(userVerificationToken);
