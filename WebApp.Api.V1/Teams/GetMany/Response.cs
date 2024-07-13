@@ -1,9 +1,16 @@
 using NodaTime;
+using Riok.Mapperly.Abstractions;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Teams.GetMany;
 
 public sealed record Response : PaginatedList<Item> { }
+
+[Mapper]
+public static partial class ResponseMapper
+{
+    public static partial Response ToResponse(this PaginatedList<Team> paginatedList);
+}
 
 public sealed record Item
 {
@@ -14,16 +21,4 @@ public sealed record Item
     public string Name { get; init; } = string.Empty;
     public string Identifier { get; init; } = string.Empty;
     public ICollection<User> Members { get; set; } = null!;
-
-    public static Item From(Team team) =>
-        new()
-        {
-            CreatedTime = team.CreatedTime,
-            UpdatedTime = team.UpdatedTime,
-            Id = team.Id,
-            WorkspaceId = team.WorkspaceId,
-            Name = team.Name,
-            Identifier = team.Identifier,
-            Members = team.Members,
-        };
 }

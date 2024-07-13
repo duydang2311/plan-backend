@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Mvc;
+using Riok.Mapperly.Abstractions;
 
 namespace WebApp.SharedKernel.Models;
 
@@ -24,6 +25,7 @@ public record Collective
     }
 
     [JsonIgnore]
+    [MapperIgnore]
     public int Offset => (page - 1) * Size;
 
     [FromQuery]

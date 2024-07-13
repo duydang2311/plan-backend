@@ -18,17 +18,8 @@ public sealed class Endpoint : Endpoint<Request, Result>
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        var paginatedList = await new GetTeams
-        {
-            UserId = req.UserId,
-            WorkspaceId = req.WorkspaceId,
-            Select = req.Select,
-        }
-            .ExecuteAsync(ct)
-            .ConfigureAwait(false);
+        var paginatedList = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
 
-        return TypedResults.Ok(
-            new Response { TotalCount = paginatedList.TotalCount, Items = [.. paginatedList.Items.Select(Item.From)] }
-        );
+        return TypedResults.Ok(paginatedList.ToResponse());
     }
 }
