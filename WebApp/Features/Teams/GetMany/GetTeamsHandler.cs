@@ -27,19 +27,16 @@ public sealed class GetTeamsHandler(AppDbContext dbContext) : ICommandHandler<Ge
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
-        query =
-            Array
-                .Find(command.Order, x => x.Name.Equals("name", StringComparison.OrdinalIgnoreCase))
-                ?.Sort(query, x => x.Name) ?? query;
-        query =
-            Array
-                .Find(command.Order, x => x.Name.Equals("identifier", StringComparison.OrdinalIgnoreCase))
-                ?.Sort(query, x => x.Identifier) ?? query;
         query = command
-            .Order.Where(x => !x.Name.EqualsEither(["name", "identifier"], StringComparison.OrdinalIgnoreCase))
-            .SortOrDefault(query, x => x.OrderBy(x => x.CreatedTime));
+            .Order.Where(static x =>
+                x.Name.EqualsEither(
+                    ["CreatedTime", "UpdatedTime", "Name", "Identifier"],
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
         var teams = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
-        return new() { TotalCount = totalCount, Items = teams };
+        return new() { Items = teams, TotalCount = totalCount };
     }
 }
