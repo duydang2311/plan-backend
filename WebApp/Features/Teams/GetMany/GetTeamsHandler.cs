@@ -37,6 +37,12 @@ public sealed class GetTeamsHandler(AppDbContext dbContext) : ICommandHandler<Ge
             .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
         var teams = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
-        return new() { Items = teams, TotalCount = totalCount };
+        return new()
+        {
+            Items = teams,
+            Size = command.Size,
+            Offset = command.Offset,
+            TotalCount = totalCount,
+        };
     }
 }
