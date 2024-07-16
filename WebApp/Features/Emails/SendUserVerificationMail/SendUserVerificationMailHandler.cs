@@ -2,7 +2,7 @@ using System.Globalization;
 using FastEndpoints;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using WebApp.SharedKernel.Mails.Abstractions;
+using WebApp.Infrastructure.Mails.Abstractions;
 
 namespace WebApp.Features.Emails.SendUserVerificationMail;
 

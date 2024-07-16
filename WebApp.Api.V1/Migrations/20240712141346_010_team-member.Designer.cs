@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 #nullable disable
 
@@ -26,7 +26,7 @@ namespace WebApp.Host.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.JobRecord", b =>
+            modelBuilder.Entity("WebApp.Common.Models.JobRecord", b =>
                 {
                     b.Property<Guid>("TrackingID")
                         .ValueGeneratedOnAdd()
@@ -62,7 +62,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("job_records", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.Team", b =>
+            modelBuilder.Entity("WebApp.Common.Models.Team", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -107,7 +107,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("teams", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.TeamMember", b =>
+            modelBuilder.Entity("WebApp.Common.Models.TeamMember", b =>
                 {
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uuid")
@@ -138,7 +138,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("team_members", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.User", b =>
+            modelBuilder.Entity("WebApp.Common.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -189,7 +189,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.UserRefreshToken", b =>
+            modelBuilder.Entity("WebApp.Common.Models.UserRefreshToken", b =>
                 {
                     b.Property<Guid>("Token")
                         .ValueGeneratedOnAdd()
@@ -221,7 +221,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("user_refresh_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.UserVerificationToken", b =>
+            modelBuilder.Entity("WebApp.Common.Models.UserVerificationToken", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -242,7 +242,7 @@ namespace WebApp.Host.Migrations
                     b.ToTable("user_verification_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.Workspace", b =>
+            modelBuilder.Entity("WebApp.Common.Models.Workspace", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -284,9 +284,9 @@ namespace WebApp.Host.Migrations
                     b.ToTable("workspaces", (string)null);
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.Team", b =>
+            modelBuilder.Entity("WebApp.Common.Models.Team", b =>
                 {
-                    b.HasOne("WebApp.SharedKernel.Models.Workspace", "Workspace")
+                    b.HasOne("WebApp.Common.Models.Workspace", "Workspace")
                         .WithMany()
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -296,16 +296,16 @@ namespace WebApp.Host.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.TeamMember", b =>
+            modelBuilder.Entity("WebApp.Common.Models.TeamMember", b =>
                 {
-                    b.HasOne("WebApp.SharedKernel.Models.User", "Member")
+                    b.HasOne("WebApp.Common.Models.User", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_team_members_users_member_id");
 
-                    b.HasOne("WebApp.SharedKernel.Models.Team", "Team")
+                    b.HasOne("WebApp.Common.Models.Team", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -317,9 +317,9 @@ namespace WebApp.Host.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.UserRefreshToken", b =>
+            modelBuilder.Entity("WebApp.Common.Models.UserRefreshToken", b =>
                 {
-                    b.HasOne("WebApp.SharedKernel.Models.User", "User")
+                    b.HasOne("WebApp.Common.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -329,11 +329,11 @@ namespace WebApp.Host.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApp.SharedKernel.Models.UserVerificationToken", b =>
+            modelBuilder.Entity("WebApp.Common.Models.UserVerificationToken", b =>
                 {
-                    b.HasOne("WebApp.SharedKernel.Models.User", "User")
+                    b.HasOne("WebApp.Common.Models.User", "User")
                         .WithOne()
-                        .HasForeignKey("WebApp.SharedKernel.Models.UserVerificationToken", "UserId")
+                        .HasForeignKey("WebApp.Common.Models.UserVerificationToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_verification_tokens_users_user_id");

@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using FastEndpoints;
 using Riok.Mapperly.Abstractions;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Features.Teams.GetMany;
-using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Teams.GetMany;
 

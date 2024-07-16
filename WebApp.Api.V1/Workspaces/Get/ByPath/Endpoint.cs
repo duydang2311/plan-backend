@@ -2,9 +2,9 @@ using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Constants;
 using WebApp.Features.Workspaces.Get;
-using WebApp.SharedKernel.Constants;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Workspaces.Get.ByPath;
 

@@ -2,10 +2,10 @@ using FastEndpoints;
 using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Teams.Create;
 

@@ -1,9 +1,9 @@
 using System.Linq.Dynamic.Core;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Teams.GetMany;
 

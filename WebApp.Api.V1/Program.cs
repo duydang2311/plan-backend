@@ -8,11 +8,11 @@ using Microsoft.IdentityModel.Tokens;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Commons.Converters;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.SharedKernel.Mails.Abstractions;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
-using WebApp.SharedKernel.Persistence.Abstractions;
+using WebApp.Infrastructure.Mails.Abstractions;
+using WebApp.Infrastructure.Persistence;
+using WebApp.Infrastructure.Persistence.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 

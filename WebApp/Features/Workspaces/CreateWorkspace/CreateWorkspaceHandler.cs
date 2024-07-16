@@ -3,10 +3,10 @@ using FluentValidation.Results;
 using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
-using WebApp.SharedKernel.Helpers;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Workspaces.CreateWorkspace;
 

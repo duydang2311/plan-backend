@@ -2,8 +2,8 @@ using Casbin;
 using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Common.Constants;
 using WebApp.Features.Teams.GetOne;
-using WebApp.SharedKernel.Constants;
 
 namespace WebApp.Api.V1.Teams.GetOne.ById;
 

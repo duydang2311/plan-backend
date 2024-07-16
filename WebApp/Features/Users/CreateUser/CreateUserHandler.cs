@@ -2,11 +2,11 @@ using System.Security.Cryptography;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Common.Hashers.Abstractions;
+using WebApp.Common.Helpers;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.SharedKernel.Hashers.Abstractions;
-using WebApp.SharedKernel.Helpers;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Users.CreateUser;
 

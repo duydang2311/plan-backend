@@ -3,10 +3,10 @@ using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Features.Teams.GetOne;
-using WebApp.SharedKernel.Constants;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Teams.GetOne.ByIdentifier;
 

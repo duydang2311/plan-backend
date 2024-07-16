@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using WebApp.SharedKernel.Persistence;
-using WebApp.SharedKernel.Persistence.Abstractions;
+using WebApp.Infrastructure.Persistence;
+using WebApp.Infrastructure.Persistence.Abstractions;
 
 namespace WebApp.Host.Persistence;
 

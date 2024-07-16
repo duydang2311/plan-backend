@@ -4,11 +4,11 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
+using WebApp.Common.Hashers.Abstractions;
+using WebApp.Common.Jwts.Abstractions;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.SharedKernel.Hashers.Abstractions;
-using WebApp.SharedKernel.Jwts.Abstractions;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Tokens.Authenticate;
 

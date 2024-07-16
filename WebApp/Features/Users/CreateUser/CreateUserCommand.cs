@@ -1,6 +1,6 @@
 using FastEndpoints;
 using OneOf;
-using WebApp.SharedKernel.Models;
+using WebApp.Common.Models;
 
 namespace WebApp.Features.Users.CreateUser;
 

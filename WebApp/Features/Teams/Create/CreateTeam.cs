@@ -1,7 +1,7 @@
 using FastEndpoints;
 using OneOf;
+using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.SharedKernel.Models;
 
 namespace WebApp.Features.Teams.Create;
 

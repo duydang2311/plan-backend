@@ -4,9 +4,9 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
-using WebApp.SharedKernel.Jwts.Abstractions;
-using WebApp.SharedKernel.Models;
-using WebApp.SharedKernel.Persistence;
+using WebApp.Common.Jwts.Abstractions;
+using WebApp.Common.Models;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Tokens.Refresh;
 

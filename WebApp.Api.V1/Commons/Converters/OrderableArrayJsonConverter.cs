@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
-using WebApp.SharedKernel.Models;
+using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.Commons.Converters;
 
@@ -18,9 +18,9 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
                 {
                     if (x![0] == '-')
                     {
-                        return new Orderable { Name = x[1..].Trim(), Order = SharedKernel.Constants.Order.Descending };
+                        return new Orderable { Name = x[1..].Trim(), Order = Common.Constants.Order.Descending };
                     }
-                    return new Orderable { Name = x.Trim(), Order = SharedKernel.Constants.Order.Ascending };
+                    return new Orderable { Name = x.Trim(), Order = Common.Constants.Order.Ascending };
                 })
                 .ToArray() ?? [];
     }
@@ -28,10 +28,7 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
     public override void Write(Utf8JsonWriter writer, Orderable[] value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(
-            string.Join(
-                ',',
-                value.Select(x => x.Order == SharedKernel.Constants.Order.Ascending ? x.Name : '-' + x.Name)
-            )
+            string.Join(',', value.Select(x => x.Order == Common.Constants.Order.Ascending ? x.Name : '-' + x.Name))
         );
     }
 
@@ -47,9 +44,9 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
                 {
                     if (x![0] == '-')
                     {
-                        return new Orderable { Name = x[1..].Trim(), Order = SharedKernel.Constants.Order.Descending };
+                        return new Orderable { Name = x[1..].Trim(), Order = Common.Constants.Order.Descending };
                     }
-                    return new Orderable { Name = x.Trim(), Order = SharedKernel.Constants.Order.Ascending };
+                    return new Orderable { Name = x.Trim(), Order = Common.Constants.Order.Ascending };
                 })
                 .ToArray() ?? []
         );

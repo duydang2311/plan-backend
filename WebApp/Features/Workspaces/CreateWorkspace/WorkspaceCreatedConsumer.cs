@@ -1,7 +1,7 @@
 using Casbin;
 using MassTransit;
+using WebApp.Common.Constants;
 using WebApp.Domain.Events;
-using WebApp.SharedKernel.Constants;
 
 namespace WebApp.Features.Workspaces.CreateWorkspace;
 
