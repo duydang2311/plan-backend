@@ -1,8 +1,8 @@
 using Casbin;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Constants;
-using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Workspaces.HasWorkspace;

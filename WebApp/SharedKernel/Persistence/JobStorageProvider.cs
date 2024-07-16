@@ -1,6 +1,6 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.SharedKernel.Persistence;
 

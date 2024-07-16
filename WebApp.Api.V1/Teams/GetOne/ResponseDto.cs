@@ -1,5 +1,5 @@
 using NodaTime;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Teams.GetOne;
 

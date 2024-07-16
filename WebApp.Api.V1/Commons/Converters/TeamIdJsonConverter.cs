@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Commons.Converters;
 

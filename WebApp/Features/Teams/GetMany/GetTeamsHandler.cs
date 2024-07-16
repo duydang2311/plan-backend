@@ -1,6 +1,7 @@
 using System.Linq.Dynamic.Core;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 

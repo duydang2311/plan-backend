@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.SharedKernel.Persistence.Configurations;
 

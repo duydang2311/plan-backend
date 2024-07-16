@@ -14,7 +14,7 @@ public sealed record Request
     public Guid UserId { get; init; }
 
     public string? QualifiedName => Name?.Trim();
-    public string? QualifiedIdentifier => Identifier?.Trim();
+    public string? QualifiedIdentifier => Identifier?.Trim().ToUpperInvariant();
 }
 
 public sealed class RequestValidator : Validator<Request>

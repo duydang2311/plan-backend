@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.SharedKernel.Persistence.Configurations;
 

@@ -2,9 +2,9 @@ using Casbin;
 using FastEndpoints;
 using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Domain.Entities;
 using WebApp.Features.Teams.Create;
 using WebApp.SharedKernel.Constants;
-using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Teams.Create;
 

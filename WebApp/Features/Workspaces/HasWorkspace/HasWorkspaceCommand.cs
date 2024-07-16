@@ -1,5 +1,5 @@
 using FastEndpoints;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Features.Workspaces.HasWorkspace;
 

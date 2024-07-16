@@ -1,4 +1,4 @@
-namespace WebApp.SharedKernel.Models;
+namespace WebApp.Domain.Entities;
 
 public sealed record class UserVerificationToken
 {

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FastEndpoints;
 
-namespace WebApp.SharedKernel.Models;
+namespace WebApp.Domain.Entities;
 
 public sealed record class JobRecord : IJobStorageRecord
 {

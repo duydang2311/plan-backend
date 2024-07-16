@@ -4,6 +4,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Hashers.Abstractions;
 using WebApp.SharedKernel.Jwts.Abstractions;
 using WebApp.SharedKernel.Models;

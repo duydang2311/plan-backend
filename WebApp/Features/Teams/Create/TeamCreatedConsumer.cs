@@ -1,8 +1,8 @@
 using Casbin;
 using MassTransit;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.SharedKernel.Constants;
-using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Teams.Create;

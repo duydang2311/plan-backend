@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Hashers.Abstractions;
 using WebApp.SharedKernel.Helpers;
 using WebApp.SharedKernel.Models;

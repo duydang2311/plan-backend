@@ -3,7 +3,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Teams.GetOne;

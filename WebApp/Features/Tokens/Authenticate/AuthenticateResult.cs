@@ -1,4 +1,4 @@
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Features.Tokens.Authenticate;
 

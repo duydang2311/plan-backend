@@ -2,6 +2,7 @@ using FastEndpoints;
 using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;

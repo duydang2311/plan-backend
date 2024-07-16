@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Teams.GetOne.ById;
 

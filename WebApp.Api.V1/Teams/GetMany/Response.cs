@@ -1,5 +1,6 @@
 using NodaTime;
 using Riok.Mapperly.Abstractions;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Teams.GetMany;

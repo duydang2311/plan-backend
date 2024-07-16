@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using FastEndpoints;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Teams.GetOne.ByIdentifier;
 

@@ -1,4 +1,5 @@
 using FastEndpoints;
+using WebApp.Domain.Entities;
 using WebApp.SharedKernel.Models;
 
 namespace WebApp.Features.Teams.GetMany;

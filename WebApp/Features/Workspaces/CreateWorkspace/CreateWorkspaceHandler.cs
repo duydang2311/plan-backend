@@ -3,9 +3,9 @@ using FluentValidation.Results;
 using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.SharedKernel.Helpers;
-using WebApp.SharedKernel.Models;
 using WebApp.SharedKernel.Persistence;
 
 namespace WebApp.Features.Workspaces.CreateWorkspace;

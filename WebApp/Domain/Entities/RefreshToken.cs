@@ -1,4 +1,4 @@
-namespace WebApp.SharedKernel.Models;
+namespace WebApp.Domain.Entities;
 
 public readonly record struct RefreshToken(Guid Value)
 {

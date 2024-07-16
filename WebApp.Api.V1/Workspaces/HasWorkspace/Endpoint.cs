@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Domain.Entities;
 using WebApp.Features.Workspaces.HasWorkspace;
-using WebApp.SharedKernel.Models;
 
 namespace WebApp.Api.V1.Workspaces.HasWorkspace;
 

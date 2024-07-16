@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation.Results;
 using OneOf;
-using WebApp.SharedKernel.Models;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Features.Workspaces.CreateWorkspace;
 
