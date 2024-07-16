@@ -2,13 +2,14 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using FastEndpoints;
 using FluentValidation;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Workspaces.CreateWorkspace;
 
 public sealed record class Request(string? Name, string? Path)
 {
     [FromClaim(ClaimTypes.NameIdentifier)]
-    public Guid Sub { get; init; }
+    public UserId UserId { get; init; }
 }
 
 public sealed partial class RequestValidator : Validator<Request>

@@ -11,7 +11,7 @@ public sealed class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
         builder.ToTable("workspaces");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<WorkspaceIdToGuidConverter>().ValueGeneratedOnAdd();
+        builder.Property(x => x.Id).HasConversion<EntityIdToGuidConverter<WorkspaceId>>().ValueGeneratedOnAdd();
         builder.Property(x => x.Name).HasMaxLength(64);
         builder.Property(x => x.Path).HasMaxLength(64).UseCollation("case_insensitive");
 

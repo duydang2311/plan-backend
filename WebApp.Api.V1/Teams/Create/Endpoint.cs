@@ -37,8 +37,8 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 
         var oneOf = await new CreateTeam
         {
-            UserId = new UserId(req.UserId),
-            WorkspaceId = new WorkspaceId(req.WorkspaceId.Value),
+            UserId = req.UserId,
+            WorkspaceId = req.WorkspaceId.Value,
             Name = req.QualifiedName!,
             Identifier = req.QualifiedIdentifier!,
         }

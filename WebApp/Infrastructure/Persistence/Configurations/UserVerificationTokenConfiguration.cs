@@ -9,7 +9,7 @@ public sealed class UserVerificationTokenConfiguration : IEntityTypeConfiguratio
     public void Configure(EntityTypeBuilder<UserVerificationToken> builder)
     {
         builder.ToTable("user_verification_tokens");
-        builder.Property(x => x.UserId).HasConversion<UserIdToGuidConverter>();
+        builder.Property(x => x.UserId).HasConversion<EntityIdToGuidConverter<UserId>>();
         builder.Property(x => x.Token).ValueGeneratedOnAdd();
         builder
             .HasOne(x => x.User)

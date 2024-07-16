@@ -11,8 +11,8 @@ public sealed class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMembe
         builder.ToTable("team_members");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.TeamId).HasConversion<TeamIdToGuidConverter>();
-        builder.Property(x => x.MemberId).HasConversion<UserIdToGuidConverter>();
+        builder.Property(x => x.TeamId).HasConversion<EntityIdToGuidConverter<TeamId>>();
+        builder.Property(x => x.MemberId).HasConversion<EntityIdToGuidConverter<UserId>>();
 
         builder.HasKey(x => new { x.TeamId, x.MemberId });
         builder.HasOne(x => x.Team).WithMany().HasForeignKey(x => x.TeamId);

@@ -12,9 +12,11 @@ public static class IdHelper
         return new Guid(guidBytes);
     }
 
-    public static UserId NewUserId() => new(NewGuid());
+    public static UserId NewUserId() => new() { Value = NewGuid() };
 
-    public static WorkspaceId NewWorkspaceId() => new(NewGuid());
+    public static WorkspaceId NewWorkspaceId() => new() { Value = NewGuid() };
 
-    public static TeamId NewTeamId() => new(NewGuid());
+    public static TeamId NewTeamId() => new() { Value = NewGuid() };
+
+    public static TeamId NewIssueId() => new() { Value = NewGuid() };
 }

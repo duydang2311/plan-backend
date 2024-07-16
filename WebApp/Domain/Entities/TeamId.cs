@@ -1,8 +1,10 @@
 namespace WebApp.Domain.Entities;
 
-public readonly record struct TeamId(Guid Value)
+public readonly record struct TeamId : IEntityId
 {
-    public static readonly TeamId Empty = new(Guid.Empty);
+    public Guid Value { get; init; }
+
+    public static readonly TeamId Empty = new() { Value = Guid.Empty };
 
     public override string ToString()
     {

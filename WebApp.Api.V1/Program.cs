@@ -70,11 +70,12 @@ builder.Services.AddPersistence(persistenceOptions).AddHashers().AddJwts().AddMa
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-    x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
-    x.SerializerOptions.Converters.Add(new UserIdJsonConverter());
-    x.SerializerOptions.Converters.Add(new WorkspaceIdJsonConverter());
-    x.SerializerOptions.Converters.Add(new TeamIdJsonConverter());
     x.SerializerOptions.Converters.Add(new OrderableArrayJsonConverter());
+    x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<IssueId>());
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -124,11 +125,12 @@ app.UseFastEndpoints(
             config.IndicateErrorCode = true;
         });
         config.Errors.ProducesMetadataType = typeof(ProblemDetails);
-        config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
-        config.Binding.ValueParserFor<UserId>(UserIdJsonConverter.ValueParser);
-        config.Binding.ValueParserFor<WorkspaceId>(WorkspaceIdJsonConverter.ValueParser);
-        config.Binding.ValueParserFor<TeamId>(TeamIdJsonConverter.ValueParser);
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
+        config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
+        config.Binding.ValueParserFor<UserId>(EntityIdJsonConverter<UserId>.ValueParser);
+        config.Binding.ValueParserFor<WorkspaceId>(EntityIdJsonConverter<WorkspaceId>.ValueParser);
+        config.Binding.ValueParserFor<TeamId>(EntityIdJsonConverter<TeamId>.ValueParser);
+        config.Binding.ValueParserFor<IssueId>(EntityIdJsonConverter<IssueId>.ValueParser);
     }
 );
 app.MapDefaultEndpoints();

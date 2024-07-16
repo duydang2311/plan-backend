@@ -1,6 +1,5 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
-using WebApp.Domain.Entities;
 using WebApp.Features.Workspaces.CreateWorkspace;
 
 namespace WebApp.Api.V1.Workspaces.CreateWorkspace;
@@ -18,7 +17,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
-        var oneOf = await new CreateWorkspaceCommand(new UserId(req.Sub), req.Name!, req.Path!)
+        var oneOf = await new CreateWorkspaceCommand(req.UserId, req.Name!, req.Path!)
             .ExecuteAsync(ct)
             .ConfigureAwait(false);
         return oneOf.Match<Results>(

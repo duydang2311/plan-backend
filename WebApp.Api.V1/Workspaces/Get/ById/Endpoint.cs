@@ -2,7 +2,6 @@ using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Common.Constants;
-using WebApp.Domain.Entities;
 using WebApp.Features.Workspaces.Get;
 
 namespace WebApp.Api.V1.Workspaces.Get.ById;
@@ -34,7 +33,7 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
             return TypedResults.Forbid();
         }
 
-        var oneOf = await new GetWorkspace { WorkspaceId = new WorkspaceId(req.WorkspaceId), Select = req.Select, }
+        var oneOf = await new GetWorkspace { WorkspaceId = req.WorkspaceId, Select = req.Select, }
             .ExecuteAsync(ct)
             .ConfigureAwait(false);
 

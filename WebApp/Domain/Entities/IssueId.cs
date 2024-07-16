@@ -1,10 +1,10 @@
 namespace WebApp.Domain.Entities;
 
-public readonly record struct UserId : IEntityId
+public readonly record struct IssueId : IEntityId
 {
     public Guid Value { get; init; }
 
-    public static readonly UserId Empty = new() { Value = Guid.Empty };
+    public static readonly IssueId Empty = new() { Value = Guid.Empty };
 
     public override string ToString()
     {

@@ -11,7 +11,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("users");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<UserIdToGuidConverter>().ValueGeneratedOnAdd();
+        builder.Property(x => x.Id).HasConversion<EntityIdToGuidConverter<UserId>>().ValueGeneratedOnAdd();
         builder.Property(x => x.Email).HasMaxLength(254);
         builder.Property(x => x.Salt);
         builder.Property(x => x.PasswordHash);
