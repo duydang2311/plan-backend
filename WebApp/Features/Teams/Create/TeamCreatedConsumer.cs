@@ -11,12 +11,12 @@ public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforc
 {
     public Task Consume(ConsumeContext<TeamCreated> context)
     {
-        enforcer.AddPolicy(
-            context.Message.UserId.ToString(),
-            string.Empty,
-            context.Message.Team.Id.ToString(),
-            Permit.Read
-        );
+        var sUserId = context.Message.UserId.ToString();
+        var sTeamId = context.Message.Team.Id.ToString();
+        enforcer.AddPolicy(sUserId, string.Empty, sTeamId, Permit.Read);
+        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.Read);
+        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CreateIssue);
+        enforcer.AddGroupingPolicy(sUserId, "member", sTeamId);
         dbContext.Add(new TeamMember { Team = context.Message.Team, MemberId = context.Message.UserId });
         return Task.CompletedTask;
     }
