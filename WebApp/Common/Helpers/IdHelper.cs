@@ -18,5 +18,5 @@ public static class IdHelper
 
     public static TeamId NewTeamId() => new() { Value = NewGuid() };
 
-    public static TeamId NewIssueId() => new() { Value = NewGuid() };
+    public static IssueId NewIssueId() => new() { Value = NewGuid() };
 }
