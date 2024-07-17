@@ -16,5 +16,6 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
 
         builder.HasKey(x => x.Id);
         builder.HasOne(x => x.Team).WithMany().HasForeignKey(x => x.TeamId);
+        builder.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
     }
 }
