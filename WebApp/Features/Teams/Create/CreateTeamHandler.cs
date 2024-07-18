@@ -40,7 +40,6 @@ public sealed class CreateTeamHandler(AppDbContext dbContext, IScopedMediator me
             Name = command.Name,
         };
         dbContext.Add(team);
-        Console.WriteLine("CreateTeamHandler: " + command.Identifier);
 
         await mediator.Publish(new TeamCreated { Team = team, UserId = command.UserId }, ct).ConfigureAwait(true);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(true);
