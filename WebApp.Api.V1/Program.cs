@@ -131,6 +131,10 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<WorkspaceId>(EntityIdJsonConverter<WorkspaceId>.ValueParser);
         config.Binding.ValueParserFor<TeamId>(EntityIdJsonConverter<TeamId>.ValueParser);
         config.Binding.ValueParserFor<IssueId>(EntityIdJsonConverter<IssueId>.ValueParser);
+        config.Binding.ValueParserFor<UserId?>(NullableEntityIdJsonConverter<UserId>.ValueParser);
+        config.Binding.ValueParserFor<WorkspaceId?>(NullableEntityIdJsonConverter<WorkspaceId>.ValueParser);
+        config.Binding.ValueParserFor<TeamId?>(NullableEntityIdJsonConverter<TeamId>.ValueParser);
+        config.Binding.ValueParserFor<IssueId?>(NullableEntityIdJsonConverter<IssueId>.ValueParser);
     }
 );
 app.MapDefaultEndpoints();

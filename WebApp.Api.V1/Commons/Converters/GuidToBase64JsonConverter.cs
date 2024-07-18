@@ -44,8 +44,17 @@ public sealed class GuidToBase64JsonConverter : JsonConverter<Guid>
         return new Guid(bytes);
     }
 
-    public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options) =>
-        writer.WriteStringValue(Base64UrlTextEncoder.Encode(value.ToByteArray()));
+    public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)
+    {
+        if (value == Guid.Empty)
+        {
+            writer.WriteNullValue();
+        }
+        else
+        {
+            writer.WriteStringValue(Base64UrlTextEncoder.Encode(value.ToByteArray()));
+        }
+    }
 
     public static ParseResult ValueParser(object? x)
     {
