@@ -11,6 +11,7 @@ public sealed record Issue
     public User Author { get; init; } = null!;
     public TeamId TeamId { get; init; }
     public Team Team { get; init; } = null!;
+    public long OrderNumber { get; init; }
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
 }
