@@ -19,7 +19,7 @@ public sealed class GetIssueHandler(AppDbContext dbContext) : ICommandHandler<Ge
         }
         else if (command.TeamId.HasValue && command.OrderNumber.HasValue)
         {
-            query = query.Where(x => x.TeamId == command.TeamId && x.OrderNumber == command.OrderNumber);
+            query = query.Where(x => x.TeamId == command.TeamId.Value && x.OrderNumber == command.OrderNumber.Value);
         }
         else
         {
