@@ -29,6 +29,7 @@ public sealed class CreateIssueHandler(AppDbContext dbContext, IScopedMediator m
             .Publish(new IssueCreated { AuthorId = command.AuthorId, Issue = issue }, ct)
             .ConfigureAwait(false);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
+        Console.WriteLine(issue);
         return issue;
     }
 }

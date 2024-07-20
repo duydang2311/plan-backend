@@ -14,6 +14,7 @@ public sealed record Response : PaginatedList<Response.Item>
         public IssueId Id { get; init; }
         public UserId AuthorId { get; init; }
         public TeamId TeamId { get; init; }
+        public long OrderNumber { get; init; }
         public string Title { get; init; } = string.Empty;
         public string? Description { get; init; }
     }
