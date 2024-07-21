@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using OneOf;
 using System.Linq.Dynamic.Core;
+using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -28,7 +29,7 @@ public sealed class GetIssueHandler(AppDbContext dbContext) : ICommandHandler<Ge
 
         if (!string.IsNullOrEmpty(command.Select))
         {
-            query = query.Select<Issue>(command.Select);
+            query = query.Select(ExpressionHelper.New<Issue>(command.Select));
         }
 
         var issue = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);
