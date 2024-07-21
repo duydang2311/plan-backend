@@ -6,4 +6,5 @@ public sealed record IssueCreated
 {
     public required Issue Issue { get; init; }
     public required UserId AuthorId { get; init; }
+    public required TeamId TeamId { get; init; }
 }

@@ -26,7 +26,7 @@ public sealed class CreateIssueHandler(AppDbContext dbContext, IScopedMediator m
         };
         dbContext.Add(issue);
         await mediator
-            .Publish(new IssueCreated { AuthorId = command.AuthorId, Issue = issue }, ct)
+            .Publish(new IssueCreated { AuthorId = command.AuthorId, TeamId = command.TeamId, Issue = issue }, ct)
             .ConfigureAwait(false);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
         Console.WriteLine(issue);

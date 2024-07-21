@@ -1,13 +1,16 @@
 using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Domain.Entities;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Issues.GetOne.ById;
 
 using Results = Results<ForbidHttpResult, NotFound, Ok<Response>>;
 
-public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Results>
+public sealed class Endpoint(AppDbContext dbContext, IEnforcer enforcer) : Endpoint<Request, Results>
 {
     public override void Configure()
     {
@@ -18,7 +21,13 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Results>
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
-        if (!await enforcer.EnforceAsync(req.UserId.ToString(), string.Empty, req.IssueId.ToString(), Permit.Read))
+        var teamId = await dbContext.Issues
+            .Where(x => x.Id == req.IssueId)
+            .Select(x => x.TeamId)
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+
+        if (teamId == TeamId.Empty || !await enforcer.EnforceAsync(req.UserId.ToString(), teamId.ToString(), req.IssueId.ToString(), Permit.Read))
         {
             return TypedResults.Forbid();
         }
