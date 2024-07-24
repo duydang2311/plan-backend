@@ -16,6 +16,7 @@ public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforc
         enforcer.AddPolicy(sUserId, string.Empty, sTeamId, Permit.Read);
         enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.Read);
         enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CreateIssue);
+        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CommentIssue);
         enforcer.AddGroupingPolicy(sUserId, "member", sTeamId);
         dbContext.Add(new TeamMember { Team = context.Message.Team, MemberId = context.Message.UserId });
         return Task.CompletedTask;
