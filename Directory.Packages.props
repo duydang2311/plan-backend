@@ -6,6 +6,7 @@
     <PackageVersion Include="Casbin.NET" Version="2.9.0" />
     <PackageVersion Include="Casbin.NET.Adapter.EFCore" Version="2.5.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.2" />
     <PackageVersion Include="FastEndpoints" Version="5.27.0" />
     <PackageVersion Include="MailKit" Version="4.7.1" />
     <PackageVersion Include="MassTransit" Version="8.2.3" />
