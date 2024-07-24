@@ -1,5 +1,4 @@
 using Casbin.Persist.Adapter.EFCore;
-using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 
@@ -19,11 +18,5 @@ public sealed class AppDbContext(DbContextOptions options) : CasbinDbContext<int
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseExceptionProcessor();
     }
 }

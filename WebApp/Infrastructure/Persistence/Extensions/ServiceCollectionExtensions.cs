@@ -1,7 +1,7 @@
 using Casbin;
-using Casbin.Model;
 using Casbin.Persist;
 using Casbin.Persist.Adapter.EFCore;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
@@ -39,6 +39,7 @@ public static partial class ServiceCollectionExtensions
 #if DEBUG
             .EnableSensitiveDataLogging()
 #endif
-            .EnableDetailedErrors();
+            .EnableDetailedErrors()
+            .UseExceptionProcessor();
     }
 }
