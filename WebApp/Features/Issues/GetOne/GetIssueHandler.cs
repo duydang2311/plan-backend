@@ -29,7 +29,7 @@ public sealed class GetIssueHandler(AppDbContext dbContext) : ICommandHandler<Ge
 
         if (!string.IsNullOrEmpty(command.Select))
         {
-            query = query.Select(ExpressionHelper.New<Issue>(command.Select));
+            query = query.Select(ExpressionHelper.LambdaNew<Issue>(command.Select));
         }
 
         var issue = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);

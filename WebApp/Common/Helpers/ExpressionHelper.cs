@@ -4,7 +4,7 @@ namespace WebApp.Common.Helpers;
 
 public static class ExpressionHelper
 {
-    public static Expression<Func<T, T>> New<T>(string names)
+    public static Expression<Func<T, T>> LambdaNew<T>(string names)
     {
         var parameter = Expression.Parameter(typeof(T), "x");
         return Expression.Lambda<Func<T, T>>(Init(typeof(T), parameter, names), parameter);
