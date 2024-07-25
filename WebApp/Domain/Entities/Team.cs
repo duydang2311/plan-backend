@@ -14,4 +14,5 @@ public sealed record class Team
 
     // Relationships
     public ICollection<User> Members { get; set; } = null!;
+    public ICollection<Issue> Issues { get; set; } = null!;
 }
