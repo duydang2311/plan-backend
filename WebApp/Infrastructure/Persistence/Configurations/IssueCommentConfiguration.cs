@@ -11,7 +11,7 @@ public sealed class IssueCommentConfiguration : IEntityTypeConfiguration<IssueCo
         builder.ToTable("issue_comments");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<EntityIdToGuidConverter<IssueCommentId>>().ValueGeneratedOnAdd();
+        builder.Property(x => x.Id).HasConversion<EntityGuidConverter<IssueCommentId>>().ValueGeneratedOnAdd();
 
         builder.HasKey(x => x.Id);
         builder.HasOne(x => x.Issue).WithMany().HasForeignKey(x => x.IssueId);

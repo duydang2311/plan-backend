@@ -10,4 +10,6 @@ public sealed record TeamMember
     public Team Team { get; init; } = null!;
     public UserId MemberId { get; init; } = UserId.Empty;
     public User Member { get; init; } = null!;
+    public TeamRoleId RoleId { get; init; }
+    public TeamRole Role { get; init; } = null!;
 }

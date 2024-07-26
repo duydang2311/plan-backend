@@ -1,6 +1,6 @@
 namespace WebApp.Domain.Entities;
 
-public readonly record struct TeamId : IEntityId
+public readonly record struct TeamId : IEntityGuid
 {
     public Guid Value { get; init; }
 

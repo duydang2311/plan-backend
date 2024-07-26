@@ -5,8 +5,8 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Commons.Converters;
 
-public sealed class EntityIdJsonConverter<T> : JsonConverter<T>
-    where T : struct, IEntityId
+public sealed class EntityGuidJsonConverter<T> : JsonConverter<T>
+    where T : struct, IEntityGuid
 {
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

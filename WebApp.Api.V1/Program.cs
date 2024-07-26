@@ -72,10 +72,10 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
     x.SerializerOptions.Converters.Add(new OrderableArrayJsonConverter());
     x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<IssueId>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<UserId>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<WorkspaceId>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamId>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueId>());
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -127,14 +127,14 @@ app.UseFastEndpoints(
         config.Errors.ProducesMetadataType = typeof(ProblemDetails);
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
-        config.Binding.ValueParserFor<UserId>(EntityIdJsonConverter<UserId>.ValueParser);
-        config.Binding.ValueParserFor<WorkspaceId>(EntityIdJsonConverter<WorkspaceId>.ValueParser);
-        config.Binding.ValueParserFor<TeamId>(EntityIdJsonConverter<TeamId>.ValueParser);
-        config.Binding.ValueParserFor<IssueId>(EntityIdJsonConverter<IssueId>.ValueParser);
-        config.Binding.ValueParserFor<UserId?>(NullableEntityIdJsonConverter<UserId>.ValueParser);
-        config.Binding.ValueParserFor<WorkspaceId?>(NullableEntityIdJsonConverter<WorkspaceId>.ValueParser);
-        config.Binding.ValueParserFor<TeamId?>(NullableEntityIdJsonConverter<TeamId>.ValueParser);
-        config.Binding.ValueParserFor<IssueId?>(NullableEntityIdJsonConverter<IssueId>.ValueParser);
+        config.Binding.ValueParserFor<UserId>(EntityGuidJsonConverter<UserId>.ValueParser);
+        config.Binding.ValueParserFor<WorkspaceId>(EntityGuidJsonConverter<WorkspaceId>.ValueParser);
+        config.Binding.ValueParserFor<TeamId>(EntityGuidJsonConverter<TeamId>.ValueParser);
+        config.Binding.ValueParserFor<IssueId>(EntityGuidJsonConverter<IssueId>.ValueParser);
+        config.Binding.ValueParserFor<UserId?>(NullableEntityGuidJsonConverter<UserId>.ValueParser);
+        config.Binding.ValueParserFor<WorkspaceId?>(NullableEntityGuidJsonConverter<WorkspaceId>.ValueParser);
+        config.Binding.ValueParserFor<TeamId?>(NullableEntityGuidJsonConverter<TeamId>.ValueParser);
+        config.Binding.ValueParserFor<IssueId?>(NullableEntityGuidJsonConverter<IssueId>.ValueParser);
     }
 );
 app.MapDefaultEndpoints();

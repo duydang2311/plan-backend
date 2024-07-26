@@ -3,9 +3,9 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Persistence.Configurations;
 
-public sealed class EntityIdToGuidConverter<T> : ValueConverter<T, Guid>
-    where T : struct, IEntityId
+public sealed class EntityGuidConverter<T> : ValueConverter<T, Guid>
+    where T : struct, IEntityGuid
 {
-    public EntityIdToGuidConverter()
+    public EntityGuidConverter()
         : base(value => value.Value, (value) => new T { Value = value }) { }
 }

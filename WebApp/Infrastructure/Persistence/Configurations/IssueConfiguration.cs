@@ -11,7 +11,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.ToTable("issues");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<EntityIdToGuidConverter<IssueId>>().ValueGeneratedOnAdd();
+        builder.Property(x => x.Id).HasConversion<EntityGuidConverter<IssueId>>().ValueGeneratedOnAdd();
         builder.Property(x => x.Title).HasMaxLength(128);
 
         builder.HasKey(x => x.Id);

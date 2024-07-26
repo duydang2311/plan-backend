@@ -11,7 +11,7 @@ public sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
         builder.ToTable("teams");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<EntityIdToGuidConverter<TeamId>>().ValueGeneratedOnAdd();
+        builder.Property(x => x.Id).HasConversion<EntityGuidConverter<TeamId>>().ValueGeneratedOnAdd();
         builder.Property(x => x.Identifier).HasMaxLength(5).UseCollation("case_insensitive");
 
         builder.HasKey(x => x.Id);

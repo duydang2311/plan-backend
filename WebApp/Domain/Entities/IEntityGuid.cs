@@ -1,6 +1,6 @@
 namespace WebApp.Domain.Entities;
 
-public interface IEntityId
+public interface IEntityGuid
 {
     Guid Value { get; init; }
 }
