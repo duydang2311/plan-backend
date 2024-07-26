@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Constants;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.IssueComments.GetMany;
@@ -13,7 +14,9 @@ public sealed class Authorize : IPreProcessor<Request>
             !await dbContext
                 .TeamMembers.AnyAsync(
                     x =>
-                        x.MemberId == context.Request.UserId && x.Team.Issues.Any(x => x.Id == context.Request.IssueId),
+                        x.MemberId == context.Request.UserId
+                        && x.Team.Issues.Any(x => x.Id == context.Request.IssueId)
+                        && x.Role.Permissions.Any(x => x.Permission.Equals(Permit.ReadIssue)),
                     ct
                 )
                 .ConfigureAwait(false)
