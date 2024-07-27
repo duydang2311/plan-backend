@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using WebApp.Api.V1.Commons;
 using WebApp.Api.V1.Commons.Converters;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -76,6 +77,8 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<WorkspaceId>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamId>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueId>());
+    // x.SerializerOptions.Converters.Add(new PatchJsonConverter());
+    x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
