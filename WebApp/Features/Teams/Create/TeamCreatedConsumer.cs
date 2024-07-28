@@ -27,6 +27,7 @@ public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforc
                 RoleId = new TeamRoleId { Value = TeamRoleDefaults.Admin.Id }
             }
         );
+        dbContext.Add(new SharedCounter { Id = context.Message.Team.Id.Value });
         return Task.CompletedTask;
     }
 }
