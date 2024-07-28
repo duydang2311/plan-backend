@@ -12,7 +12,9 @@ public sealed record Response : PaginatedList<Response.Item>
         public Instant CreatedTime { get; init; }
         public Instant UpdatedTime { get; init; }
         public IssueCommentId Id { get; init; }
+        public UserId AuthorId { get; init; }
         public User? Author { get; init; }
+        public IssueId IssueId { get; init; }
         public Issue? Issue { get; init; }
         public string Content { get; init; } = string.Empty;
     }
