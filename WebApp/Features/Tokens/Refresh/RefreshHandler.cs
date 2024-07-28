@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FastEndpoints;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
@@ -34,7 +35,7 @@ public sealed class RefreshHandler(IOptions<JwtOptions> options, IJwtService jwt
         var accessToken = jwtService.CreateToken(
             issuer: o.ValidIssuers.FirstOrDefault(),
             audience: o.ValidAudiences.FirstOrDefault(),
-            claims: [new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString("D"))],
+            claims: [new Claim(JwtRegisteredClaimNames.Sub, Base64UrlTextEncoder.Encode(user.Id.Value.ToByteArray()))],
             notBefore: now,
             expires: now.Add(accessTokenMaxAge),
             issuedAt: now
