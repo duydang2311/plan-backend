@@ -1,8 +1,9 @@
 using NodaTime;
+using WebApp.Common.Interfaces;
 
 namespace WebApp.Domain.Entities;
 
-public sealed record Issue
+public sealed record Issue : ISoftDelete
 {
     public Instant CreatedTime { get; init; }
     public Instant UpdatedTime { get; init; }
@@ -14,4 +15,6 @@ public sealed record Issue
     public long OrderNumber { get; init; }
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
+    public bool IsDeleted { get; init; }
+    public Instant? DeletedTime { get; init; }
 }
