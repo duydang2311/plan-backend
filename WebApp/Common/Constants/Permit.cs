@@ -12,4 +12,6 @@ public static class Permit
     public const string UpdateIssue = "issue:update";
     public const string DeleteIssue = "issue:delete";
     public const string CommentIssue = "issue:comment";
+
+    public const string DeleteIssueComment = "issue-comment:delete";
 }

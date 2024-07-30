@@ -14,7 +14,7 @@ public sealed class IssueCommentConfiguration : IEntityTypeConfiguration<IssueCo
         builder.Property(x => x.Id).HasConversion<EntityGuidConverter<IssueCommentId>>().ValueGeneratedOnAdd();
 
         builder.HasKey(x => x.Id);
-        builder.HasOne(x => x.Issue).WithMany().HasForeignKey(x => x.IssueId);
+        builder.HasOne(x => x.Issue).WithMany(x => x.Comments).HasForeignKey(x => x.IssueId);
         builder.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
         builder.HasIndex(x => x.IssueId);
         builder.HasQueryFilter(x => !x.Issue.IsDeleted);
