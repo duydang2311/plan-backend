@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using FastEndpoints;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
@@ -89,23 +88,6 @@ builder.Services.AddFastEndpoints(
             .Get<FastEndpointsOptions>();
         options.DisableAutoDiscovery = true;
         options.Assemblies = fastEndpointsOptions?.Assemblies?.Select(Assembly.Load).ToArray() ?? [];
-    }
-);
-
-builder.Services.AddMassTransit(
-    (x) =>
-    {
-        x.SetKebabCaseEndpointNameFormatter();
-        x.UsingInMemory(
-            (context, cfg) =>
-            {
-                cfg.ConfigureEndpoints(context);
-            }
-        );
-        x.AddMediator(cfg =>
-        {
-            cfg.AddConsumers(Assembly.Load("WebApp"));
-        });
     }
 );
 

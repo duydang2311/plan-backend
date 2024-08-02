@@ -1,6 +1,5 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
-using MassTransit.Mediator;
 using OneOf;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -11,7 +10,7 @@ namespace WebApp.Features.IssueComments.Create;
 
 using Result = OneOf<ValidationFailures, IssueComment>;
 
-public sealed class CreateIssueCommentHandler(AppDbContext dbContext, IScopedMediator mediator) : ICommandHandler<CreateIssueComment, Result>
+public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommandHandler<CreateIssueComment, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssueComment command, CancellationToken ct)
     {
@@ -22,7 +21,8 @@ public sealed class CreateIssueCommentHandler(AppDbContext dbContext, IScopedMed
             Content = command.Content,
         };
         dbContext.Add(comment);
-        await mediator.Publish(new IssueCommentCreated { IssueComment = comment }, ct)
+        await new IssueCommentCreated { IssueComment = comment }
+            .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
         try
         {
@@ -30,7 +30,11 @@ public sealed class CreateIssueCommentHandler(AppDbContext dbContext, IScopedMed
         }
         catch (ReferenceConstraintException exception)
         {
-            return ValidationFailures.Single(exception.ConstraintProperties[0], "Reference does not exist", "reference");
+            return ValidationFailures.Single(
+                exception.ConstraintProperties[0],
+                "Reference does not exist",
+                "reference"
+            );
         }
         return comment;
     }

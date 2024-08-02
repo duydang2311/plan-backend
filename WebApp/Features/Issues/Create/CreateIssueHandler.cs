@@ -1,5 +1,4 @@
 using FastEndpoints;
-using MassTransit.Mediator;
 using OneOf;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
@@ -11,7 +10,7 @@ namespace WebApp.Features.Issues.Create;
 
 using Result = OneOf<ValidationFailures, Issue>;
 
-public sealed class CreateIssueHandler(AppDbContext dbContext, IScopedMediator mediator)
+public sealed class CreateIssueHandler(AppDbContext dbContext, IServiceProvider serviceProvider)
     : ICommandHandler<CreateIssue, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssue command, CancellationToken ct)
@@ -25,16 +24,14 @@ public sealed class CreateIssueHandler(AppDbContext dbContext, IScopedMediator m
             Description = command.Description,
         };
         dbContext.Add(issue);
-        await mediator
-            .Publish(
-                new IssueCreated
-                {
-                    AuthorId = command.AuthorId,
-                    TeamId = command.TeamId,
-                    Issue = issue
-                },
-                ct
-            )
+        await new IssueCreated
+        {
+            ServiceProvider = serviceProvider,
+            AuthorId = command.AuthorId,
+            TeamId = command.TeamId,
+            Issue = issue
+        }
+            .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
         return issue;

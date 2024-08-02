@@ -1,7 +1,5 @@
 using FastEndpoints;
-using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
-using WebApp.Features.Teams.GetMany;
 
 namespace WebApp.Api.V1.Teams.GetMany;
 

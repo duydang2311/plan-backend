@@ -1,16 +1,17 @@
 using Casbin;
-using MassTransit;
+using FastEndpoints;
 using WebApp.Common.Constants;
 using WebApp.Domain.Events;
 
 namespace WebApp.Features.Workspaces.CreateWorkspace;
 
-public sealed class WorkspaceCreatedConsumer(IEnforcer enforcer) : IConsumer<WorkspaceCreated>
+public sealed class WorkspaceCreatedHandler : IEventHandler<WorkspaceCreated>
 {
-    public Task Consume(ConsumeContext<WorkspaceCreated> context)
+    public Task HandleAsync(WorkspaceCreated eventModel, CancellationToken ct)
     {
-        var sUserId = context.Message.UserId.ToString();
-        var sWorkspaceId = context.Message.Workspace.Id.ToString();
+        var enforcer = eventModel.ServiceProvider.GetRequiredService<IEnforcer>();
+        var sUserId = eventModel.UserId.ToString();
+        var sWorkspaceId = eventModel.Workspace.Id.ToString();
         enforcer.AddPolicy("admin", sWorkspaceId, sWorkspaceId, Permit.Read);
         enforcer.AddPolicy("admin", sWorkspaceId, sWorkspaceId, Permit.WriteTeam);
         enforcer.AddGroupingPolicy(sUserId, "admin", sWorkspaceId);

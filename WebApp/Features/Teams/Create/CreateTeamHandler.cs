@@ -1,5 +1,4 @@
 using FastEndpoints;
-using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using WebApp.Common.Models;
@@ -11,7 +10,7 @@ namespace WebApp.Features.Teams.Create;
 
 using Result = OneOf<ValidationFailures, Team>;
 
-public sealed class CreateTeamHandler(AppDbContext dbContext, IScopedMediator mediator)
+public sealed class CreateTeamHandler(AppDbContext dbContext, IServiceProvider serviceProvider)
     : ICommandHandler<CreateTeam, Result>
 {
     public async Task<Result> ExecuteAsync(CreateTeam command, CancellationToken ct)
@@ -41,7 +40,14 @@ public sealed class CreateTeamHandler(AppDbContext dbContext, IScopedMediator me
         };
         dbContext.Add(team);
 
-        await mediator.Publish(new TeamCreated { Team = team, UserId = command.UserId }, ct).ConfigureAwait(true);
+        await new TeamCreated
+        {
+            ServiceProvider = serviceProvider,
+            Team = team,
+            UserId = command.UserId
+        }
+            .PublishAsync(cancellation: ct)
+            .ConfigureAwait(true);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(true);
 
         return team;

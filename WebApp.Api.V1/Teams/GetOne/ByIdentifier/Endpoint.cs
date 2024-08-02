@@ -1,6 +1,5 @@
 using Casbin;
 using FastEndpoints;
-using MassTransit;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;

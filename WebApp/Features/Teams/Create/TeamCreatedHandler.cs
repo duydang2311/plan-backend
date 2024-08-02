@@ -1,5 +1,5 @@
 using Casbin;
-using MassTransit;
+using FastEndpoints;
 using WebApp.Common.Constants;
 using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
@@ -8,12 +8,16 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Teams.Create;
 
-public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforcer) : IConsumer<TeamCreated>
+public sealed class TeamCreatedHandler : IEventHandler<TeamCreated>
 {
-    public Task Consume(ConsumeContext<TeamCreated> context)
+    public Task HandleAsync(TeamCreated eventModel, CancellationToken ct)
     {
-        var sUserId = context.Message.UserId.ToString();
-        var sTeamId = context.Message.Team.Id.ToString();
+        var (dbContext, enforcer) = (
+            eventModel.ServiceProvider.GetRequiredService<AppDbContext>(),
+            eventModel.ServiceProvider.GetRequiredService<IEnforcer>()
+        );
+        var sUserId = eventModel.UserId.ToString();
+        var sTeamId = eventModel.Team.Id.ToString();
         enforcer.AddPolicy(sUserId, string.Empty, sTeamId, Permit.Read);
         enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.Read);
         enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CreateIssue);
@@ -22,12 +26,12 @@ public sealed class TeamCreatedConsumer(AppDbContext dbContext, IEnforcer enforc
         dbContext.Add(
             new TeamMember
             {
-                Team = context.Message.Team,
-                MemberId = context.Message.UserId,
+                Team = eventModel.Team,
+                MemberId = eventModel.UserId,
                 RoleId = new TeamRoleId { Value = TeamRoleDefaults.Admin.Id }
             }
         );
-        dbContext.Add(new SharedCounter { Id = context.Message.Team.Id.Value });
+        dbContext.Add(new SharedCounter { Id = eventModel.Team.Id.Value });
         return Task.CompletedTask;
     }
 }

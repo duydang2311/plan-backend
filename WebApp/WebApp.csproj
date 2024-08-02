@@ -15,7 +15,6 @@
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="JsonPatch.Net" />
     <PackageReference Include="MailKit" />
-    <PackageReference Include="MassTransit" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" />
     <PackageReference Include="NodaTime" />

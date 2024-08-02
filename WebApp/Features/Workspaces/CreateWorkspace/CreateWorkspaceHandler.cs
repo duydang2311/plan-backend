@@ -1,6 +1,5 @@
 using FastEndpoints;
 using FluentValidation.Results;
-using MassTransit.Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using WebApp.Common.Helpers;
@@ -12,7 +11,7 @@ namespace WebApp.Features.Workspaces.CreateWorkspace;
 
 using Result = OneOf<IReadOnlyList<ValidationFailure>, Workspace>;
 
-public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IScopedMediator mediator)
+public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IServiceProvider serviceProvider)
     : CommandHandler<CreateWorkspaceCommand, Result>
 {
     public override async Task<Result> ExecuteAsync(CreateWorkspaceCommand command, CancellationToken ct)
@@ -30,8 +29,13 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IScopedMediat
         };
         dbContext.Add(workspace);
 
-        await mediator
-            .Publish(new WorkspaceCreated { UserId = command.UserId, Workspace = workspace, }, ct)
+        await new WorkspaceCreated
+        {
+            ServiceProvider = serviceProvider,
+            UserId = command.UserId,
+            Workspace = workspace,
+        }
+            .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
 
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
