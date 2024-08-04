@@ -4,7 +4,6 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
-using NATS.Client.Core;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Commons;
@@ -22,18 +21,8 @@ var persistenceOptions =
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
 
-var natsOptions =
-    builder.Configuration.GetRequiredSection(NatsOptions.Section).Get<NatsOptions>()
-    ?? throw new InvalidOperationException("NatsOptions must be configured");
-
 builder.AddServiceDefaults();
 
-var natsOpts = NatsOpts.Default with
-{
-    Url = natsOptions.Url,
-    AuthOpts = NatsAuthOpts.Default with { Username = natsOptions.Username, Password = natsOptions.Password }
-};
-builder.Services.AddScoped<INatsConnection>(provider => new NatsConnection(natsOpts));
 builder
     .Services.AddOptions<NatsOptions>()
     .BindConfiguration(NatsOptions.Section)
@@ -84,7 +73,7 @@ builder
         }
     });
 
-builder.Services.AddPersistence(persistenceOptions).AddHashers().AddJwts().AddMails().AddAuthorization();
+builder.Services.AddPersistence(persistenceOptions).AddHashers().AddJwts().AddMails().AddAuthorization().AddNATS();
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
