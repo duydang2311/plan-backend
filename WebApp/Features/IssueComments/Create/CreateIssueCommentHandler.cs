@@ -10,7 +10,8 @@ namespace WebApp.Features.IssueComments.Create;
 
 using Result = OneOf<ValidationFailures, IssueComment>;
 
-public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommandHandler<CreateIssueComment, Result>
+public sealed class CreateIssueCommentHandler(IServiceProvider serviceProvider, AppDbContext dbContext)
+    : ICommandHandler<CreateIssueComment, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssueComment command, CancellationToken ct)
     {
@@ -21,7 +22,7 @@ public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommand
             Content = command.Content,
         };
         dbContext.Add(comment);
-        await new IssueCommentCreated { IssueComment = comment }
+        await new IssueCommentCreated { ServiceProvider = serviceProvider, IssueComment = comment }
             .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
         try

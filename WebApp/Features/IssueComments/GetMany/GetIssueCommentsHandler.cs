@@ -6,7 +6,8 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.IssueComments.GetMany;
 
-public sealed class GetIssueCommentsHandler(AppDbContext dbContext) : ICommandHandler<GetIssueComments, PaginatedList<IssueComment>>
+public sealed class GetIssueCommentsHandler(AppDbContext dbContext)
+    : ICommandHandler<GetIssueComments, PaginatedList<IssueComment>>
 {
     public async Task<PaginatedList<IssueComment>> ExecuteAsync(GetIssueComments command, CancellationToken ct)
     {
@@ -19,12 +20,8 @@ public sealed class GetIssueCommentsHandler(AppDbContext dbContext) : ICommandHa
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
         query = query.OrderBy(x => x.CreatedTime);
-        var items = await query.ToListAsync(ct).ConfigureAwait(false);
+        var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
 
-        return new()
-        {
-            Items = items,
-            TotalCount = totalCount,
-        };
+        return new() { Items = items, TotalCount = totalCount, };
     }
 }

@@ -4,6 +4,7 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
+using NATS.Client.Core;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Commons;
@@ -11,6 +12,7 @@ using WebApp.Api.V1.Commons.Converters;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Mails.Abstractions;
+using WebApp.Infrastructure.Nats.Abstractions;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 
@@ -20,7 +22,23 @@ var persistenceOptions =
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
 
+var natsOptions =
+    builder.Configuration.GetRequiredSection(NatsOptions.Section).Get<NatsOptions>()
+    ?? throw new InvalidOperationException("NatsOptions must be configured");
+
 builder.AddServiceDefaults();
+
+var natsOpts = NatsOpts.Default with
+{
+    Url = natsOptions.Url,
+    AuthOpts = NatsAuthOpts.Default with { Username = natsOptions.Username, Password = natsOptions.Password }
+};
+builder.Services.AddScoped<INatsConnection>(provider => new NatsConnection(natsOpts));
+builder
+    .Services.AddOptions<NatsOptions>()
+    .BindConfiguration(NatsOptions.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder
     .Services.AddOptions<FastEndpointsOptions>()
     .BindConfiguration(FastEndpointsOptions.Section)
