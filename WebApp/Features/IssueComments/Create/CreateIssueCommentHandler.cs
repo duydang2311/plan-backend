@@ -22,9 +22,6 @@ public sealed class CreateIssueCommentHandler(IServiceProvider serviceProvider, 
             Content = command.Content,
         };
         dbContext.Add(comment);
-        await new IssueCommentCreated { ServiceProvider = serviceProvider, IssueComment = comment }
-            .PublishAsync(cancellation: ct)
-            .ConfigureAwait(false);
         try
         {
             await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
@@ -37,6 +34,9 @@ public sealed class CreateIssueCommentHandler(IServiceProvider serviceProvider, 
                 "reference"
             );
         }
+        await new IssueCommentCreated { ServiceProvider = serviceProvider, IssueComment = comment }
+            .PublishAsync(cancellation: ct)
+            .ConfigureAwait(false);
         return comment;
     }
 }
