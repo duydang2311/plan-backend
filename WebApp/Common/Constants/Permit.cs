@@ -13,5 +13,6 @@ public static class Permit
     public const string DeleteIssue = "issue:delete";
     public const string CommentIssue = "issue:comment";
 
+    public const string ReadIssueComment = "issue-comment:read";
     public const string DeleteIssueComment = "issue-comment:delete";
 }
