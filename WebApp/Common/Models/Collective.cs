@@ -1,7 +1,4 @@
-using System.Text.Json.Serialization;
 using FastEndpoints;
-using Microsoft.AspNetCore.Mvc;
-using Riok.Mapperly.Abstractions;
 
 namespace WebApp.Common.Models;
 
@@ -9,6 +6,7 @@ public record Collective
 {
     private int page = 1;
     private int size = 20;
+    private int? offset;
 
     [QueryParam]
     public int Page
@@ -24,11 +22,13 @@ public record Collective
         set { size = value < 0 ? 0 : value; }
     }
 
-    [JsonIgnore]
-    [MapperIgnore]
-    public int Offset => (page - 1) * Size;
+    [QueryParam]
+    public int Offset
+    {
+        get => offset.GetValueOrDefault((page - 1) * Size);
+        set { offset = value < 0 ? 0 : value; }
+    }
 
-    [FromQuery]
     [BindFrom("order")]
     public Orderable[] Order { get; set; } = [];
 }
