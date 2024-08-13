@@ -33,12 +33,6 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
             .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
         var issues = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
-        return new()
-        {
-            Items = issues,
-            Size = command.Size,
-            Offset = command.Offset,
-            TotalCount = totalCount,
-        };
+        return new() { Items = issues, TotalCount = totalCount, };
     }
 }

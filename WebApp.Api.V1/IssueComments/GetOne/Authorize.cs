@@ -19,7 +19,6 @@ public sealed class Authorize : IPreProcessor<Request>
                 ct
             )
             .ConfigureAwait(false);
-        Console.WriteLine($"Authorize {context.Request} - Result: {canReadAsAMember}");
         if (!canReadAsAMember)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);

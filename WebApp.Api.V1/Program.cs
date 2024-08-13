@@ -84,6 +84,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamId>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueId>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueCommentId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamRoleId, int>());
     x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -116,7 +117,6 @@ app.UseFastEndpoints(
         {
             config.IndicateErrorCode = true;
         });
-        config.Errors.ProducesMetadataType = typeof(ProblemDetails);
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
         config.Binding.ValueParserFor<UserId>(EntityGuidJsonConverter<UserId>.ValueParser);
