@@ -20,7 +20,8 @@ public sealed record TeamRoleDefaults
     public static readonly TeamRoleDefaults Member =
         new(2, "Member", [.. Guest.Permissions, Permit.CreateIssue, Permit.CommentIssue]);
     public static readonly TeamRoleDefaults Manager = new(3, "Manager", [.. Member.Permissions]);
-    public static readonly TeamRoleDefaults Admin = new(4, "Administrator", [.. Manager.Permissions]);
+    public static readonly TeamRoleDefaults Admin =
+        new(4, "Administrator", [.. Manager.Permissions, Permit.UpdateTeamRole]);
 
     public static readonly TeamRoleDefaults[] Roles = [Guest, Member, Manager, Admin];
 }
