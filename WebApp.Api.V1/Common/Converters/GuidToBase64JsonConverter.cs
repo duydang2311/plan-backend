@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace WebApp.Api.V1.Commons.Converters;
+namespace WebApp.Api.V1.Common.Converters;
 
 public sealed class GuidToBase64JsonConverter : JsonConverter<Guid>
 {

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Api.V1.Commons.Converters;
+namespace WebApp.Api.V1.Common.Converters;
 
 public sealed class EntityGuidJsonConverter<T> : JsonConverter<T>
     where T : struct, IEntityGuid

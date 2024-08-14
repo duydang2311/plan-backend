@@ -1,7 +1,7 @@
 using FastEndpoints;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Api.V1.Commons.Converters;
+namespace WebApp.Api.V1.Common.Converters;
 
 public sealed class NullableEntityGuidJsonConverter<T>
     where T : struct, IEntityGuid

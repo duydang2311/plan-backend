@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using WebApp.Common.Models;
 
-namespace WebApp.Api.V1.Commons.Converters;
+namespace WebApp.Api.V1.Common.Converters;
 
 public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
 {
