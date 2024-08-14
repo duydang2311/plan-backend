@@ -21,21 +21,23 @@ public sealed class Endpoint(AppDbContext dbContext, IEnforcer enforcer) : Endpo
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
-        var teamId = await dbContext.Issues
-            .Where(x => x.Id == req.IssueId)
+        var teamId = await dbContext
+            .Issues.Where(x => x.Id == req.IssueId)
             .Select(x => x.TeamId)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
 
-        if (teamId == TeamId.Empty || !await enforcer.EnforceAsync(req.UserId.ToString(), teamId.ToString(), req.IssueId.ToString(), Permit.Read))
+        if (
+            teamId == TeamId.Empty
+            || !await enforcer
+                .EnforceAsync(req.UserId.ToString(), teamId.ToString(), req.IssueId.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }
 
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
-        return oneOf.Match<Results>(
-            (_) => TypedResults.NotFound(),
-            (issue) => TypedResults.Ok(issue.ToResponse())
-        );
+        return oneOf.Match<Results>((_) => TypedResults.NotFound(), (issue) => TypedResults.Ok(issue.ToResponse()));
     }
 }

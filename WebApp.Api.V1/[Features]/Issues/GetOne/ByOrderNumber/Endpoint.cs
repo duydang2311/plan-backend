@@ -21,8 +21,8 @@ public sealed class Endpoint(AppDbContext dbContext, IEnforcer enforcer) : Endpo
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
-        var issueId = await dbContext.Issues
-            .Where(x => x.TeamId == req.TeamId && x.OrderNumber == req.OrderNumber)
+        var issueId = await dbContext
+            .Issues.Where(x => x.TeamId == req.TeamId && x.OrderNumber == req.OrderNumber)
             .Select(x => x.Id)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
@@ -32,15 +32,16 @@ public sealed class Endpoint(AppDbContext dbContext, IEnforcer enforcer) : Endpo
             return TypedResults.NotFound();
         }
 
-        if (!await enforcer.EnforceAsync(req.UserId.ToString(), string.Empty, issueId.ToString(), Permit.Read))
+        if (
+            !await enforcer
+                .EnforceAsync(req.UserId.ToString(), string.Empty, issueId.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }
 
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
-        return oneOf.Match<Results>(
-            (_) => TypedResults.NotFound(),
-            (issue) => TypedResults.Ok(issue.ToResponse())
-        );
+        return oneOf.Match<Results>((_) => TypedResults.NotFound(), (issue) => TypedResults.Ok(issue.ToResponse()));
     }
 }

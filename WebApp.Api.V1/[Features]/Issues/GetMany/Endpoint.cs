@@ -23,7 +23,12 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Results>
             return TypedResults.Forbid();
         }
 
-        if (req.TeamId is not null && !await enforcer.EnforceAsync(req.UserId.ToString(), string.Empty, req.TeamId.ToString(), Permit.Read))
+        if (
+            req.TeamId is not null
+            && !await enforcer
+                .EnforceAsync(req.UserId.ToString(), string.Empty, req.TeamId.ToString(), Permit.Read)
+                .ConfigureAwait(false)
+        )
         {
             return TypedResults.Forbid();
         }
