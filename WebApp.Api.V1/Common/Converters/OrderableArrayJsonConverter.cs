@@ -5,6 +5,8 @@ using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.Common.Converters;
 
+using Order = WebApp.Common.Constants.Order;
+
 public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
 {
     public override Orderable[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -18,9 +20,9 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
                 {
                     if (x![0] == '-')
                     {
-                        return new Orderable { Name = x[1..].Trim(), Order = Common.Constants.Order.Descending };
+                        return new Orderable { Name = x[1..].Trim(), Order = Order.Descending };
                     }
-                    return new Orderable { Name = x.Trim(), Order = Common.Constants.Order.Ascending };
+                    return new Orderable { Name = x.Trim(), Order = Order.Ascending };
                 })
                 .ToArray() ?? [];
     }
@@ -28,7 +30,7 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
     public override void Write(Utf8JsonWriter writer, Orderable[] value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(
-            string.Join(',', value.Select(x => x.Order == Common.Constants.Order.Ascending ? x.Name : '-' + x.Name))
+            string.Join(',', value.Select(x => x.Order == Order.Ascending ? x.Name : '-' + x.Name))
         );
     }
 
@@ -44,9 +46,9 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
                 {
                     if (x![0] == '-')
                     {
-                        return new Orderable { Name = x[1..].Trim(), Order = Common.Constants.Order.Descending };
+                        return new Orderable { Name = x[1..].Trim(), Order = Order.Descending };
                     }
-                    return new Orderable { Name = x.Trim(), Order = Common.Constants.Order.Ascending };
+                    return new Orderable { Name = x.Trim(), Order = Order.Ascending };
                 })
                 .ToArray() ?? []
         );
