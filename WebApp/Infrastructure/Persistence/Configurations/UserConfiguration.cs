@@ -18,6 +18,6 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.IsVerified).HasDefaultValue(false);
 
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Email).IsUnique();
+        builder.HasIndex(x => x.Email).HasMethod("gin").HasOperators("gin_trgm_ops");
     }
 }
