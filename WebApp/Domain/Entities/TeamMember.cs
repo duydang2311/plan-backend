@@ -12,4 +12,6 @@ public sealed record TeamMember
     public User Member { get; init; } = null!;
     public TeamRoleId RoleId { get; init; }
     public TeamRole Role { get; init; } = null!;
+    public TeamInvitation? PendingInvitation { get; init; }
+    public bool IsInvitationPending => PendingInvitation is not null;
 }
