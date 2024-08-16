@@ -19,9 +19,10 @@ public sealed record TeamRoleDefaults
         new(1, "Guest", [Permit.ReadTeam, Permit.ReadIssue, Permit.ReadIssueComment]);
     public static readonly TeamRoleDefaults Member =
         new(2, "Member", [.. Guest.Permissions, Permit.CreateIssue, Permit.CommentIssue]);
-    public static readonly TeamRoleDefaults Manager = new(3, "Manager", [.. Member.Permissions]);
+    public static readonly TeamRoleDefaults Manager =
+        new(3, "Manager", [.. Member.Permissions, Permit.ReadTeamInvitation]);
     public static readonly TeamRoleDefaults Admin =
-        new(4, "Administrator", [.. Manager.Permissions, Permit.UpdateTeamRole]);
+        new(4, "Administrator", [.. Manager.Permissions, Permit.UpdateTeamRole, Permit.CreateTeamMember]);
 
     public static readonly TeamRoleDefaults[] Roles = [Guest, Member, Manager, Admin];
 }

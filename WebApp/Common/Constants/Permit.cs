@@ -17,4 +17,8 @@ public static class Permit
     public const string DeleteIssueComment = "issue-comment:delete";
 
     public const string UpdateTeamRole = "team-role:update";
+
+    public const string CreateTeamMember = "team-member:create";
+
+    public const string ReadTeamInvitation = "team-invitation:read";
 }

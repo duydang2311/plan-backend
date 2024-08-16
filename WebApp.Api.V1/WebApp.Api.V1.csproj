@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AnalyzerVersion>latest-Default</AnalyzerVersion>
     <UserSecretsId>80d5e6e3-1c8a-4cf4-a91b-817f5bfa6f30</UserSecretsId>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>

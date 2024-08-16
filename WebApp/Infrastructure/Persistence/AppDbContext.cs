@@ -15,6 +15,7 @@ public sealed class AppDbContext(DbContextOptions options) : CasbinDbContext<int
     public DbSet<Issue> Issues => Set<Issue>();
     public DbSet<IssueComment> IssueComments => Set<IssueComment>();
     public DbSet<TeamRole> TeamRoles => Set<TeamRole>();
+    public DbSet<TeamInvitation> TeamInvitations => Set<TeamInvitation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

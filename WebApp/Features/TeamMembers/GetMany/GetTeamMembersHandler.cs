@@ -14,7 +14,7 @@ public sealed class GetTeamMembersHandler(AppDbContext dbContext) : ICommandHand
 {
     public async Task<Result> ExecuteAsync(GetTeamMembers command, CancellationToken ct)
     {
-        var query = dbContext.TeamMembers.Where(x => x.TeamId == command.TeamId);
+        var query = dbContext.TeamMembers.Where(a => a.TeamId == command.TeamId);
         if (command.Select is not null)
         {
             query = query.Select(ExpressionHelper.LambdaNew<TeamMember>(command.Select));
@@ -22,10 +22,10 @@ public sealed class GetTeamMembersHandler(AppDbContext dbContext) : ICommandHand
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
         query = command
-            .Order.Where(static x =>
-                x.Name.EqualsEither(["CreatedTime", "UpdatedTime"], StringComparison.OrdinalIgnoreCase)
+            .Order.Where(static a =>
+                a.Name.EqualsEither(["CreatedTime", "UpdatedTime"], StringComparison.OrdinalIgnoreCase)
             )
-            .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
+            .SortOrDefault(query, a => a.OrderByDescending(x => x.CreatedTime));
         var teamMembers = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
         return new() { Items = teamMembers, TotalCount = totalCount, };
