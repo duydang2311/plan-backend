@@ -13,7 +13,7 @@ public sealed class CreateTeamInvitationHandler(AppDbContext db) : ICommandHandl
 {
     public async Task<Result> ExecuteAsync(CreateTeamInvitation command, CancellationToken ct)
     {
-        var teamInvitation = new TeamInvitation { TeamId = command.TeamId, UserId = command.MemberId, };
+        var teamInvitation = new TeamInvitation { TeamId = command.TeamId, MemberId = command.MemberId, };
         db.Add(teamInvitation);
         try
         {
