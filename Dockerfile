@@ -1,6 +1,6 @@
 FROM nats:latest
 
-ADD ./nats.conf /var/opt/nats.conf
+ADD nats-server.conf /nats-server.conf
 
 ENTRYPOINT [ "nats-server" ]
-CMD [ "-c", "/var/opt/nats.conf" ]
+CMD [ "--config", "/nats-server.conf"]
