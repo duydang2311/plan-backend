@@ -1,11 +1,18 @@
+using Microsoft.Extensions.Configuration;
+using WebApp.AppHost;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
+var mailerOptions =
+    builder.Configuration.GetSection(MailerOptions.Section).Get<MailerOptions>()
+    ?? throw new InvalidOperationException("MailerOptions must be configured");
+
+builder.AddContainer("nats", "nats", "latest").WithDockerfile("../").WithContainerRuntimeArgs("--network=host");
+
 builder
-    .AddContainer("nats", "nats", "latest")
-    .WithDockerfile("../")
-    .WithEndpoint(port: 4222, targetPort: 4222, name: "nats", scheme: "tcp")
-    .WithEndpoint(port: 4223, targetPort: 4223, name: "nats-ws", scheme: "tcp")
-    .WithEndpoint(port: 8222, targetPort: 8222, name: "nats-monitor", scheme: "http");
+    .AddContainer(mailerOptions.Name, mailerOptions.Image, mailerOptions.Tag)
+    .WithDockerfile(mailerOptions.DockerContextPath)
+    .WithContainerRuntimeArgs("--network=host");
 
 builder.AddProject<Projects.WebApp_Api_V1>("api-v1");
 
