@@ -17,4 +17,16 @@ public sealed record MailerOptions
 
     [Required]
     public required string DockerContextPath { get; init; }
+
+    [Required]
+    public required string ResendApiKey { get; init; }
+
+    [Required]
+    public required string NatsUrl { get; init; }
+
+    [Required]
+    public required string NatsUser { get; init; }
+
+    [Required]
+    public required string NatsPassword { get; init; }
 }
