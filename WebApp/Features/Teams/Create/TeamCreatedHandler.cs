@@ -28,7 +28,7 @@ public sealed class TeamCreatedHandler : IEventHandler<TeamCreated>
             {
                 Team = eventModel.Team,
                 MemberId = eventModel.UserId,
-                RoleId = new TeamRoleId { Value = TeamRoleDefaults.Admin.Id }
+                RoleId = TeamRoleDefaults.Admin.Id
             }
         );
         dbContext.Add(new SharedCounter { Id = eventModel.Team.Id.Value });

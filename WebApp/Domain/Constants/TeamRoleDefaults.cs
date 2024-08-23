@@ -1,14 +1,15 @@
 using WebApp.Common.Constants;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Domain.Constants;
 
 public sealed record TeamRoleDefaults
 {
-    public int Id { get; }
+    public TeamRoleId Id { get; }
     public string Name { get; }
     public string[] Permissions { get; }
 
-    private TeamRoleDefaults(int id, string name, string[] permissions)
+    private TeamRoleDefaults(TeamRoleId id, string name, string[] permissions)
     {
         Id = id;
         Name = name;
@@ -16,13 +17,17 @@ public sealed record TeamRoleDefaults
     }
 
     public static readonly TeamRoleDefaults Guest =
-        new(1, "Guest", [Permit.ReadTeam, Permit.ReadIssue, Permit.ReadIssueComment]);
+        new(new TeamRoleId { Value = 100 }, "Guest", [Permit.ReadTeam, Permit.ReadIssue, Permit.ReadIssueComment]);
     public static readonly TeamRoleDefaults Member =
-        new(2, "Member", [.. Guest.Permissions, Permit.CreateIssue, Permit.CommentIssue]);
+        new(new TeamRoleId { Value = 200 }, "Member", [.. Guest.Permissions, Permit.CreateIssue, Permit.CommentIssue]);
     public static readonly TeamRoleDefaults Manager =
-        new(3, "Manager", [.. Member.Permissions, Permit.ReadTeamInvitation]);
+        new(new TeamRoleId { Value = 300 }, "Manager", [.. Member.Permissions, Permit.ReadTeamInvitation]);
     public static readonly TeamRoleDefaults Admin =
-        new(4, "Administrator", [.. Manager.Permissions, Permit.UpdateTeamRole, Permit.CreateTeamMember]);
+        new(
+            new TeamRoleId { Value = 400 },
+            "Administrator",
+            [.. Manager.Permissions, Permit.UpdateTeamRole, Permit.CreateTeamMember]
+        );
 
     public static readonly TeamRoleDefaults[] Roles = [Guest, Member, Manager, Admin];
 }

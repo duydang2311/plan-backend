@@ -10,10 +10,12 @@ public sealed class TeamInvitationConfiguration : IEntityTypeConfiguration<TeamI
     {
         builder.ToTable("team_invitations");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
+        builder.Property(x => x.Id).HasConversion<EntityGuidConverter<TeamInvitationId>>().ValueGeneratedOnAdd();
         builder.Property(x => x.TeamId).HasConversion<EntityGuidConverter<TeamId>>().ValueGeneratedNever();
         builder.Property(x => x.MemberId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
 
-        builder.HasKey(a => new { a.TeamId, a.MemberId });
+        builder.HasKey(a => a.Id);
+        builder.HasIndex(a => new { a.TeamId, a.MemberId }).IsUnique();
         builder.HasOne(a => a.Team).WithMany().HasForeignKey(a => a.TeamId);
         builder.HasOne(a => a.Member).WithMany().HasForeignKey(a => a.MemberId);
         builder

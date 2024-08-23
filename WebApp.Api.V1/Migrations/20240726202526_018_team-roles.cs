@@ -71,7 +71,11 @@ namespace WebApp.Host.Migrations
 
             foreach (var role in TeamRoleDefaults.Roles)
             {
-                migrationBuilder.InsertData(table: "team_roles", columns: ["id", "name"], values: [role.Id, role.Name]);
+                migrationBuilder.InsertData(
+                    table: "team_roles",
+                    columns: ["id", "name"],
+                    values: [role.Id.Value, role.Name]
+                );
                 foreach (var permission in role.Permissions)
                 {
                     migrationBuilder.InsertData(
