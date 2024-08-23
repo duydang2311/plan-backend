@@ -19,6 +19,7 @@ public static class Permit
     public const string UpdateTeamRole = "team-role:update";
 
     public const string CreateTeamMember = "team-member:create";
+    public const string ReadTeamMember = "team-member:read";
 
     public const string ReadTeamInvitation = "team-invitation:read";
 }

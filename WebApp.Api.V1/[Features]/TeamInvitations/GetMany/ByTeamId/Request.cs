@@ -5,7 +5,7 @@ using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Features.TeamInvitations.GetMany;
 
-namespace WebApp.Api.V1.TeamInvitations.GetMany;
+namespace WebApp.Api.V1.TeamInvitations.GetMany.ByTeamId;
 
 public sealed record Request : Collective
 {

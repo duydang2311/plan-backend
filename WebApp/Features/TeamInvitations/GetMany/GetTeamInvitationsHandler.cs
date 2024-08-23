@@ -12,7 +12,16 @@ public sealed record GetTeamInvitationHandlers(AppDbContext db)
 {
     public async Task<PaginatedList<TeamInvitation>> ExecuteAsync(GetTeamInvitations command, CancellationToken ct)
     {
-        var query = db.TeamInvitations.Where(x => x.TeamId == command.TeamId);
+        var query = db.TeamInvitations.AsQueryable();
+
+        if (command.TeamId is not null)
+        {
+            query = query.Where(x => x.TeamId == command.TeamId);
+        }
+        if (command.MemberId is not null)
+        {
+            query = query.Where(x => x.MemberId == command.MemberId);
+        }
         if (!string.IsNullOrEmpty(command.Select))
         {
             query = query.Select(ExpressionHelper.LambdaNew<TeamInvitation>(command.Select));

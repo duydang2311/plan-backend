@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace WebApp.Api.V1.TeamInvitations.GetMany;
+namespace WebApp.Api.V1.TeamInvitations.GetMany.ByTeamId;
 
 using Results = Results<ForbidHttpResult, Ok<Response>>;
 
