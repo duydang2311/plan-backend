@@ -4,10 +4,11 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.TeamInvitations.Accept;
 
-public sealed class Authorize(AppDbContext db) : IPreProcessor<Request>
+public sealed class Authorize : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
+        var db = context.HttpContext.Resolve<AppDbContext>();
         var isSameUser = await db
             .TeamInvitations.AnyAsync(
                 a => a.Id == context.Request.TeamInvitationId && a.MemberId == context.Request.UserId,
