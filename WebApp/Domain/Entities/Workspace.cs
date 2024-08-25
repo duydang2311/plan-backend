@@ -9,4 +9,5 @@ public sealed record class Workspace
     public WorkspaceId Id { get; init; } = WorkspaceId.Empty;
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
+    public ICollection<WorkspaceFieldDefinition> FieldDefinitions { get; init; } = null!;
 }
