@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WebApp.Host.Migrations
 {
     /// <inheritdoc />
-    public partial class _027_workspaces_issues_status : Migration
+    public partial class _027_status : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,6 @@ namespace WebApp.Host.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    workspace_id = table.Column<Guid>(type: "uuid", nullable: true),
                     order = table.Column<int>(type: "integer", nullable: false),
                     value = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     color = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
@@ -33,11 +32,30 @@ namespace WebApp.Host.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_statuses", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "workspace_statuses",
+                columns: table => new
+                {
+                    status_id = table.Column<long>(type: "bigint", nullable: false),
+                    workspace_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_workspace_statuses", x => x.status_id);
                     table.ForeignKey(
-                        name: "fk_statuses_workspaces_workspace_id",
+                        name: "fk_workspace_statuses_statuses_status_id",
+                        column: x => x.status_id,
+                        principalTable: "statuses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_workspace_statuses_workspaces_workspace_id",
                         column: x => x.workspace_id,
                         principalTable: "workspaces",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -46,8 +64,8 @@ namespace WebApp.Host.Migrations
                 column: "status_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_statuses_workspace_id",
-                table: "statuses",
+                name: "ix_workspace_statuses_workspace_id",
+                table: "workspace_statuses",
                 column: "workspace_id");
 
             migrationBuilder.AddForeignKey(
@@ -64,6 +82,9 @@ namespace WebApp.Host.Migrations
             migrationBuilder.DropForeignKey(
                 name: "fk_issues_statuses_status_id",
                 table: "issues");
+
+            migrationBuilder.DropTable(
+                name: "workspace_statuses");
 
             migrationBuilder.DropTable(
                 name: "statuses");

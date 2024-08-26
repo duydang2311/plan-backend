@@ -13,8 +13,16 @@ public sealed class StatusConfiguration : IEntityTypeConfiguration<Status>
         builder.Property(a => a.Value).HasMaxLength(64);
         builder.Property(a => a.Color).HasMaxLength(16);
         builder.Property(a => a.Description).HasMaxLength(256);
+
         builder.HasKey(a => a.Id);
-        builder.HasOne(a => a.Workspace).WithMany(a => a.Statuses).HasForeignKey(a => a.WorkspaceId);
-        builder.HasMany<Issue>().WithOne(a => a.Status).HasForeignKey(a => a.StatusId);
+        builder
+            .HasMany<Workspace>()
+            .WithMany(a => a.Statuses)
+            .UsingEntity<WorkspaceStatus>(
+                "workspace_statuses",
+                l => l.HasOne(a => a.Workspace).WithMany().HasForeignKey(a => a.WorkspaceId),
+                r => r.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId),
+                j => j.HasKey(a => a.StatusId)
+            );
     }
 }

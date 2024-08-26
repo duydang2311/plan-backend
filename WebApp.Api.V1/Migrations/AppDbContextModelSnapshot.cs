@@ -308,15 +308,8 @@ namespace WebApp.Host.Migrations
                         .HasColumnType("character varying(64)")
                         .HasColumnName("value");
 
-                    b.Property<Guid?>("WorkspaceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("workspace_id");
-
                     b.HasKey("Id")
                         .HasName("pk_statuses");
-
-                    b.HasIndex("WorkspaceId")
-                        .HasDatabaseName("ix_statuses_workspace_id");
 
                     b.ToTable("statuses", (string)null);
                 });
@@ -653,6 +646,25 @@ namespace WebApp.Host.Migrations
                     b.ToTable("workspace_field_definitions", (string)null);
                 });
 
+            modelBuilder.Entity("workspace_statuses", b =>
+                {
+                    b.Property<long>("StatusId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("status_id");
+
+                    b.Property<Guid>("WorkspaceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("workspace_id");
+
+                    b.HasKey("StatusId")
+                        .HasName("pk_workspace_statuses");
+
+                    b.HasIndex("WorkspaceId")
+                        .HasDatabaseName("ix_workspace_statuses_workspace_id");
+
+                    b.ToTable("workspace_statuses", (string)null);
+                });
+
             modelBuilder.Entity("WebApp.Domain.Entities.IssueFieldBoolean", b =>
                 {
                     b.HasBaseType("WebApp.Domain.Entities.IssueField");
@@ -760,16 +772,6 @@ namespace WebApp.Host.Migrations
                         .HasConstraintName("fk_issue_fields_issues_issue_id");
 
                     b.Navigation("Issue");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.Status", b =>
-                {
-                    b.HasOne("WebApp.Domain.Entities.Workspace", "Workspace")
-                        .WithMany("Statuses")
-                        .HasForeignKey("WorkspaceId")
-                        .HasConstraintName("fk_statuses_workspaces_workspace_id");
-
-                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Team", b =>
@@ -888,6 +890,27 @@ namespace WebApp.Host.Migrations
                     b.Navigation("Workspace");
                 });
 
+            modelBuilder.Entity("workspace_statuses", b =>
+                {
+                    b.HasOne("WebApp.Domain.Entities.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_workspace_statuses_statuses_status_id");
+
+                    b.HasOne("WebApp.Domain.Entities.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_workspace_statuses_workspaces_workspace_id");
+
+                    b.Navigation("Status");
+
+                    b.Navigation("Workspace");
+                });
+
             modelBuilder.Entity("WebApp.Domain.Entities.Issue", b =>
                 {
                     b.Navigation("Comments");
@@ -913,8 +936,6 @@ namespace WebApp.Host.Migrations
             modelBuilder.Entity("WebApp.Domain.Entities.Workspace", b =>
                 {
                     b.Navigation("FieldDefinitions");
-
-                    b.Navigation("Statuses");
                 });
 #pragma warning restore 612, 618
         }
