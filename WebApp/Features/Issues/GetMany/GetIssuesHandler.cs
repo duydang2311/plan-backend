@@ -22,6 +22,12 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
             query = query.Select<Issue>(command.Select);
         }
 
+        IQueryable<IGrouping<StatusId?, Issue>>? statusGroupedQuery = default;
+        if (command.GroupByStatus == true)
+        {
+            statusGroupedQuery = query.GroupBy(a => a.StatusId);
+        }
+
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
         query = command
             .Order.Where(static x =>
@@ -31,7 +37,16 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
                 )
             )
             .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
-        var issues = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
+        var issues = statusGroupedQuery is not null
+            ? (
+                await statusGroupedQuery
+                    .Select(a => a.Skip(command.Offset).Take(command.Size))
+                    .ToArrayAsync(ct)
+                    .ConfigureAwait(false)
+            )
+                .SelectMany(a => a)
+                .ToArray()
+            : await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
         return new() { Items = issues, TotalCount = totalCount, };
     }

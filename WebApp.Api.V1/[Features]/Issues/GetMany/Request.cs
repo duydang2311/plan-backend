@@ -15,6 +15,9 @@ public sealed record Request : Collective
     [QueryParam]
     public string? Select { get; init; }
 
+    [QueryParam]
+    public bool? GroupByStatus { get; init; }
+
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId UserId { get; init; }
 }

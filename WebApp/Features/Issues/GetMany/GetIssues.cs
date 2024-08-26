@@ -8,4 +8,5 @@ public sealed record GetIssues : Collective, ICommand<PaginatedList<Issue>>
 {
     public TeamId? TeamId { get; init; }
     public string? Select { get; init; }
+    public bool? GroupByStatus { get; init; }
 }

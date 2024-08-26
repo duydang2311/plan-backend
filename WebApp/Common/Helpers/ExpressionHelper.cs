@@ -10,6 +10,13 @@ public static class ExpressionHelper
         return Expression.Lambda<Func<T, T>>(Init(typeof(T), parameter, names), parameter);
     }
 
+    public static Expression LambdaProperty<T>(string name)
+    {
+        var parameter = Expression.Parameter(typeof(T), "x");
+        var property = Expression.Property(parameter, typeof(T).GetProperty(name)!);
+        return Expression.Lambda(property, parameter);
+    }
+
     private static MemberInitExpression Init(Type type, Expression member, string names)
     {
         var processed = new HashSet<string>();
@@ -21,31 +28,32 @@ public static class ExpressionHelper
             switch (name.Split('.'))
             {
                 case [string Name]:
-                    {
-                        var property = type.GetProperty(Name)!;
-                        bindings.Add(Expression.Bind(property, Expression.Property(member, property)));
-                        break;
-                    }
+                {
+                    var property = type.GetProperty(Name)!;
+                    bindings.Add(Expression.Bind(property, Expression.Property(member, property)));
+                    break;
+                }
                 case [string Name, _]:
+                {
+                    if (processed.Contains(Name))
                     {
-                        if (processed.Contains(Name))
-                        {
-                            break;
-                        }
-                        processed.Add(Name);
-                        var property = type.GetProperty(Name)!;
-                        var format = $"{Name}.";
-                        var init = Init(
-                            property.PropertyType,
-                            Expression.Property(member, Name),
-                            string.Join(',', splits
-                                .Where(x => x.StartsWith(format))
-                                .Select(x => x.Substring(format.Length)))
-                        );
-
-                        bindings.Add(Expression.Bind(property, init));
                         break;
                     }
+                    processed.Add(Name);
+                    var property = type.GetProperty(Name)!;
+                    var format = $"{Name}.";
+                    var init = Init(
+                        property.PropertyType,
+                        Expression.Property(member, Name),
+                        string.Join(
+                            ',',
+                            splits.Where(x => x.StartsWith(format)).Select(x => x.Substring(format.Length))
+                        )
+                    );
+
+                    bindings.Add(Expression.Bind(property, init));
+                    break;
+                }
                 default:
                     throw new NotImplementedException();
             }

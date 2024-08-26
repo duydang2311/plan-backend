@@ -1,4 +1,5 @@
 using NodaTime;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Workspaces.Get;
 
@@ -9,4 +10,5 @@ public sealed record Response
     public Guid Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
+    public ICollection<Status> Statuses { get; init; } = null!;
 }
