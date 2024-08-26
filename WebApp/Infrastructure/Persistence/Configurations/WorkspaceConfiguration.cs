@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Persistence.Configurations;
