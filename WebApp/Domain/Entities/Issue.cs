@@ -17,6 +17,8 @@ public sealed record Issue : ISoftDelete
     public string? Description { get; init; }
     public bool IsDeleted { get; init; }
     public Instant? DeletedTime { get; init; }
+    public StatusId? StatusId { get; init; }
+    public Status? Status { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
 }
