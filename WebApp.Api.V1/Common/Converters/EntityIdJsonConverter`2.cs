@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FastEndpoints;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Common.Converters;
@@ -24,19 +23,4 @@ public sealed class EntityIdJsonConverter<TId, TValue> : JsonConverter<TId>
             value.Value,
             options
         );
-
-    public static ParseResult ValueParser(object? x)
-    {
-        if (x is null)
-        {
-            return new ParseResult(false, default);
-        }
-
-        if (x.GetType() == typeof(TValue))
-        {
-            return new ParseResult(true, new TId { Value = (TValue)x });
-        }
-
-        throw new NotImplementedException();
-    }
 }

@@ -16,7 +16,10 @@ public sealed record Request : Collective
     public string? Select { get; init; }
 
     [QueryParam]
-    public bool? GroupByStatus { get; init; }
+    public StatusId? StatusId { get; init; }
+
+    [QueryParam]
+    public bool? NullStatusId { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId UserId { get; init; }

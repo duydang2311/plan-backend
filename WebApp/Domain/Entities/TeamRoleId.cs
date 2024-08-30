@@ -12,4 +12,11 @@ public readonly record struct TeamRoleId : IEntityId<int>
     {
         return Value.ToString(CultureInfo.InvariantCulture);
     }
+
+    public static bool TryParse(string? input, out TeamRoleId output)
+    {
+        var ok = int.TryParse(input, CultureInfo.InvariantCulture, out var value);
+        output = ok ? new TeamRoleId { Value = value } : Empty;
+        return ok;
+    }
 }

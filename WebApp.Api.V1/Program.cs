@@ -86,6 +86,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueCommentId>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamRoleId, int>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamInvitationId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
     x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -125,14 +126,12 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<TeamId>(EntityGuidJsonConverter<TeamId>.ValueParser);
         config.Binding.ValueParserFor<IssueId>(EntityGuidJsonConverter<IssueId>.ValueParser);
         config.Binding.ValueParserFor<IssueCommentId>(EntityGuidJsonConverter<IssueCommentId>.ValueParser);
-        config.Binding.ValueParserFor<TeamRoleId>(EntityIdJsonConverter<TeamRoleId, int>.ValueParser);
         config.Binding.ValueParserFor<TeamInvitationId>(EntityGuidJsonConverter<TeamInvitationId>.ValueParser);
         config.Binding.ValueParserFor<UserId?>(NullableEntityGuidJsonConverter<UserId>.ValueParser);
         config.Binding.ValueParserFor<WorkspaceId?>(NullableEntityGuidJsonConverter<WorkspaceId>.ValueParser);
         config.Binding.ValueParserFor<TeamId?>(NullableEntityGuidJsonConverter<TeamId>.ValueParser);
         config.Binding.ValueParserFor<IssueId?>(NullableEntityGuidJsonConverter<IssueId>.ValueParser);
         config.Binding.ValueParserFor<IssueCommentId?>(NullableEntityGuidJsonConverter<IssueCommentId>.ValueParser);
-        config.Binding.ValueParserFor<TeamRoleId?>(NullableEntityIdJsonConverter<TeamRoleId, int>.ValueParser);
         config.Binding.ValueParserFor<TeamInvitationId?>(NullableEntityGuidJsonConverter<TeamInvitationId>.ValueParser);
     }
 );

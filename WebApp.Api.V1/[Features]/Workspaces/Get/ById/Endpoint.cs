@@ -39,17 +39,7 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 
         return oneOf.Match<Result>(
             (_) => TypedResults.NotFound(),
-            workspace =>
-                TypedResults.Ok(
-                    new Response
-                    {
-                        CreatedTime = workspace.CreatedTime,
-                        UpdatedTime = workspace.UpdatedTime,
-                        Id = workspace.Id.Value,
-                        Name = workspace.Name,
-                        Path = workspace.Path,
-                    }
-                )
+            workspace => TypedResults.Ok(workspace.ToResponse())
         );
     }
 }

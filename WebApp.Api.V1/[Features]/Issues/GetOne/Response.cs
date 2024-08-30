@@ -17,6 +17,7 @@ public sealed record Response
     public string? Description { get; init; }
     public StatusId? StatusId { get; init; }
     public Status? Status { get; init; }
+    public long OrderByStatus { get; init; }
 }
 
 [Mapper]

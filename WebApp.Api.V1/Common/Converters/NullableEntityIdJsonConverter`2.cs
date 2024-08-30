@@ -8,7 +8,6 @@ public sealed class NullableEntityIdJsonConverter<TId, TValue>
 {
     public static ParseResult ValueParser(object? x)
     {
-        var result = EntityIdJsonConverter<TId, TValue>.ValueParser(x);
-        return result.IsSuccess ? result : new ParseResult(true, null);
+        throw new NotImplementedException();
     }
 }

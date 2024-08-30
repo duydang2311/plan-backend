@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace WebApp.Common.Helpers;
 
@@ -15,6 +16,18 @@ public static class ExpressionHelper
         var parameter = Expression.Parameter(typeof(T), "x");
         var property = Expression.Property(parameter, typeof(T).GetProperty(name)!);
         return Expression.Lambda(property, parameter);
+    }
+
+    public static Expression<Func<T, T>> Append<T>(Expression<Func<T, T>>? left, Expression<Func<T, T>> right)
+    {
+        if (left is null)
+        {
+            return right;
+        }
+
+        var replace = new ReplacingExpressionVisitor(right.Parameters, [left.Body]);
+        var combined = replace.Visit(right.Body);
+        return Expression.Lambda<Func<T, T>>(combined, left.Parameters);
     }
 
     private static MemberInitExpression Init(Type type, Expression member, string names)

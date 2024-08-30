@@ -1,8 +1,8 @@
+using System.Linq.Dynamic.Core;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
-using OneOf.Types;
 using OneOf;
-using System.Linq.Dynamic.Core;
+using OneOf.Types;
 using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
