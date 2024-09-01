@@ -32,5 +32,6 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageVersion Include="Riok.Mapperly" Version="3.6.0" />
+    <PackageVersion Include="StringBetween" Version="1.0.0" />
   </ItemGroup>
 </Project>
