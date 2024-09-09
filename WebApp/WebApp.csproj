@@ -13,6 +13,7 @@
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
     <PackageReference Include="FastEndpoints" />
+    <PackageReference Include="Google.Apis.Auth" />
     <PackageReference Include="JsonPatch.Net" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
