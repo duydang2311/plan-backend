@@ -8,10 +8,11 @@ public sealed record class User
     public Instant UpdatedTime { get; init; }
     public UserId Id { get; init; } = UserId.Empty;
     public string Email { get; init; } = string.Empty;
-    public byte[] Salt { get; init; } = [];
-    public byte[] PasswordHash { get; init; } = [];
+    public byte[]? Salt { get; init; }
+    public byte[]? PasswordHash { get; init; }
     public bool IsVerified { get; init; }
 
     // Relationships
     public ICollection<Team> Teams { get; init; } = null!;
+    public UserGoogleAuth? GoogleAuth { get; init; } = null!;
 }
