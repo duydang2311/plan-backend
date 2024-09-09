@@ -1,59 +1,51 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FastEndpoints;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
-using WebApp.Common.Hashers.Abstractions;
 using WebApp.Common.Jwts.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
-namespace WebApp.Features.Tokens.Authenticate;
+namespace WebApp.Features.Tokens.Authenticate.WithGoogle;
 
-using Result = OneOf<IEnumerable<ValidationError>, AuthenticateResult>;
+using Result = OneOf<ValidationFailures, AuthenticateResult>;
 
-public sealed class AuthenticateHandler(
-    IOptions<JwtOptions> options,
-    IJwtService jwtService,
-    IHasher hasher,
-    AppDbContext dbContext
-) : ICommandHandler<AuthenticateCommand, Result>
+public sealed class AuthenticateWithGoogleHandler(IOptions<JwtOptions> options, IJwtService jwtService, AppDbContext db)
+    : ICommandHandler<AuthenticateWithGoogleCommand, Result>
 {
-    public async Task<Result> ExecuteAsync(AuthenticateCommand command, CancellationToken ct)
+    public async Task<Result> ExecuteAsync(AuthenticateWithGoogleCommand command, CancellationToken ct)
     {
-        var user = await dbContext
-            .Users.Where(a => EF.Functions.Collate(a.Email, "case_insensitive") == command.Email)
-            .Select(a => new
-            {
-                a.Id,
-                a.Salt,
-                a.PasswordHash
-            })
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(command.IdToken).ConfigureAwait(false);
+        }
+        catch (InvalidJwtException)
+        {
+            return ValidationFailures.Single("idToken", "Invalid token", "invalid");
+        }
+
+        var user = await db
+            .Users.Where(a => a.GoogleAuth != null && a.GoogleAuth.GoogleId.Equals(payload.Subject))
+            .Select(a => new { a.Id })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
 
         if (user is null)
         {
-            return new[] { new ValidationError("email", "Email is not found", "email_not_found"), };
-        }
-
-        if (!hasher.Verify(command.Password, user.PasswordHash, user.Salt))
-        {
-            return new[]
-            {
-                new ValidationError("email", "Authentication credentials is invalid", "invalid_credentials"),
-                new ValidationError("password", "Authentication credentials is invalid", "invalid_credentials")
-            };
+            return ValidationFailures.Single("user", "User has not been registered", "unregistered");
         }
 
         var userRefreshToken = new UserRefreshToken { UserId = user.Id };
-        dbContext.Add(userRefreshToken);
+        db.Add(userRefreshToken);
 
         var o = options.Value;
-        var task = dbContext.SaveChangesAsync(ct);
+        var task = db.SaveChangesAsync(ct);
         var now = DateTime.UtcNow;
         var accessTokenMaxAge = TimeSpan.FromMinutes(5);
         var accessToken = jwtService.CreateToken(
