@@ -88,6 +88,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamInvitationId>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
     x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -122,20 +123,23 @@ app.UseFastEndpoints(
         });
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
-        config.Binding.ValueParserFor<UserId>(EntityGuidJsonConverter<UserId>.ValueParser);
-        config.Binding.ValueParserFor<WorkspaceId>(EntityGuidJsonConverter<WorkspaceId>.ValueParser);
-        config.Binding.ValueParserFor<TeamId>(EntityGuidJsonConverter<TeamId>.ValueParser);
-        config.Binding.ValueParserFor<IssueId>(EntityGuidJsonConverter<IssueId>.ValueParser);
-        config.Binding.ValueParserFor<IssueCommentId>(EntityGuidJsonConverter<IssueCommentId>.ValueParser);
-        config.Binding.ValueParserFor<TeamInvitationId>(EntityGuidJsonConverter<TeamInvitationId>.ValueParser);
-        config.Binding.ValueParserFor<RefreshToken>(EntityGuidJsonConverter<RefreshToken>.ValueParser);
-        config.Binding.ValueParserFor<UserId?>(NullableEntityGuidJsonConverter<UserId>.ValueParser);
-        config.Binding.ValueParserFor<WorkspaceId?>(NullableEntityGuidJsonConverter<WorkspaceId>.ValueParser);
-        config.Binding.ValueParserFor<TeamId?>(NullableEntityGuidJsonConverter<TeamId>.ValueParser);
-        config.Binding.ValueParserFor<IssueId?>(NullableEntityGuidJsonConverter<IssueId>.ValueParser);
-        config.Binding.ValueParserFor<IssueCommentId?>(NullableEntityGuidJsonConverter<IssueCommentId>.ValueParser);
-        config.Binding.ValueParserFor<TeamInvitationId?>(NullableEntityGuidJsonConverter<TeamInvitationId>.ValueParser);
-        config.Binding.ValueParserFor<RefreshToken?>(NullableEntityGuidJsonConverter<RefreshToken>.ValueParser);
+        config.Binding.ValueParserFor<UserId>(EntityGuidJsonConverter<UserId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<WorkspaceId>(EntityGuidJsonConverter<WorkspaceId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<TeamId>(EntityGuidJsonConverter<TeamId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<IssueId>(EntityGuidJsonConverter<IssueId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<IssueCommentId>(
+            EntityGuidJsonConverter<IssueCommentId>.ValueParser,
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<TeamInvitationId>(
+            EntityGuidJsonConverter<TeamInvitationId>.ValueParser,
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<RefreshToken>(
+            EntityGuidJsonConverter<RefreshToken>.ValueParser,
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ProjectId>(EntityGuidJsonConverter<ProjectId>.ValueParser, handleNull: true);
     }
 );
 app.MapDefaultEndpoints();

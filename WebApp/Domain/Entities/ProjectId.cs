@@ -10,4 +10,17 @@ public readonly record struct ProjectId : IEntityGuid
     {
         return Value.ToString();
     }
+
+    public static bool TryParse(string? input, out ProjectId? output) //adhere to this signature
+    {
+        output = null;
+
+        if (Guid.TryParseExact(input, "D", out var guid))
+        {
+            return false;
+        }
+
+        output = new ProjectId { Value = guid };
+        return true;
+    }
 }
