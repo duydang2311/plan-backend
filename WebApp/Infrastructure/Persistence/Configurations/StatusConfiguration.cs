@@ -24,5 +24,14 @@ public sealed class StatusConfiguration : IEntityTypeConfiguration<Status>
                 r => r.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId),
                 j => j.HasKey(a => a.StatusId)
             );
+        builder
+            .HasMany<Project>()
+            .WithMany(a => a.Statuses)
+            .UsingEntity<ProjectStatus>(
+                "project_statuses",
+                l => l.HasOne(a => a.Project).WithMany().HasForeignKey(a => a.ProjectId),
+                r => r.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId),
+                j => j.HasKey(a => a.StatusId)
+            );
     }
 }
