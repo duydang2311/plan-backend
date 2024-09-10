@@ -21,7 +21,7 @@ public sealed class ValidationFailures
 
     public static ValidationFailures Single(string name, string message, string code)
     {
-        return new ValidationFailures { Failures = [new ValidationFailure(name, message, code)] };
+        return new ValidationFailures { Failures = [new ValidationFailure(name, message) { ErrorCode = code }] };
     }
 
     public ValidationFailures Add(string name, string message)
