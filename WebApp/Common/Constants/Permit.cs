@@ -22,4 +22,7 @@ public static class Permit
     public const string ReadTeamMember = "team-member:read";
 
     public const string ReadTeamInvitation = "team-invitation:read";
+
+    public const string CreateProject = "project:create";
+    public const string ReadProject = "project:read";
 }

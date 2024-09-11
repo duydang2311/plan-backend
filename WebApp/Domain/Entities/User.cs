@@ -15,4 +15,5 @@ public sealed record class User
     // Relationships
     public ICollection<Team> Teams { get; init; } = null!;
     public UserGoogleAuth? GoogleAuth { get; init; } = null!;
+    public ICollection<UserRole> Roles { get; init; } = null!;
 }

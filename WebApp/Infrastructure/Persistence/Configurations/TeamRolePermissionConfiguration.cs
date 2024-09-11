@@ -4,7 +4,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Persistence.Configurations;
 
-public sealed class MemberRolePermissionConfiguration : IEntityTypeConfiguration<TeamRolePermission>
+public sealed class TeamRolePermissionConfiguration : IEntityTypeConfiguration<TeamRolePermission>
 {
     public void Configure(EntityTypeBuilder<TeamRolePermission> builder)
     {
