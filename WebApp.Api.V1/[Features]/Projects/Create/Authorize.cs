@@ -16,7 +16,7 @@ public sealed class Authorize : IPreProcessor<Request>
                 a =>
                     a.Id == context.Request.UserId
                     && a.Roles.Any(a =>
-                        ((UserWorkspaceRole)a).WorkspaceId == context.Request.WorkspaceId
+                        ((WorkspaceMember)a).WorkspaceId == context.Request.WorkspaceId
                         && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.CreateProject))
                     ),
                 ct

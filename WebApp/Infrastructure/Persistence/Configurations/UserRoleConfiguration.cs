@@ -10,7 +10,7 @@ public sealed class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
     {
         builder.ToTable("user_roles");
         builder.Property(a => a.UserRoleId).HasConversion<EntityIdConverter<UserRoleId, long>>().ValueGeneratedOnAdd();
-        builder.UseTphMappingStrategy().HasDiscriminator<string>("role_type").HasValue<UserWorkspaceRole>("workspace");
+        builder.UseTphMappingStrategy().HasDiscriminator<string>("role_type").HasValue<WorkspaceMember>("workspace");
         builder.HasOne(a => a.User).WithMany(a => a.Roles).HasForeignKey(a => a.UserId);
         builder.HasOne(a => a.Role).WithMany().HasForeignKey(a => a.RoleId);
         builder.HasKey(a => a.UserRoleId);

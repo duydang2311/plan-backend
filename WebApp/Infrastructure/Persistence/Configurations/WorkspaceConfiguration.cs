@@ -15,7 +15,7 @@ public sealed class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
         builder.Property(a => a.Name).HasMaxLength(64);
         builder.Property(a => a.Path).HasMaxLength(64).UseCollation("case_insensitive");
 
-        builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Path).IsUnique();
+        builder.HasKey(a => a.Id);
+        builder.HasIndex(a => a.Path).IsUnique();
     }
 }
