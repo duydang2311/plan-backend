@@ -1,3 +1,4 @@
+using System.Data;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -15,6 +16,10 @@ public sealed class AcceptTeamInvitationHandler(AppDbContext db, IServiceProvide
 {
     public async Task<Result> ExecuteAsync(AcceptTeamInvitation command, CancellationToken ct)
     {
+        await using var transaction = await db
+            .Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, ct)
+            .ConfigureAwait(false);
+
         var query = db.TeamInvitations.AsQueryable();
         if (command.TeamInvitationId is not null)
         {
@@ -44,6 +49,7 @@ public sealed class AcceptTeamInvitationHandler(AppDbContext db, IServiceProvide
             .PublishAsync(Mode.WaitForAll, ct)
             .ConfigureAwait(false);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        await transaction.CommitAsync(ct).ConfigureAwait(false);
 
         return new Success();
     }

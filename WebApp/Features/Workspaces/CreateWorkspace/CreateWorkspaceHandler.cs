@@ -1,3 +1,4 @@
+using System.Data;
 using FastEndpoints;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,10 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IServiceProvi
 {
     public override async Task<Result> ExecuteAsync(CreateWorkspaceCommand command, CancellationToken ct)
     {
+        await using var transaction = await dbContext
+            .Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+            .ConfigureAwait(false);
+
         if (await dbContext.Workspaces.AnyAsync(x => x.Path.Equals(command.Path), ct).ConfigureAwait(false))
         {
             return new[] { ValidationHelper.Fail("path", "Path has already been used", "duplicated") };
@@ -37,8 +42,9 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IServiceProvi
         }
             .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
-
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
+        await transaction.CommitAsync(ct).ConfigureAwait(false);
+
         return workspace;
     }
 }
