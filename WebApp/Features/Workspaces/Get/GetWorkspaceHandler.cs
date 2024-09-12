@@ -3,6 +3,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
+using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -21,9 +22,11 @@ public sealed class GetWorkspaceHandler(AppDbContext dbContext) : ICommandHandle
         {
             query = query.Where(x => x.Path == command.Path);
         }
-        query = string.IsNullOrEmpty(command.Select)
-            ? query.Select(x => new Workspace { Id = x.Id, Name = x.Name })
-            : query.Select<Workspace>(command.Select);
+
+        if (!string.IsNullOrEmpty(command.Select))
+        {
+            query = query.Select(ExpressionHelper.Select<Workspace, Workspace>(command.Select));
+        }
 
         var workspace = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);
         return workspace is null ? new None() : workspace;
