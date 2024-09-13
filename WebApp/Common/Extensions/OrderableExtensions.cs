@@ -5,13 +5,13 @@ public static class OrderableExtensions
     public static IQueryable<T> SortOrDefault<T>(
         this IEnumerable<Orderable> orders,
         IQueryable<T> query,
-        Func<IQueryable<T>, IOrderedQueryable<T>> sortDefault
+        Func<IQueryable<T>, IOrderedQueryable<T>>? sortDefault = null
     )
         where T : notnull
     {
         if (!orders.Any())
         {
-            return sortDefault(query);
+            return sortDefault is null ? query : sortDefault(query);
         }
 
         var orderedQuery = orders.First().Sort(query);

@@ -5,15 +5,24 @@ namespace WebApp.Common.Helpers;
 
 public static class ExpressionHelper
 {
+    public static Expression<Func<T, object>> OrderBy<T>(string name)
+    {
+        var parameter = Expression.Parameter(typeof(T), "a");
+        return Expression.Lambda<Func<T, object>>(
+            Expression.TypeAs(BuildOrderBy(typeof(T), parameter, name), typeof(object)),
+            parameter
+        );
+    }
+
     public static Expression<Func<T, T>> LambdaNew<T>(string names)
     {
-        var parameter = Expression.Parameter(typeof(T), "x");
+        var parameter = Expression.Parameter(typeof(T), "a");
         return Expression.Lambda<Func<T, T>>(Init(typeof(T), parameter, names), parameter);
     }
 
     public static Expression LambdaProperty<T>(string name)
     {
-        var parameter = Expression.Parameter(typeof(T), "x");
+        var parameter = Expression.Parameter(typeof(T), "a");
         var property = Expression.Property(parameter, typeof(T).GetProperty(name)!);
         return Expression.Lambda(property, parameter);
     }
@@ -72,6 +81,25 @@ public static class ExpressionHelper
             }
         }
         return Expression.MemberInit(Expression.New(type), bindings);
+    }
+
+    private static MemberExpression BuildOrderBy(Type type, Expression member, string name)
+    {
+        switch (name.Split('.'))
+        {
+            case [string Name]:
+            {
+                var property = type.GetProperty(Name)!;
+                return Expression.Property(member, property);
+            }
+            case [string Name, string Rest]:
+            {
+                var property = type.GetProperty(Name)!;
+                return BuildOrderBy(property.PropertyType, Expression.Property(member, property), Rest);
+            }
+            default:
+                throw new NotImplementedException();
+        }
     }
 
     // ref: https://stackoverflow.com/a/66334073

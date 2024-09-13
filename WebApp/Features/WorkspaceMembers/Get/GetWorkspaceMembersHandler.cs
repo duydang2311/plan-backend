@@ -21,6 +21,11 @@ public sealed class GetWorkspaceMembersHandler(AppDbContext db) : ICommandHandle
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        Console.WriteLine(string.Join(',', command.Order.Select(a => a.Name)));
+        query = command
+            .Order.Where(static x => x.Name.EqualsEither(["User.Email"], StringComparison.OrdinalIgnoreCase))
+            .SortOrDefault(query);
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         return new PaginatedList<WorkspaceMember>() { Items = items, TotalCount = totalCount };
     }
