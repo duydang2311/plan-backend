@@ -1,12 +1,17 @@
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Common.Helpers;
 
 namespace WebApp.Common.Models;
 
 public class Orderable
 {
-    private string UppercasedName => string.Concat(Name[0].ToString().ToUpperInvariant(), Name.AsSpan(1));
+    private string UppercasedName =>
+        string.Join(
+            '.',
+            Name.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(a => string.Concat(a[0].ToString().ToUpperInvariant(), a.AsSpan(1)))
+        );
 
     public required string Name { get; set; }
     public Order Order { get; set; } = Order.Ascending;
@@ -15,16 +20,16 @@ public class Orderable
         where T : notnull
     {
         return Order == Order.Ascending
-            ? query.OrderBy(x => EF.Property<T>(x, UppercasedName))
-            : query.OrderByDescending(x => EF.Property<T>(x, UppercasedName));
+            ? query.OrderBy(ExpressionHelper.OrderBy<T>(UppercasedName))
+            : query.OrderByDescending(ExpressionHelper.OrderBy<T>(UppercasedName));
     }
 
     public IOrderedQueryable<T> Sort<T>(IOrderedQueryable<T> query)
         where T : notnull
     {
         return Order == Order.Ascending
-            ? query.ThenBy(x => EF.Property<T>(x, UppercasedName))
-            : query.ThenByDescending(x => EF.Property<T>(x, UppercasedName));
+            ? query.ThenBy(ExpressionHelper.OrderBy<T>(UppercasedName))
+            : query.ThenByDescending(ExpressionHelper.OrderBy<T>(UppercasedName));
     }
 
     public IOrderedQueryable<T1> Sort<T1, T2>(IQueryable<T1> query, Expression<Func<T1, T2>> expression)
