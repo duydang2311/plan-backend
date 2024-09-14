@@ -12,4 +12,5 @@ public sealed record class Workspace
     public ICollection<Status> Statuses { get; init; } = null!;
     public ICollection<WorkspaceFieldDefinition> FieldDefinitions { get; init; } = null!;
     public ICollection<WorkspaceMember> Members { get; init; } = null!;
+    public ICollection<Project> Projects { get; init; } = null!;
 }

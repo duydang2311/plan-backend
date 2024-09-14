@@ -18,6 +18,6 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => new { a.WorkspaceId, a.Identifier }).IsUnique();
 
-        builder.HasOne(a => a.Workspace).WithMany().HasForeignKey(a => a.WorkspaceId);
+        builder.HasOne(a => a.Workspace).WithMany(a => a.Projects).HasForeignKey(a => a.WorkspaceId);
     }
 }
