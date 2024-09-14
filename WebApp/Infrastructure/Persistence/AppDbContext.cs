@@ -19,6 +19,7 @@ public sealed class AppDbContext(DbContextOptions options) : CasbinDbContext<int
     public DbSet<WorkspaceFieldDefinition> WorkspaceFieldDefinitions => Set<WorkspaceFieldDefinition>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<WorkspaceMember> WorkspaceMembers => Set<WorkspaceMember>();
+    public DbSet<ProjectStatus> ProjectStatuses => Set<ProjectStatus>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
