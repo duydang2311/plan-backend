@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
+using Riok.Mapperly.Abstractions;
 using WebApp.Domain.Entities;
+using WebApp.Features.Projects.Create;
 
 namespace WebApp.Api.V1.Projects.Create;
 
@@ -21,7 +23,13 @@ public sealed class RequestValidator : Validator<Request>
     public RequestValidator()
     {
         RuleFor(a => a.WorkspaceId).NotNull();
-        RuleFor(a => a.Name).NotNull();
-        RuleFor(a => a.Identifier).NotNull();
+        RuleFor(a => a.Name).NotEmpty();
+        RuleFor(a => a.Identifier).NotEmpty();
     }
+}
+
+[Mapper]
+public static partial class RequestMapepr
+{
+    public static partial CreateProject ToCommand(this Request request);
 }

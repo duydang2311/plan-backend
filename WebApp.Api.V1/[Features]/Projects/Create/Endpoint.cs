@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebApp.Api.V1.Projects.Create;
 
-using Results = Results<ForbidHttpResult, ProblemDetails, Conflict, NoContent>;
+using Results = Results<ForbidHttpResult, ProblemDetails, Conflict, Ok<Response>>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -14,8 +14,13 @@ public sealed class Endpoint : Endpoint<Request, Results>
         PreProcessor<Authorize>();
     }
 
-    public override Task<Results> ExecuteAsync(Request req, CancellationToken ct)
+    public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
-        return base.ExecuteAsync(req, ct);
+        var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
+        return oneOf.Match<Results>(
+            conflict => TypedResults.Conflict(),
+            problem => problem.ToProblemDetails(),
+            project => TypedResults.Ok(project.ToResponse())
+        );
     }
 }
