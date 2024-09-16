@@ -24,8 +24,8 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithMany(a => a.Projects)
             .UsingEntity<ProjectIssue>(
                 "project_issues",
-                r => r.HasOne(a => a.Issue).WithMany().HasForeignKey(a => a.IssueId),
-                l => l.HasOne(a => a.Project).WithMany().HasForeignKey(a => a.ProjectId),
+                r => r.HasOne(a => a.Issue).WithMany(a => a.ProjectIssues).HasForeignKey(a => a.IssueId),
+                l => l.HasOne(a => a.Project).WithMany(a => a.ProjectIssues).HasForeignKey(a => a.ProjectId),
                 b =>
                 {
                     b.Property(a => a.ProjectId).HasConversion<EntityGuidConverter<ProjectId>>();
