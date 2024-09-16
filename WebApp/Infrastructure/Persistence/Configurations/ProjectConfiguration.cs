@@ -31,6 +31,7 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
                     b.Property(a => a.ProjectId).HasConversion<EntityGuidConverter<ProjectId>>();
                     b.Property(a => a.IssueId).HasConversion<EntityGuidConverter<IssueId>>();
                     b.Property(a => a.CreatedTime).HasDefaultValueSql("now()");
+                    b.Property(a => a.Rank).UseCollation("C");
                     b.HasQueryFilter(a => !a.Issue.IsDeleted);
                 }
             );
