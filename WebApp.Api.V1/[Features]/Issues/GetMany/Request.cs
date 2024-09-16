@@ -13,6 +13,9 @@ public sealed record Request : Collective
     public TeamId? TeamId { get; init; }
 
     [QueryParam]
+    public ProjectId? ProjectId { get; init; }
+
+    [QueryParam]
     public string? Select { get; init; }
 
     [QueryParam]
