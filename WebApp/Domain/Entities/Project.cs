@@ -13,4 +13,5 @@ public sealed record class Project
     public string Identifier { get; init; } = string.Empty;
     public string? Description { get; init; }
     public ICollection<Status> Statuses { get; init; } = null!;
+    public ICollection<Issue> Issues { get; init; } = null!;
 }

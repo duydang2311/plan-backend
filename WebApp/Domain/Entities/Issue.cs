@@ -22,4 +22,5 @@ public sealed record Issue : ISoftDelete
     public long OrderByStatus { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
+    public ICollection<Project> Projects { get; init; } = null!;
 }
