@@ -8,20 +8,25 @@ public static class FastEndpointsExtensions
         bool handleNull = false
     )
     {
-        var ok = options.ValueParserFor<T>(parse);
-        if (handleNull)
+        ParseResult ParseNullable(object? input)
         {
-            ok = options.ValueParserFor<T?>(
-                (input) =>
-                {
-                    if (input is null)
-                    {
-                        return new ParseResult(true, null);
-                    }
-                    return parse(input);
-                }
-            );
+            if (input is null)
+            {
+                return new ParseResult(true, null);
+            }
+            return parse(input);
         }
-        return ok;
+
+        if (typeof(T).IsValueType)
+        {
+            var ok = options.ValueParserFor<T>(parse);
+            if (handleNull)
+            {
+                ok = options.ValueParserFor(typeof(Nullable<>).MakeGenericType(typeof(T)), ParseNullable);
+            }
+            return ok;
+        }
+
+        return handleNull ? options.ValueParserFor<T>(ParseNullable) : options.ValueParserFor<T>(parse);
     }
 }

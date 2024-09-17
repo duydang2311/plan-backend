@@ -1,5 +1,6 @@
 using NodaTime;
 using WebApp.Common.Interfaces;
+using WebApp.Domain.Constants;
 
 namespace WebApp.Domain.Entities;
 
@@ -20,6 +21,7 @@ public sealed record Issue : ISoftDelete
     public StatusId? StatusId { get; init; }
     public Status? Status { get; init; }
     public long OrderByStatus { get; init; }
+    public IssuePriority Priority { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
     public ICollection<ProjectIssue> ProjectIssues { get; init; } = null!;

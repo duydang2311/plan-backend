@@ -1,6 +1,7 @@
 using NodaTime;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Issues.GetMany;
@@ -20,6 +21,7 @@ public sealed record Response : PaginatedList<Response.Item>
         public StatusId? StatusId { get; init; }
         public Status? Status { get; init; }
         public long OrderByStatus { get; init; }
+        public IssuePriority Priority { get; init; }
     }
 }
 
