@@ -20,22 +20,6 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.HasOne(a => a.Workspace).WithMany(a => a.Projects).HasForeignKey(a => a.WorkspaceId);
         builder
-            .HasMany(a => a.Issues)
-            .WithMany(a => a.Projects)
-            .UsingEntity<ProjectIssue>(
-                "project_issues",
-                r => r.HasOne(a => a.Issue).WithMany(a => a.ProjectIssues).HasForeignKey(a => a.IssueId),
-                l => l.HasOne(a => a.Project).WithMany(a => a.ProjectIssues).HasForeignKey(a => a.ProjectId),
-                b =>
-                {
-                    b.Property(a => a.ProjectId).HasConversion<EntityGuidConverter<ProjectId>>();
-                    b.Property(a => a.IssueId).HasConversion<EntityGuidConverter<IssueId>>();
-                    b.Property(a => a.CreatedTime).HasDefaultValueSql("now()");
-                    b.Property(a => a.Rank).UseCollation("C");
-                    b.HasQueryFilter(a => !a.Issue.IsDeleted);
-                }
-            );
-        builder
             .HasMany(a => a.Teams)
             .WithMany(a => a.Projects)
             .UsingEntity<ProjectTeam>(

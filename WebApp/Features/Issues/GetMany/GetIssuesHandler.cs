@@ -28,8 +28,9 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
         if (command.ProjectId is not null)
         {
             query = query.Where(i =>
-                i.Projects.Any(p =>
-                    p.Id == command.ProjectId && p.Teams.Any(t => t.Members.Any(m => m.Id == command.UserId))
+                i.ProjectIssues.Any(p =>
+                    p.ProjectId == command.ProjectId
+                    && p.Project.Teams.Any(t => t.Members.Any(m => m.Id == command.UserId))
                 )
             );
         }

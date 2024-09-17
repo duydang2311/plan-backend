@@ -34,13 +34,13 @@ public sealed class GetProjectIssuesHandler(AppDbContext dbContext)
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
         query = command
-            .Order.Where(static x =>
-                x.Name.EqualsEither(
-                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber"],
+            .Order.Where(static a =>
+                a.Name.EqualsEither(
+                    ["Issue.CreatedTime", "Issue.UpdatedTime", "Issue.Title"],
                     StringComparison.OrdinalIgnoreCase
                 )
             )
-            .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
+            .SortOrDefault(query);
         var issues = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
         return new PaginatedList<ProjectIssue>() { Items = issues, TotalCount = totalCount, };
