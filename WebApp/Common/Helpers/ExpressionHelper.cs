@@ -1,10 +1,13 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace WebApp.Common.Helpers;
 
 public static class ExpressionHelper
 {
+    private static readonly NullabilityInfoContext nullabilityInfoContext = new();
+
     public static Expression<Func<T, object>> OrderBy<T>(string name)
     {
         var parameter = Expression.Parameter(typeof(T), "a");
@@ -42,7 +45,7 @@ public static class ExpressionHelper
     private static MemberInitExpression Init(Type type, Expression member, string names)
     {
         var processed = new HashSet<string>();
-        var splits = names.Split(',').Select(x => x.Trim()).ToArray();
+        var splits = names.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
         var bindings = new List<MemberBinding>();
         for (var i = 0; i != splits.Length; ++i)
         {
@@ -104,7 +107,9 @@ public static class ExpressionHelper
 
     // ref: https://stackoverflow.com/a/66334073
     public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(string members) =>
-        Select<TSource, TTarget>(members.Split(',').Select(m => m.Trim()));
+        Select<TSource, TTarget>(
+            members.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray()
+        );
 
     public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(IEnumerable<string> members)
     {
@@ -125,8 +130,8 @@ public static class ExpressionHelper
         foreach (var memberGroup in memberPaths.GroupBy(path => path[depth]))
         {
             var memberName = memberGroup.Key;
-            var targetMember = Expression.PropertyOrField(target, memberName);
-            var sourceMember = Expression.PropertyOrField(source, memberName);
+            var targetMember = Expression.Property(target, memberName);
+            var sourceMember = Expression.Property(source, memberName);
             var childMembers = memberGroup.Where(path => depth + 1 < path.Length).ToList();
 
             Expression? targetValue = null;
@@ -159,6 +164,17 @@ public static class ExpressionHelper
                 }
             }
 
+            if (
+                (sourceMember.Type.IsValueType && Nullable.GetUnderlyingType(sourceMember.Type) is not null)
+                || IsNullableMember(sourceMember.Member)
+            )
+            {
+                targetValue = Expression.Condition(
+                    Expression.Equal(sourceMember, Expression.Constant(null)),
+                    Expression.Constant(null, targetMember.Type),
+                    targetValue
+                );
+            }
             bindings.Add(Expression.Bind(targetMember.Member, targetValue));
         }
         return Expression.MemberInit(Expression.New(targetType), bindings);
@@ -208,5 +224,25 @@ public static class ExpressionHelper
         }
 
         throw new NotImplementedException($"Not implemented transformation for type '{memberType.Name}'");
+    }
+
+    static bool IsNullableMember(MemberInfo member)
+    {
+        return member switch
+        {
+            PropertyInfo m
+                => nullabilityInfoContext.Create(m)
+                    is { WriteState: NullabilityState.Nullable }
+                        or { ReadState: NullabilityState.Nullable },
+            FieldInfo m
+                => nullabilityInfoContext.Create(m)
+                    is { WriteState: NullabilityState.Nullable }
+                        or { ReadState: NullabilityState.Nullable },
+            EventInfo m
+                => nullabilityInfoContext.Create(m)
+                    is { WriteState: NullabilityState.Nullable }
+                        or { ReadState: NullabilityState.Nullable },
+            _ => false,
+        };
     }
 }
