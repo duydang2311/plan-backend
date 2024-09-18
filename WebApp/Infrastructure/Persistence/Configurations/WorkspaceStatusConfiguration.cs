@@ -10,6 +10,6 @@ public sealed class WorkspaceStatusConfiguration : IEntityTypeConfiguration<Work
     {
         builder.ToTable("workspace_statuses");
         builder.Property(a => a.WorkspaceId).HasConversion<EntityGuidConverter<WorkspaceId>>();
-        builder.HasOne(a => a.Workspace).WithMany().HasForeignKey(a => a.WorkspaceId);
+        builder.HasOne(a => a.Workspace).WithMany(a => a.Statuses).HasForeignKey(a => a.WorkspaceId);
     }
 }

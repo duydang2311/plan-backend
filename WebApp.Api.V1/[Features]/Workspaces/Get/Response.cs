@@ -11,7 +11,17 @@ public sealed record Response
     public WorkspaceId Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
-    public ICollection<Status> Statuses { get; init; } = null!;
+    public ICollection<WorkspaceStatus>? Statuses { get; init; }
+
+    public sealed class WorkspaceStatus
+    {
+        public StatusId Id { get; init; }
+        public int Rank { get; init; }
+        public string Value { get; init; } = string.Empty;
+        public string Color { get; init; } = string.Empty;
+        public string? Description { get; init; }
+        public bool IsDefault { get; init; }
+    }
 }
 
 [Mapper]
