@@ -1,6 +1,6 @@
 namespace WebApp.Domain.Entities;
 
-public sealed record Status
+public abstract record Status
 {
     public StatusId Id { get; init; }
     public int Rank { get; init; }

@@ -1,9 +1,8 @@
 namespace WebApp.Domain.Entities;
 
-public sealed record class WorkspaceStatus
+public sealed record WorkspaceStatus : Status
 {
-    public WorkspaceId WorkspaceId { get; init; } = WorkspaceId.Empty;
+    public WorkspaceId WorkspaceId { get; init; }
     public Workspace Workspace { get; init; } = null!;
-    public StatusId StatusId { get; init; } = StatusId.Empty;
-    public Status Status { get; init; } = null!;
+    public bool IsDefault { get; init; }
 }

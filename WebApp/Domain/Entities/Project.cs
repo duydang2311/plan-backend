@@ -12,7 +12,8 @@ public sealed record class Project
     public string Name { get; init; } = string.Empty;
     public string Identifier { get; init; } = string.Empty;
     public string? Description { get; init; }
-    public ICollection<Status> Statuses { get; init; } = null!;
+
+    // public ICollection<Status> Statuses { get; init; } = null!;
     public ICollection<ProjectIssue> ProjectIssues { get; init; } = null!;
     public ICollection<Team> Teams { get; init; } = null!;
 }
