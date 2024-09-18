@@ -82,7 +82,7 @@ namespace WebApp.Host.Migrations
             migrationBuilder.AddPrimaryKey(name: "PK_workspace_statuses", table: "workspace_statuses", column: "id");
 
             migrationBuilder.AddForeignKey(
-                name: "fk_issues_workspace_statuses_status_id",
+                name: "fk_issues_workspace_statuss_status_id",
                 table: "issues",
                 column: "status_id",
                 principalTable: "workspace_statuses",
@@ -93,7 +93,7 @@ namespace WebApp.Host.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(name: "fk_issues_workspace_statuses_status_id", table: "issues");
+            migrationBuilder.DropForeignKey(name: "fk_issues_workspace_statuss_status_id", table: "issues");
 
             migrationBuilder.DropPrimaryKey(name: "PK_workspace_statuses", table: "workspace_statuses");
 
