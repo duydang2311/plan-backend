@@ -10,5 +10,5 @@ public sealed record PatchIssueStatus : ICommand<OneOf<ValidationFailures, Succe
 {
     public required IssueId IssueId { get; init; }
     public StatusId StatusId { get; init; }
-    public long OrderByStatus { get; init; }
+    public long? OrderByStatus { get; init; }
 }

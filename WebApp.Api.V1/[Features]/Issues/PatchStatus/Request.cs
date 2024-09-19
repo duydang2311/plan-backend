@@ -22,7 +22,6 @@ public sealed class RequestValidator : Validator<Request>
     public RequestValidator()
     {
         RuleFor(a => a.StatusId).NotNull();
-        RuleFor(a => a.OrderByStatus).NotNull();
     }
 }
 

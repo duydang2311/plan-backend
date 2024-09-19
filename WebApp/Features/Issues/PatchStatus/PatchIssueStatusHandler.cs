@@ -14,6 +14,17 @@ public sealed class PatchIssueStatusHandler(AppDbContext dbContext)
 {
     public async Task<OneOf<ValidationFailures, Success>> ExecuteAsync(PatchIssueStatus command, CancellationToken ct)
     {
+        if (!command.OrderByStatus.HasValue)
+        {
+            var count = await dbContext
+                .Issues.Where(a => a.Id == command.IssueId)
+                .ExecuteUpdateAsync(a => a.SetProperty(b => b.StatusId, command.StatusId), ct)
+                .ConfigureAwait(false);
+            return count == 0
+                ? ValidationFailures.Single("issueId", "Could not find issue", "not_found")
+                : new Success();
+        }
+
         await using var transaction = await dbContext
             .Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, ct)
             .ConfigureAwait(false);
@@ -49,6 +60,7 @@ public sealed class PatchIssueStatusHandler(AppDbContext dbContext)
                 ct
             )
             .ConfigureAwait(false);
+
         await transaction.CommitAsync(ct).ConfigureAwait(false);
 
         return new Success();
