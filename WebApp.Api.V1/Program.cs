@@ -122,6 +122,16 @@ app.UseFastEndpoints(
         {
             config.IndicateErrorCode = true;
         });
+        config.Binding.JsonExceptionTransformer = ex =>
+        {
+            return new FluentValidation.Results.ValidationFailure(
+                propertyName: ex.Path,
+                errorMessage: ex.InnerException?.Message ?? ex.Message
+            )
+            {
+                ErrorCode = "bad_json"
+            };
+        };
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
         config.Binding.ValueParserFor<Guid>(GuidToBase64JsonConverter.ValueParser);
         config.Binding.ValueParserFor<UserId>(EntityGuidJsonConverter<UserId>.ValueParser, handleNull: true);
