@@ -8,7 +8,6 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Common;
 using WebApp.Api.V1.Common.Converters;
-using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Mails.Abstractions;
@@ -90,6 +89,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
+    x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
     x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
