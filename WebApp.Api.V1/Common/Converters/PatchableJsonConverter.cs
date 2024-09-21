@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using WebApp.Api.V1.Common.Models;
+using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.Common.Converters;
 
@@ -41,7 +41,7 @@ public sealed class PatchableJsonConverter : JsonConverter<Patchable>
                         patchable,
                         JsonSerializer.Deserialize(ref reader, propertyInfo.PropertyType, options)
                     );
-                    patchable.MarkPropertyAsPresent(propertyInfo.Name);
+                    patchable.PresentProperties.Add(propertyInfo.Name);
                     break;
             }
         }

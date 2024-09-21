@@ -10,7 +10,6 @@ public sealed class Endpoint : Endpoint<Request, Results>
     public override void Configure()
     {
         Patch("issues/{IssueId}");
-        Verbs(Http.PATCH);
         Version(1);
         PreProcessor<Authorize>();
     }

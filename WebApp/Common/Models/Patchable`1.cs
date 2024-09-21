@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 
-namespace WebApp.Api.V1.Common.Models;
+namespace WebApp.Common.Models;
 
 public abstract record Patchable<T> : Patchable
     where T : Patchable<T>
 {
-    public bool IsPresent<TProperty>(Expression<Func<T, TProperty>> expression) =>
-        IsPresent(((MemberExpression)expression.Body).Member.Name);
+    public bool Has<TProperty>(Expression<Func<T, TProperty>> expression) =>
+        PresentProperties.Contains(((MemberExpression)expression.Body).Member.Name);
 
     public bool TryGetValue<TProperty>(Expression<Func<T, TProperty>> expression, out TProperty value)
     {
-        if (!IsPresent(expression))
+        if (!Has(expression))
         {
             value = default!;
             return false;

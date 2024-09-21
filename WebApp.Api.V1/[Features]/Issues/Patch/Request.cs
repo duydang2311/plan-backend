@@ -1,8 +1,9 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
-using Json.Patch;
 using Riok.Mapperly.Abstractions;
+using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Features.Issues.Patch;
 
@@ -11,7 +12,15 @@ namespace WebApp.Api.V1.Issues.Patch;
 public sealed record Request
 {
     public IssueId IssueId { get; init; }
-    public JsonPatch? Patch { get; init; } = null!;
+
+    public Patchable Patch { get; init; } = null!;
+
+    public sealed record Patchable : Patchable<Patchable>
+    {
+        public string Description { get; init; } = string.Empty;
+        public IssuePriority Priority { get; init; }
+        public StatusId StatusId { get; init; }
+    }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId UserId { get; init; }

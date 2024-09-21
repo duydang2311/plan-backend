@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using FastEndpoints;
-using Json.Patch;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using OneOf;
@@ -17,41 +16,33 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
 {
     public async Task<OneOf<ValidationFailures, Success>> ExecuteAsync(PatchIssue command, CancellationToken ct)
     {
-        var any = await dbContext.Issues.AnyAsync(x => x.Id == command.IssueId, ct).ConfigureAwait(false);
-        if (!any)
+        Expression<Func<SetPropertyCalls<Issue>, SetPropertyCalls<Issue>>>? updateEx = default;
+        if (command.Patch.TryGetValue(a => a.Description, out var description))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Description, description));
+        }
+        if (command.Patch.TryGetValue(a => a.Priority, out var priority))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Priority, priority));
+        }
+        if (command.Patch.TryGetValue(a => a.StatusId, out var statusId))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.StatusId, statusId));
+        }
+
+        if (updateEx is null)
+        {
+            return ValidationFailures.Single("patch", "Invalid patch", "invalid");
+        }
+
+        var count = await dbContext
+            .Issues.Where(a => a.Id == command.IssueId)
+            .ExecuteUpdateAsync(updateEx, ct)
+            .ConfigureAwait(false);
+
+        if (count == 0)
         {
             return ValidationFailures.Single("issueId", "Could not find issue", "not_found");
-        }
-
-        Expression<Func<SetPropertyCalls<Issue>, SetPropertyCalls<Issue>>>? updateEx = default;
-        foreach (
-            var op in command.Patch.Operations.Where(a =>
-                a.Op == OperationType.Replace && a.Path.Count > 0 && a.Value is not null
-            )
-        )
-        {
-            if (op.Path[0].Equals(nameof(Issue.Description), StringComparison.OrdinalIgnoreCase))
-            {
-                updateEx = ExpressionHelper.Append(
-                    updateEx,
-                    a => a.SetProperty(a => a.Description, op.Value!.GetValue<string>())
-                );
-            }
-            else if (op.Path[0].Equals(nameof(Issue.Title), StringComparison.OrdinalIgnoreCase))
-            {
-                updateEx = ExpressionHelper.Append(
-                    updateEx,
-                    a => a.SetProperty(a => a.Title, op.Value!.GetValue<string>())
-                );
-            }
-        }
-
-        if (updateEx is not null)
-        {
-            await dbContext
-                .Issues.Where(a => a.Id == command.IssueId)
-                .ExecuteUpdateAsync(updateEx, ct)
-                .ConfigureAwait(false);
         }
 
         return new Success();
