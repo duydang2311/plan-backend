@@ -90,7 +90,6 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
     x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
-    // x.SerializerOptions.TypeInfoResolverChain.Add(ApiJsonSerializerContext.Default);
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
