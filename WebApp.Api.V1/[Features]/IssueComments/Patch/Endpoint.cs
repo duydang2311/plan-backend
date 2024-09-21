@@ -10,13 +10,12 @@ public sealed class Endpoint : Endpoint<Request, Results>
     public override void Configure()
     {
         Patch("issue-comments/{IssueCommentId}");
-        Verbs(Http.PATCH);
         Version(1);
     }
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
-        return oneOf.Match<Results>(failures => failures.ToProblemDetails(), _ => TypedResults.NoContent());
+        return oneOf.Match<Results>(failures => failures.ToProblemDetails(), success => TypedResults.NoContent());
     }
 }
