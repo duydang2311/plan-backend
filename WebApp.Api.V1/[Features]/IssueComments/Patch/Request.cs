@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
-using Json.Patch;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
