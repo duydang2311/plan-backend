@@ -14,14 +14,22 @@ public sealed class IssueCommentCreatedHandler : IEventHandler<IssueCommentCreat
     {
         var nats = eventModel.ServiceProvider.GetRequiredService<INatsConnection>();
         var options = eventModel.ServiceProvider.GetRequiredService<IOptions<JsonOptions>>();
-        await nats.PublishAsync(
-                $"issues.{eventModel.IssueComment.IssueId.ToBase64String()}.comments.created",
-                JsonSerializer.Serialize(
-                    new { issueCommentId = eventModel.IssueComment.Id.Value, },
-                    options.Value.SerializerOptions
-                ),
-                cancellationToken: ct
-            )
-            .ConfigureAwait(false);
+        var logger = eventModel.ServiceProvider.GetRequiredService<ILogger<IssueCommentCreatedHandler>>();
+        try
+        {
+            await nats.PublishAsync(
+                    $"issues.{eventModel.IssueComment.IssueId.ToBase64String()}.comments.created",
+                    JsonSerializer.Serialize(
+                        new { issueCommentId = eventModel.IssueComment.Id.Value, },
+                        options.Value.SerializerOptions
+                    ),
+                    cancellationToken: ct
+                )
+                .ConfigureAwait(false);
+        }
+        catch (NatsException e)
+        {
+            logger.LogError(e, "Failed to publish comments.created message");
+        }
     }
 }
