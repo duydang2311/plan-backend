@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -19,7 +20,14 @@ public sealed class GetIssueCommentsHandler(AppDbContext dbContext)
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
-        query = query.OrderBy(x => x.CreatedTime);
+        if (!string.IsNullOrEmpty(command.Select))
+        {
+            query = query.Select(ExpressionHelper.Select<IssueComment, IssueComment>(command.Select));
+        }
+
+        query = command
+            .Order.Where(a => a.Name.EqualsEither(["CreatedTime", "UpdatedTime"], StringComparison.OrdinalIgnoreCase))
+            .SortOrDefault(query);
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
 
         return new() { Items = items, TotalCount = totalCount, };
