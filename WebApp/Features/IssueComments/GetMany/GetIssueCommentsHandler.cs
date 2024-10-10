@@ -27,7 +27,7 @@ public sealed class GetIssueCommentsHandler(AppDbContext dbContext)
 
         query = command
             .Order.Where(a => a.Name.EqualsEither(["CreatedTime", "UpdatedTime"], StringComparison.OrdinalIgnoreCase))
-            .SortOrDefault(query);
+            .SortOrDefault(query, query => query.OrderBy(a => a.CreatedTime));
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
 
         return new() { Items = items, TotalCount = totalCount, };
