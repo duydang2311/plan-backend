@@ -27,4 +27,5 @@ public static class Permit
     public const string ReadProject = "project:read";
 
     public const string CreateWorkspaceStatus = "workspace-status:create";
+    public const string DeleteWorkspaceStatus = "workspace-status:delete";
 }
