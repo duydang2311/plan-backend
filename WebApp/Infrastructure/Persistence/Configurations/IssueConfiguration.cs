@@ -23,7 +23,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasKey(x => x.Id);
         builder.HasOne(x => x.Team).WithMany(x => x.Issues).HasForeignKey(x => x.TeamId);
         builder.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
-        builder.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId);
+        builder.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId).OnDelete(DeleteBehavior.SetNull);
         builder.HasIndex(x => new { x.TeamId, x.OrderNumber }).IsUnique();
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
