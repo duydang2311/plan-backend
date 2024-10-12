@@ -9,6 +9,11 @@ public sealed class Authorize : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
+        if (context.Request is null)
+        {
+            return;
+        }
+
         var dbContext = context.HttpContext.Resolve<AppDbContext>();
         var isAuthor = await dbContext
             .Issues.AnyAsync(x => x.Id == context.Request.IssueId && x.AuthorId == context.Request.UserId, ct)

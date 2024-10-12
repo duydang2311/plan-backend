@@ -9,6 +9,11 @@ public sealed class Authorize : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
+        if (context.Request is null)
+        {
+            return;
+        }
+
         var db = context.HttpContext.Resolve<AppDbContext>();
         var canRead = await db
             .WorkspaceMembers.AnyAsync(

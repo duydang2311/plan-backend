@@ -8,6 +8,11 @@ public sealed class Authorize : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
+        if (context.Request is null)
+        {
+            return;
+        }
+
         var db = context.HttpContext.Resolve<AppDbContext>();
         var isInTeam = await db
             .TeamMembers.AnyAsync(a => a.TeamId == context.Request.TeamId && a.MemberId == context.Request.UserId, ct)
