@@ -14,6 +14,8 @@ public sealed class UserProfileConfiguration : IEntityTypeConfiguration<UserProf
         builder.Property(x => x.UserId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
         builder.Property(x => x.Name).HasMaxLength(64);
         builder.Property(x => x.ImageUrl).HasMaxLength(2000);
+        builder.Property(a => a.DisplayName).HasMaxLength(64);
+        builder.Property(a => a.Bio).HasMaxLength(256);
 
         builder.HasKey(a => a.UserId);
         builder.HasIndex(a => a.Name).IsUnique();
