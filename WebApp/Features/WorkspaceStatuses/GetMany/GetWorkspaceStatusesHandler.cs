@@ -24,7 +24,7 @@ public sealed class GetWorkspaceStatusesHandler(AppDbContext db)
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
         query = command
-            .Order.Where(a => a.Name.EqualsEither(["Status.Rank"], StringComparison.OrdinalIgnoreCase))
+            .Order.Where(a => a.Name.EqualsEither(["Rank"], StringComparison.OrdinalIgnoreCase))
             .SortOrDefault(query)
             .Skip(command.Offset)
             .Take(command.Size);
