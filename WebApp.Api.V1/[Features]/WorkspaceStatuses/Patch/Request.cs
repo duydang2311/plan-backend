@@ -33,5 +33,6 @@ public sealed class RequestValidator : Validator<Request>
 [Mapper]
 public static partial class RequestMapper
 {
+    [MapperIgnoreSource(nameof(Request.UserId))]
     public static partial PatchWorkspaceStatus ToCommand(this Request request);
 }
