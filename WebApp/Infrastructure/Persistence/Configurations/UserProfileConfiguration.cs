@@ -9,11 +9,20 @@ public sealed class UserProfileConfiguration : IEntityTypeConfiguration<UserProf
     public void Configure(EntityTypeBuilder<UserProfile> builder)
     {
         builder.ToTable("user_profiles");
-        builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.UserId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
-        builder.Property(x => x.Name).HasMaxLength(64);
-        builder.Property(x => x.ImageUrl).HasMaxLength(2000);
+        builder.Property(a => a.CreatedTime).HasDefaultValueSql("now()");
+        builder.Property(a => a.UpdatedTime).HasDefaultValueSql("now()");
+        builder.Property(a => a.UserId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
+        builder.Property(a => a.Name).HasMaxLength(64);
+        builder.ComplexProperty(
+            a => a.Image,
+            b =>
+            {
+                b.Property(a => a.ResourceType).HasMaxLength(16);
+                b.Property(a => a.PublicId).HasMaxLength(256);
+                b.Property(a => a.Format).HasMaxLength(16);
+                b.Property(a => a.Version);
+            }
+        );
         builder.Property(a => a.DisplayName).HasMaxLength(64);
         builder.Property(a => a.Bio).HasMaxLength(256);
 

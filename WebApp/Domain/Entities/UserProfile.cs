@@ -1,4 +1,5 @@
 using NodaTime;
+using WebApp.Common.Models;
 
 namespace WebApp.Domain.Entities;
 
@@ -10,7 +11,7 @@ public sealed record class UserProfile
     public User User { get; init; } = null!;
     public string Name { get; init; } = null!;
     public string DisplayName { get; init; } = null!;
-    public string? ImageUrl { get; init; }
+    public Asset Image { get; init; } = Asset.Empty;
     public string? Bio { get; init; } = null!;
     public ICollection<UserSocialLink>? SocialLinks { get; init; }
 }
