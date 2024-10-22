@@ -13,7 +13,7 @@ public sealed class Endpoint : Endpoint<Request, Ok>
 
     public override async Task<Ok> ExecuteAsync(Request req, CancellationToken ct)
     {
-        await req.ToEvent().PublishAsync(Mode.WaitForNone, ct).ConfigureAwait(false);
+        await req.ToJob().QueueJobAsync(ct: CancellationToken.None).ConfigureAwait(false);
         return TypedResults.Ok();
     }
 }

@@ -1,9 +1,9 @@
 using FastEndpoints;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Domain.Events;
+namespace WebApp.Domain.Commands;
 
-public sealed record UserProfileImageUploaded : IEvent
+public sealed record UpdateUserProfileImage : ICommand
 {
     public required UserId UserId { get; init; }
     public required string PublicId { get; init; }

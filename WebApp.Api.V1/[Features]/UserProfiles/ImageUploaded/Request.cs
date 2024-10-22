@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Riok.Mapperly.Abstractions;
+using WebApp.Domain.Commands;
 using WebApp.Domain.Entities;
-using WebApp.Domain.Events;
 
 namespace WebApp.Api.V1.UserProfiles.ImageUploaded;
 
@@ -22,5 +22,5 @@ public sealed record Request
 [Mapper]
 public static partial class RequestMapper
 {
-    public static partial UserProfileImageUploaded ToEvent(this Request request);
+    public static partial UpdateUserProfileImage ToJob(this Request request);
 }
