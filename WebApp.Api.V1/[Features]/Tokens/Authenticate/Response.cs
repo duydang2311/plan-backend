@@ -8,7 +8,9 @@ public sealed record class Response(
     string AccessToken,
     RefreshToken RefreshToken,
     int AccessTokenMaxAge,
-    int RefreshTokenMaxAge
+    int RefreshTokenMaxAge,
+    SessionToken SessionId,
+    int SessionMaxAge
 );
 
 [Mapper]

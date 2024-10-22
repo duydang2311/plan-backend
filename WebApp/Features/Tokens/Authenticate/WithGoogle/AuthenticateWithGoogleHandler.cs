@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
+using WebApp.Common.Helpers;
 using WebApp.Common.Jwts.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -42,7 +43,9 @@ public sealed class AuthenticateWithGoogleHandler(IOptions<JwtOptions> options, 
         }
 
         var userRefreshToken = new UserRefreshToken { UserId = user.Id };
+        var session = new UserSession { Token = IdHelper.NewSessionId(), UserId = user.Id };
         db.Add(userRefreshToken);
+        db.Add(session);
 
         var o = options.Value;
         var task = db.SaveChangesAsync(ct);
@@ -59,11 +62,14 @@ public sealed class AuthenticateWithGoogleHandler(IOptions<JwtOptions> options, 
 
         await task.ConfigureAwait(false);
 
-        return new AuthenticateResult(
-            jwtService.WriteToken(accessToken),
-            userRefreshToken.Token,
-            (int)accessTokenMaxAge.TotalSeconds,
-            (int)TimeSpan.FromDays(1).TotalSeconds
-        );
+        return new AuthenticateResult
+        {
+            AccessToken = jwtService.WriteToken(accessToken),
+            RefreshToken = userRefreshToken.Token,
+            AccessTokenMaxAge = (int)accessTokenMaxAge.TotalSeconds,
+            RefreshTokenMaxAge = (int)TimeSpan.FromDays(1).TotalSeconds,
+            SessionId = session.Token,
+            SessionMaxAge = (int)TimeSpan.FromDays(45).TotalSeconds,
+        };
     }
 }

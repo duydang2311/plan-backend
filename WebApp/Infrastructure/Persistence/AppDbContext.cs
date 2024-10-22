@@ -22,6 +22,7 @@ public sealed class AppDbContext(DbContextOptions options) : CasbinDbContext<int
     public DbSet<WorkspaceStatus> WorkspaceStatuses => Set<WorkspaceStatus>();
     public DbSet<ProjectIssue> ProjectIssues => Set<ProjectIssue>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

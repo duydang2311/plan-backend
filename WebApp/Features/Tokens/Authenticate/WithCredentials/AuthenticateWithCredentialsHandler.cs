@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OneOf;
 using WebApp.Common.Hashers.Abstractions;
+using WebApp.Common.Helpers;
 using WebApp.Common.Jwts.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -53,10 +54,14 @@ public sealed class AuthenticateWithCredentialsHandler(
         }
 
         var userRefreshToken = new UserRefreshToken { UserId = user.Id };
+        var session = new UserSession { Token = IdHelper.NewSessionId(), UserId = user.Id };
+
+        dbContext.Add(session);
         dbContext.Add(userRefreshToken);
 
-        var o = options.Value;
         var task = dbContext.SaveChangesAsync(ct);
+
+        var o = options.Value;
         var now = DateTime.UtcNow;
         var accessTokenMaxAge = TimeSpan.FromMinutes(5);
         var accessToken = jwtService.CreateToken(
@@ -70,11 +75,14 @@ public sealed class AuthenticateWithCredentialsHandler(
 
         await task.ConfigureAwait(false);
 
-        return new AuthenticateResult(
-            jwtService.WriteToken(accessToken),
-            userRefreshToken.Token,
-            (int)accessTokenMaxAge.TotalSeconds,
-            (int)TimeSpan.FromDays(1).TotalSeconds
-        );
+        return new AuthenticateResult
+        {
+            AccessToken = jwtService.WriteToken(accessToken),
+            RefreshToken = userRefreshToken.Token,
+            AccessTokenMaxAge = (int)accessTokenMaxAge.TotalSeconds,
+            RefreshTokenMaxAge = (int)TimeSpan.FromDays(1).TotalSeconds,
+            SessionId = session.Token,
+            SessionMaxAge = (int)TimeSpan.FromDays(45).TotalSeconds,
+        };
     }
 }

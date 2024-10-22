@@ -1,12 +1,10 @@
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 using FastEndpoints;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.IdentityModel.Tokens;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
-using WebApp.Api.V1.Common;
+using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -48,32 +46,46 @@ builder
     .BindConfiguration(PersistenceOptions.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder
-    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var jwtOptions = builder.Configuration.GetSection(JwtOptions.Section).Get<JwtOptions>();
-        if (jwtOptions is not null)
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuers = jwtOptions.ValidIssuers,
-                ValidAudiences = jwtOptions.ValidAudiences,
-                IssuerSigningKey = new X509SecurityKey(
-                    X509Certificate2.CreateFromEncryptedPemFile(
-                        jwtOptions.CertificateFilePath,
-                        jwtOptions.KeyPassword,
-                        jwtOptions.KeyFilePath
-                    )
-                )
-            };
-        }
-    });
 
-builder.Services.AddPersistence(persistenceOptions).AddHashers().AddJwts().AddMails().AddAuthorization().AddNATS();
+builder
+    .Services.AddAuthentication()
+    .AddScheme<BasicAuthenticationSchemeOptions, BasicAuthenticationSchemeHandler>(
+        BasicAuthenticationSchemeOptions.DefaultScheme,
+        options => { }
+    );
+
+// builder.Services
+// .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// .AddJwtBearer(options =>
+// {
+//     var jwtOptions = builder.Configuration.GetSection(JwtOptions.Section).Get<JwtOptions>();
+//     if (jwtOptions is not null)
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateIssuerSigningKey = true,
+//             ValidIssuers = jwtOptions.ValidIssuers,
+//             ValidAudiences = jwtOptions.ValidAudiences,
+//             IssuerSigningKey = new X509SecurityKey(
+//                 X509Certificate2.CreateFromEncryptedPemFile(
+//                     jwtOptions.CertificateFilePath,
+//                     jwtOptions.KeyPassword,
+//                     jwtOptions.KeyFilePath
+//                 )
+//             )
+//         };
+//     }
+// });
+
+builder
+    .Services.AddPersistence(persistenceOptions)
+    .AddHashers()
+    .AddJwts()
+    .AddMails()
+    .AddAuthorization()
+    .AddNATS();
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
@@ -89,7 +101,9 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<SessionToken>());
     x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
+    x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
@@ -103,12 +117,18 @@ builder.Services.AddFastEndpoints(
     }
 );
 
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024;
+});
+
 var app = builder.Build();
 app.UseDefaultExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(
@@ -150,6 +170,10 @@ app.UseFastEndpoints(
             handleNull: true
         );
         config.Binding.ValueParserFor<ProjectId>(EntityGuidJsonConverter<ProjectId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<SessionToken>(
+            EntityGuidJsonConverter<SessionToken>.ValueParser,
+            handleNull: true
+        );
     }
 );
 app.MapDefaultEndpoints();
