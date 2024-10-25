@@ -6,7 +6,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Features.UserProfiles.Create;
 
-public sealed record CreateUserProfile : ICommand<OneOf<NotFoundError, ValidationFailures, Success>>
+public sealed record CreateUserProfile : ICommand<OneOf<NotFoundError, DuplicatedError, ValidationFailures, Success>>
 {
     public required UserId UserId { get; init; }
     public required string Name { get; init; }

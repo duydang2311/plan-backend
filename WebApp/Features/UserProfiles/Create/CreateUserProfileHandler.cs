@@ -8,7 +8,7 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.UserProfiles.Create;
 
-using Result = OneOf<NotFoundError, ValidationFailures, Success>;
+using Result = OneOf<NotFoundError, DuplicatedError, ValidationFailures, Success>;
 
 public sealed class CreateUserProfileHandler(AppDbContext db) : ICommandHandler<CreateUserProfile, Result>
 {
@@ -36,6 +36,10 @@ public sealed class CreateUserProfileHandler(AppDbContext db) : ICommandHandler<
         try
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        }
+        catch (UniqueConstraintException)
+        {
+            return new DuplicatedError();
         }
         catch (ReferenceConstraintException)
         {
