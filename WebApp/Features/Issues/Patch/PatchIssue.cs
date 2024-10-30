@@ -17,6 +17,6 @@ public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, NotFoundErr
         public string Description { get; init; } = string.Empty;
         public IssuePriority Priority { get; init; }
         public StatusId StatusId { get; init; }
-        public string StatusRank { get; init; } = string.Empty;
+        public string? StatusRank { get; init; }
     }
 }

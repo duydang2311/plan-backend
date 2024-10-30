@@ -15,8 +15,27 @@ public sealed record class Workspace
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
 
-    public ICollection<WorkspaceStatus> Statuses => statuses ??= [];
-    public ICollection<WorkspaceFieldDefinition> FieldDefinitions => fieldDefinitions ??= [];
-    public ICollection<WorkspaceMember> Members => members ??= [];
-    public ICollection<Project> Projects => projects ??= [];
+    public ICollection<WorkspaceStatus> Statuses
+    {
+        get => statuses ??= [];
+        set { statuses = value; }
+    }
+
+    public ICollection<WorkspaceFieldDefinition> FieldDefinitions
+    {
+        get => fieldDefinitions ??= [];
+        set { fieldDefinitions = value; }
+    }
+
+    public ICollection<WorkspaceMember> Members
+    {
+        get => members ??= [];
+        set { members = value; }
+    }
+
+    public ICollection<Project> Projects
+    {
+        get => projects ??= [];
+        set { projects = value; }
+    }
 }

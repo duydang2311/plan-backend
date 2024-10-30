@@ -30,9 +30,12 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
         }
         if (command.Patch.TryGetValue(a => a.StatusId, out var statusId))
         {
-            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.StatusId, statusId));
+            updateEx = ExpressionHelper.Append(
+                updateEx,
+                a => a.SetProperty(a => a.StatusId, statusId.Value == -1 ? null : statusId)
+            );
         }
-        if (command.Patch.TryGetValue(a => a.StatusRank, out var statusRank))
+        if (command.Patch.TryGetValue(a => a.StatusRank, out var statusRank) && statusRank is not null)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.StatusRank, statusRank));
         }

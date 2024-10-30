@@ -20,6 +20,7 @@ public sealed record Request
         public string Description { get; init; } = string.Empty;
         public IssuePriority Priority { get; init; }
         public StatusId StatusId { get; init; }
+        public string? StatusRank { get; init; }
     }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
@@ -37,5 +38,6 @@ public sealed class RequestValidator : Validator<Request>
 [Mapper]
 public static partial class RequestMapper
 {
+    [MapperIgnoreSource(nameof(Request.UserId))]
     public static partial PatchIssue ToCommand(this Request request);
 }
