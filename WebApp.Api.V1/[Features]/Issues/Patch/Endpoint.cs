@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebApp.Api.V1.Issues.Patch;
 
-using Results = Results<ForbidHttpResult, ProblemDetails, NoContent>;
+using Results = Results<ForbidHttpResult, ProblemDetails, NotFound, NoContent>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -18,6 +18,10 @@ public sealed class Endpoint : Endpoint<Request, Results>
     {
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
 
-        return oneOf.Match<Results>(failures => failures.ToProblemDetails(), _ => TypedResults.NoContent());
+        return oneOf.Match<Results>(
+            failures => failures.ToProblemDetails(),
+            notFoundError => TypedResults.NotFound(),
+            success => TypedResults.NoContent()
+        );
     }
 }

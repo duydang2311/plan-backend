@@ -7,7 +7,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Features.Issues.Patch;
 
-public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, Success>>
+public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, NotFoundError, Success>>
 {
     public required IssueId IssueId { get; init; }
     public required Patchable Patch { get; init; }
@@ -17,5 +17,6 @@ public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, Success>>
         public string Description { get; init; } = string.Empty;
         public IssuePriority Priority { get; init; }
         public StatusId StatusId { get; init; }
+        public string StatusRank { get; init; } = string.Empty;
     }
 }
