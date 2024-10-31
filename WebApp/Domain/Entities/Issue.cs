@@ -14,7 +14,7 @@ public sealed record Issue : ISoftDelete
     public TeamId TeamId { get; init; }
     public Team Team { get; init; } = null!;
     public long OrderNumber { get; init; }
-    public string Title { get; init; } = string.Empty;
+    public string Title { get; init; } = null!;
     public string? Description { get; init; }
     public bool IsDeleted { get; init; }
     public Instant? DeletedTime { get; init; }

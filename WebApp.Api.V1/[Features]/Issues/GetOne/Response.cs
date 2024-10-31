@@ -14,7 +14,7 @@ public sealed record Response
     public TeamId? TeamId { get; init; }
     public Team? Team { get; init; }
     public long? OrderNumber { get; init; }
-    public string? Title { get; init; } = string.Empty;
+    public string? Title { get; init; }
     public string? Description { get; init; }
     public StatusId? StatusId { get; init; }
     public Status? Status { get; init; }
