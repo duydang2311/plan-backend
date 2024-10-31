@@ -12,6 +12,7 @@ public sealed record Request
     public TeamId? TeamId { get; init; }
     public string? Title { get; init; }
     public string? Description { get; init; }
+    public StatusId? StatusId { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId AuthorId { get; init; }

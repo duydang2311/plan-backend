@@ -11,4 +11,5 @@ public sealed record CreateIssue : ICommand<OneOf<ValidationFailures, Issue>>
     public required TeamId TeamId { get; init; }
     public required string Title { get; init; }
     public string? Description { get; init; }
+    public StatusId? StatusId { get; init; }
 }

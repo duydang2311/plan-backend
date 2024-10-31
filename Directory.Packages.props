@@ -9,6 +9,7 @@
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
     <PackageVersion Include="FastEndpoints" Version="5.30.0" />
+    <PackageVersion Include="FractionalIndexing" Version="1.0.1" />
     <PackageVersion Include="Google.Apis.Auth" Version="1.68.0" />
     <PackageVersion Include="MailKit" Version="4.8.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
