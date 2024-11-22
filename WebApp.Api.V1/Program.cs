@@ -1,3 +1,5 @@
+#pragma warning disable EXTEXP0018
+
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FastEndpoints;
@@ -117,10 +119,7 @@ builder.Services.AddFastEndpoints(
     }
 );
 
-builder.Services.AddMemoryCache(options =>
-{
-    options.SizeLimit = 1024;
-});
+builder.Services.AddHybridCache();
 
 var app = builder.Build();
 app.UseDefaultExceptionHandler();

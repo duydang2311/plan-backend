@@ -3,11 +3,11 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace WebApp.Api.V1.Common.Authentications;
 
@@ -16,7 +16,7 @@ public class BasicAuthenticationSchemeHandler(
     ILoggerFactory logger,
     UrlEncoder encoder,
     AppDbContext db,
-    IMemoryCache cache
+    HybridCache cache
 ) : AuthenticationHandler<BasicAuthenticationSchemeOptions>(options, logger, encoder)
 {
     private const string MissingHeader =
@@ -63,32 +63,36 @@ public class BasicAuthenticationSchemeHandler(
             return AuthenticateResult.Fail(BadToken);
         }
 
-        if (!cache.TryGetValue(parseResult.Value, out UserId userId))
-        {
-            userId = await db
-                .UserSessions.Where(a => a.Token == (SessionToken)parseResult.Value)
-                .Select(a => a.UserId)
-                .FirstOrDefaultAsync()
-                .ConfigureAwait(false);
-            if (userId == UserId.Empty)
+        var userId = await cache.GetOrCreateAsync(
+            $"session-{parseResult.Value}",
+            (token: (SessionToken)parseResult.Value, db),
+            static async (state, token) =>
             {
-                return AuthenticateResult.Fail(InvalidSession);
-            }
+                return await state.db
+                        .UserSessions.Where(a => a.Token == state.token)
+                        .Select(a => a.UserId)
+                        .FirstOrDefaultAsync()
+                        .ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
+        Console.WriteLine("Session = " + userId);
 
-            cache.Set(
-                parseResult.Value,
-                userId,
-                new MemoryCacheEntryOptions
-                {
-                    Size = 1,
-                    SlidingExpiration = TimeSpan.FromMinutes(30),
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1),
-                }
-            );
+        if (userId == UserId.Empty)
+        {
+            await cache.RemoveAsync($"session-{parseResult.Value}").ConfigureAwait(false);
+            return AuthenticateResult.Fail(InvalidSession);
         }
 
         var claims = new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));
         return AuthenticateResult.Success(new AuthenticationTicket(principal, Scheme.Name));
+    }
+
+    private Task<UserId> GetUserSessionAsync(SessionToken sessionToken)
+    {
+        return db
+            .UserSessions.Where(a => a.Token == sessionToken)
+            .Select(a => a.UserId)
+            .FirstOrDefaultAsync();
     }
 }
