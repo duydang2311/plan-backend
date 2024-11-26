@@ -37,14 +37,14 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
 
         if (!string.IsNullOrEmpty(command.Select))
         {
-            query = query.Select(ExpressionHelper.LambdaNew<Issue>(command.Select));
+            query = query.Select(ExpressionHelper.Select<Issue, Issue>(command.Select));
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
         query = command
             .Order.Where(static x =>
                 x.Name.EqualsEither(
-                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber"],
+                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber", "Priority", "Status.Rank"],
                     StringComparison.OrdinalIgnoreCase
                 )
             )
