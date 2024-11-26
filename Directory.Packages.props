@@ -5,7 +5,7 @@
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.9.24556.5" />
     <PackageVersion Include="System.Text.Json" Version="9.0.0" />
-    <PackageVersion Include="Ardalis.GuardClauses" Version="4.6.0" />
+    <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
     <PackageVersion Include="Casbin.NET" Version="2.12.0" />
     <PackageVersion Include="Casbin.NET.Adapter.EFCore" Version="2.5.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />

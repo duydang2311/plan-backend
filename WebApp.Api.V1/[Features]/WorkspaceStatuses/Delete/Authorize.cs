@@ -7,26 +7,31 @@ namespace WebApp.Api.V1.WorkspaceStatuses.Delete;
 
 public sealed class Authorize : IPreProcessor<Request>
 {
-    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        var db = context.HttpContext.Resolve<AppDbContext>();
-        var canDelete = await db
-            .WorkspaceMembers.AnyAsync(
-                a =>
-                    a.Workspace.Statuses.Any(a => a.Id == context.Request.StatusId)
-                    && a.UserId == context.Request.UserId
-                    && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.DeleteWorkspaceStatus)),
-                ct
-            )
-            .ConfigureAwait(false);
-        if (!canDelete)
+        return CheckAsync(context, ct);
+        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
         {
-            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            Guard.Against.Null(context.Request);
+            var db = context.HttpContext.Resolve<AppDbContext>();
+            var canDelete = await db
+                .WorkspaceMembers.AnyAsync(
+                    a =>
+                        a.Workspace.Statuses.Any(a => a.Id == context.Request.StatusId)
+                        && a.UserId == context.Request.UserId
+                        && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.DeleteWorkspaceStatus)),
+                    ct
+                )
+                .ConfigureAwait(false);
+            if (!canDelete)
+            {
+                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            }
         }
     }
 }

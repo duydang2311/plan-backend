@@ -1,19 +1,25 @@
+using Ardalis.GuardClauses;
 using FastEndpoints;
 
 namespace WebApp.Api.V1.UserProfiles.Create;
 
 public sealed class Authorize : IPreProcessor<Request>
 {
-    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        if (context.Request.RequestingUserId != context.Request.UserId)
+        return CheckAsync(context, ct);
+        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
         {
-            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            Guard.Against.Null(context.Request);
+            if (context.Request.RequestingUserId != context.Request.UserId)
+            {
+                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            }
         }
     }
 }

@@ -1,20 +1,26 @@
+using Ardalis.GuardClauses;
 using FastEndpoints;
 
 namespace WebApp.Api.V1.TeamInvitations.GetMany.ByMemberId;
 
 public sealed class Authorize : IPreProcessor<Request>
 {
-    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        if (context.Request.MemberId != context.Request.UserId)
+        return CheckAsync(context, ct);
+        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
         {
-            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-            return;
+            Guard.Against.Null(context.Request);
+            if (context.Request.MemberId != context.Request.UserId)
+            {
+                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+                return;
+            }
         }
     }
 }
