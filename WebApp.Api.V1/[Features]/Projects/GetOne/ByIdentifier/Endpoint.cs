@@ -9,7 +9,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Get("projects/identifier/{Identifier}");
+        Get("workspaces/{WorkspaceId}/projects/identifier/{Identifier}");
         Version(1);
         PreProcessor<Authorize>();
     }

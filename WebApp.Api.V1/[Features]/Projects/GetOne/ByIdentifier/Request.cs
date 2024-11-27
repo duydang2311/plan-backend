@@ -8,6 +8,7 @@ namespace WebApp.Api.V1.Projects.GetOne.ByIdentifier;
 
 public sealed record Request
 {
+    public WorkspaceId WorkspaceId { get; init; }
     public string Identifier { get; init; } = null!;
     public string? Select { get; init; }
 
@@ -18,5 +19,7 @@ public sealed record Request
 [Mapper]
 public static partial class RequestMapper
 {
+    [MapperIgnoreSource(nameof(Request.UserId))]
+    [MapperIgnoreTarget(nameof(GetProject.ProjectId))]
     public static partial GetProject ToCommand(this Request request);
 }
