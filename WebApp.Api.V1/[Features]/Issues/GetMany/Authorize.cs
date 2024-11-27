@@ -34,10 +34,6 @@ public sealed class Authorize : IPreProcessor<Request>
                     )
                     .ConfigureAwait(false);
             }
-            else if (context.Request.TeamId is null && context.Request.ProjectId is null)
-            {
-                canRead = false;
-            }
 
             if (!canRead)
             {
