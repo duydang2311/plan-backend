@@ -13,10 +13,30 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
     public async Task<PaginatedList<Issue>> ExecuteAsync(GetIssues command, CancellationToken ct)
     {
         var query = dbContext.Issues.AsQueryable();
-        if (command.TeamId is not null)
+        if (!command.TeamId.HasValue && !command.ProjectId.HasValue)
         {
-            query = query.Where(a => a.TeamId == command.TeamId);
+            query = query.Where(a =>
+                a.Team.Members.Any(b => b.Id == command.UserId)
+                || a.ProjectIssues.Any(b => b.Project.Teams.Any(b => b.Members.Any(c => c.Id == command.UserId)))
+            );
         }
+        else
+        {
+            if (command.TeamId.HasValue)
+            {
+                query = query.Where(a => a.TeamId == command.TeamId);
+            }
+            if (command.ProjectId.HasValue)
+            {
+                query = query.Where(i =>
+                    i.ProjectIssues.Any(p =>
+                        p.ProjectId == command.ProjectId
+                        && p.Project.Teams.Any(t => t.Members.Any(m => m.Id == command.UserId))
+                    )
+                );
+            }
+        }
+
         if (command.StatusId.HasValue)
         {
             query = query.Where(a => a.StatusId == command.StatusId);
@@ -24,15 +44,6 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
         else if (command.NullStatusId == true)
         {
             query = query.Where(a => a.StatusId == null);
-        }
-        if (command.ProjectId is not null)
-        {
-            query = query.Where(i =>
-                i.ProjectIssues.Any(p =>
-                    p.ProjectId == command.ProjectId
-                    && p.Project.Teams.Any(t => t.Members.Any(m => m.Id == command.UserId))
-                )
-            );
         }
 
         if (!string.IsNullOrEmpty(command.Select))
