@@ -3,6 +3,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
+using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -23,10 +24,14 @@ public sealed class GetTeamHandler(AppDbContext dbContext) : ICommandHandler<Get
         {
             query = query.Where(x => x.WorkspaceId == command.WorkspaceId && x.Identifier.Equals(command.Identifier));
         }
+        else
+        {
+            return new None();
+        }
 
         if (command.Select is not null)
         {
-            query = query.Select<Team>(command.Select);
+            query = query.Select(ExpressionHelper.Select<Team, Team>(command.Select));
         }
 
         var team = await query.FirstOrDefaultAsync(ct).ConfigureAwait(false);
