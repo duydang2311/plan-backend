@@ -22,13 +22,25 @@ public sealed class Authorize : IPreProcessor<Request>
             var db = context.HttpContext.Resolve<AppDbContext>();
             var canRead = true;
 
-            if (context.Request.TeamId is not null)
+            if (context.Request.TeamId.HasValue)
             {
                 canRead = await db
                     .TeamMembers.AnyAsync(
                         a =>
                             a.MemberId == context.Request.UserId
-                            && a.TeamId == context.Request.TeamId
+                            && a.TeamId == context.Request.TeamId.Value
+                            && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
+                        ct
+                    )
+                    .ConfigureAwait(false);
+            }
+            else if (context.Request.ProjectId.HasValue)
+            {
+                canRead = await db
+                    .ProjectMembers.AnyAsync(
+                        a =>
+                            a.UserId == context.Request.UserId
+                            && a.ProjectId == context.Request.ProjectId.Value
                             && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
                         ct
                     )
@@ -40,6 +52,5 @@ public sealed class Authorize : IPreProcessor<Request>
                 await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
             }
         }
-        ;
     }
 }

@@ -20,17 +20,16 @@ public sealed class Authorize : IPreProcessor<Request>
         {
             Guard.Against.Null(context.Request);
             var dbContext = context.HttpContext.Resolve<AppDbContext>();
-            if (
-                !await dbContext
-                    .TeamMembers.AnyAsync(
-                        x =>
-                            x.MemberId == context.Request.UserId
-                            && x.Team.Issues.Any(x => x.Id == context.Request.IssueId)
-                            && x.Role.Permissions.Any(x => x.Permission.Equals(Permit.ReadIssue)),
-                        ct
-                    )
-                    .ConfigureAwait(false)
-            )
+            var canRead = await dbContext
+                .ProjectMembers.AnyAsync(
+                    a =>
+                        a.UserId == context.Request.UserId
+                        && a.Project.Issues.Any(b => b.Id == context.Request.IssueId)
+                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.ReadIssue)),
+                    ct
+                )
+                .ConfigureAwait(false);
+            if (!canRead)
             {
                 await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
             }

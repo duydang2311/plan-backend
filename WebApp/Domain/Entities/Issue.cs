@@ -11,8 +11,8 @@ public sealed record Issue : ISoftDelete
     public IssueId Id { get; init; }
     public UserId AuthorId { get; init; }
     public User Author { get; init; } = null!;
-    public TeamId TeamId { get; init; }
-    public Team Team { get; init; } = null!;
+    public ProjectId ProjectId { get; init; }
+    public Project Project { get; init; } = null!;
     public long OrderNumber { get; init; }
     public string Title { get; init; } = null!;
     public string? Description { get; init; }
@@ -24,5 +24,6 @@ public sealed record Issue : ISoftDelete
     public IssuePriority Priority { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
-    public ICollection<ProjectIssue> ProjectIssues { get; init; } = null!;
+    public ICollection<TeamIssue> TeamIssues { get; init; } = null!;
+    public ICollection<Team> Teams { get; init; } = null!;
 }

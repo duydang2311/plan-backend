@@ -23,7 +23,7 @@ public sealed class CreateIssueHandler(AppDbContext db, IServiceProvider service
             .ConfigureAwait(false);
 
         var lastIssueWithSameStatus = await db
-            .Issues.Where(a => a.TeamId == command.TeamId && a.StatusId == command.StatusId)
+            .Issues.Where(a => a.ProjectId == command.ProjectId && a.StatusId == command.StatusId)
             .Select(a => new { a.StatusRank })
             .OrderByDescending(a => a.StatusRank)
             .FirstOrDefaultAsync(ct)
@@ -33,7 +33,7 @@ public sealed class CreateIssueHandler(AppDbContext db, IServiceProvider service
         {
             Id = IdHelper.NewIssueId(),
             AuthorId = command.AuthorId,
-            TeamId = command.TeamId,
+            ProjectId = command.ProjectId,
             Title = command.Title,
             Description = command.Description,
             StatusId = command.StatusId,
@@ -45,7 +45,7 @@ public sealed class CreateIssueHandler(AppDbContext db, IServiceProvider service
         {
             ServiceProvider = serviceProvider,
             AuthorId = command.AuthorId,
-            TeamId = command.TeamId,
+            ProjectId = command.ProjectId,
             Issue = issue
         }
             .PublishAsync(cancellation: ct)

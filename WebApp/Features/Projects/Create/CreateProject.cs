@@ -10,5 +10,6 @@ public sealed record CreateProject : ICommand<OneOf<ConflictError, ValidationFai
     public required WorkspaceId WorkspaceId { get; init; }
     public required string Name { get; init; }
     public required string Identifier { get; init; }
+    public required UserId UserId { get; init; }
     public required string? Description { get; init; }
 }

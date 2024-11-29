@@ -1,6 +1,6 @@
+using System.Security.Claims;
 using FastEndpoints;
 using Riok.Mapperly.Abstractions;
-using System.Security.Claims;
 using WebApp.Domain.Entities;
 using WebApp.Features.Issues.GetOne;
 
@@ -20,5 +20,8 @@ public sealed record Request
 [Mapper]
 public static partial class RequestMapper
 {
+    [MapperIgnoreSource(nameof(Request.UserId))]
+    [MapperIgnoreTarget(nameof(GetIssue.ProjectId))]
+    [MapperIgnoreTarget(nameof(GetIssue.OrderNumber))]
     public static partial GetIssue ToCommand(this Request request);
 }

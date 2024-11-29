@@ -21,11 +21,11 @@ public sealed class Authorize : IPreProcessor<Request>
             Guard.Against.Null(context.Request);
             var db = context.HttpContext.Resolve<AppDbContext>();
             var canReadAsAMember = await db
-                .TeamMembers.AnyAsync(
-                    x =>
-                        x.MemberId == context.Request.UserId
-                        && x.Team.Issues.Any(x => x.Comments.Any(x => x.Id == context.Request.IssueCommentId))
-                        && x.Role.Permissions.Any(x => x.Permission.Equals(Permit.ReadIssueComment)),
+                .ProjectMembers.AnyAsync(
+                    a =>
+                        a.UserId == context.Request.UserId
+                        && a.Project.Issues.Any(b => b.Comments.Any(x => x.Id == context.Request.IssueCommentId))
+                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.ReadIssueComment)),
                     ct
                 )
                 .ConfigureAwait(false);

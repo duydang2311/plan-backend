@@ -24,5 +24,12 @@ public sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
                 l => l.HasOne<User>().WithMany().HasForeignKey(x => x.MemberId),
                 r => r.HasOne<Team>().WithMany().HasForeignKey(x => x.TeamId)
             );
+        builder
+            .HasMany(x => x.Issues)
+            .WithMany(x => x.Teams)
+            .UsingEntity<TeamIssue>(
+                l => l.HasOne<Issue>().WithMany(a => a.TeamIssues).HasForeignKey(a => a.IssueId),
+                r => r.HasOne<Team>().WithMany(a => a.TeamIssues).HasForeignKey(a => a.TeamId)
+            );
     }
 }

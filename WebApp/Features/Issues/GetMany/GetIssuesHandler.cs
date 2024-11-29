@@ -1,6 +1,7 @@
 using System.Linq.Dynamic.Core;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Constants;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -16,24 +17,26 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
         if (!command.TeamId.HasValue && !command.ProjectId.HasValue)
         {
             query = query.Where(a =>
-                a.Team.Members.Any(b => b.Id == command.UserId)
-                || a.ProjectIssues.Any(b => b.Project.Teams.Any(b => b.Members.Any(c => c.Id == command.UserId)))
+                a.Project.Members.Any(b =>
+                    b.UserId == command.UserId && b.Role.Permissions.Any(c => c.Permission.Equals(Permit.ReadIssue))
+                )
+                || a.Teams.Any(b =>
+                    b.Members.Any(b =>
+                        b.Id == command.UserId
+                        && b.Roles.Any(c => c.Role.Permissions.Any(d => d.Permission.Equals(Permit.ReadIssue)))
+                    )
+                )
             );
         }
         else
         {
-            if (command.TeamId.HasValue)
-            {
-                query = query.Where(a => a.TeamId == command.TeamId);
-            }
             if (command.ProjectId.HasValue)
             {
-                query = query.Where(i =>
-                    i.ProjectIssues.Any(p =>
-                        p.ProjectId == command.ProjectId
-                        && p.Project.Teams.Any(t => t.Members.Any(m => m.Id == command.UserId))
-                    )
-                );
+                query = query.Where(a => a.ProjectId == command.ProjectId.Value);
+            }
+            if (command.TeamId.HasValue)
+            {
+                query = query.Where(a => a.Teams.Any(b => b.Id == command.TeamId.Value));
             }
         }
 

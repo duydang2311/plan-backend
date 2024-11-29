@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace WebApp.Api.V1.Projects.GetMany.ByWorkspace;
+namespace WebApp.Api.V1.Projects.GetMany;
 
 using Results = Results<ForbidHttpResult, Ok<Response>>;
 
@@ -9,7 +9,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Get("workspaces/{WorkspaceId}/projects");
+        Get("projects");
         Version(1);
     }
 

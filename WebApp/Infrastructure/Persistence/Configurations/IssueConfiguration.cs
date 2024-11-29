@@ -21,10 +21,10 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasDefaultValue(IssuePriority.None);
 
         builder.HasKey(a => a.Id);
-        builder.HasOne(a => a.Team).WithMany(a => a.Issues).HasForeignKey(a => a.TeamId);
+        builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);
         builder.HasOne(a => a.Author).WithMany().HasForeignKey(a => a.AuthorId);
         builder.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId).OnDelete(DeleteBehavior.SetNull);
-        builder.HasIndex(a => new { a.TeamId, a.OrderNumber }).IsUnique();
+        builder.HasIndex(a => new { a.ProjectId, a.OrderNumber }).IsUnique();
         builder.HasIndex(a => a.StatusId);
         builder.HasIndex(a => a.StatusRank);
         builder.HasQueryFilter(a => !a.IsDeleted);

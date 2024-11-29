@@ -18,13 +18,15 @@ public sealed class GetIssueHandler(AppDbContext dbContext) : ICommandHandler<Ge
         {
             query = query.Where(x => x.Id == command.IssueId);
         }
-        else if (command.TeamId.HasValue && command.OrderNumber.HasValue)
+        else if (command.ProjectId.HasValue && command.OrderNumber.HasValue)
         {
-            query = query.Where(x => x.TeamId == command.TeamId.Value && x.OrderNumber == command.OrderNumber.Value);
+            query = query.Where(x =>
+                x.ProjectId == command.ProjectId.Value && x.OrderNumber == command.OrderNumber.Value
+            );
         }
         else
         {
-            throw new InvalidOperationException();
+            return new None();
         }
 
         if (!string.IsNullOrEmpty(command.Select))

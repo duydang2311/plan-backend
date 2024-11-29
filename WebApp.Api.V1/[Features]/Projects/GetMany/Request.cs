@@ -5,11 +5,11 @@ using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Features.Projects.GetMany;
 
-namespace WebApp.Api.V1.Projects.GetMany.ByWorkspace;
+namespace WebApp.Api.V1.Projects.GetMany;
 
 public sealed record Request : Collective
 {
-    public WorkspaceId WorkspaceId { get; init; }
+    public WorkspaceId? WorkspaceId { get; init; }
     public string? Select { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
@@ -19,5 +19,6 @@ public sealed record Request : Collective
 [Mapper]
 public static partial class RequestMapper
 {
+    [MapperIgnoreSource(nameof(Request.UserId))]
     public static partial GetProjects ToCommand(this Request request);
 }

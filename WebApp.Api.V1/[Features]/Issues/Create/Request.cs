@@ -9,7 +9,7 @@ namespace WebApp.Api.V1.Issues.Create;
 
 public sealed record Request
 {
-    public TeamId? TeamId { get; init; }
+    public ProjectId? ProjectId { get; init; }
     public string? Title { get; init; }
     public string? Description { get; init; }
     public StatusId? StatusId { get; init; }
@@ -22,7 +22,7 @@ public sealed class RequestValidator : Validator<Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.TeamId).NotNull();
+        RuleFor(x => x.ProjectId).NotNull();
         RuleFor(x => x.Title).NotEmpty();
     }
 }

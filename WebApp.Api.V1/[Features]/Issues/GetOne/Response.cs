@@ -11,8 +11,8 @@ public sealed record Response
     public Instant? UpdatedTime { get; init; }
     public IssueId? Id { get; init; }
     public UserId? AuthorId { get; init; }
-    public TeamId? TeamId { get; init; }
-    public Team? Team { get; init; }
+    public ProjectId? ProjectId { get; init; }
+    public Project? Project { get; init; }
     public long? OrderNumber { get; init; }
     public string? Title { get; init; }
     public string? Description { get; init; }
@@ -30,6 +30,7 @@ public static partial class ResponseMapper
     [MapperIgnoreSource(nameof(Issue.DeletedTime))]
     [MapperIgnoreSource(nameof(Issue.Comments))]
     [MapperIgnoreSource(nameof(Issue.Fields))]
-    [MapperIgnoreSource(nameof(Issue.ProjectIssues))]
+    [MapperIgnoreSource(nameof(Issue.TeamIssues))]
+    [MapperIgnoreSource(nameof(Issue.Teams))]
     public static partial Response ToResponse(this Issue issue);
 }
