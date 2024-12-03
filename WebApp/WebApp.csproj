@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Casbin.NET" />
     <PackageReference Include="Casbin.NET.Adapter.EFCore" />
+    <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
     <PackageReference Include="FastEndpoints" />

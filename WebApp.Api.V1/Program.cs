@@ -14,12 +14,17 @@ using WebApp.Infrastructure.Mails.Abstractions;
 using WebApp.Infrastructure.Nats.Abstractions;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
+using WebApp.Infrastructure.Storages.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var persistenceOptions =
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
+
+var cloudinaryOptions =
+    builder.Configuration.GetRequiredSection(CloudinaryOptions.Section).Get<CloudinaryOptions>()
+    ?? throw new InvalidOperationException("CloudinaryOptions must be configured");
 
 builder.AddServiceDefaults();
 
@@ -46,6 +51,11 @@ builder
 builder
     .Services.AddOptions<PersistenceOptions>()
     .BindConfiguration(PersistenceOptions.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder
+    .Services.AddOptions<CloudinaryOptions>()
+    .BindConfiguration(CloudinaryOptions.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
@@ -87,7 +97,8 @@ builder
     .AddJwts()
     .AddMails()
     .AddAuthorization()
-    .AddNATS();
+    .AddNATS()
+    .AddStorage(cloudinaryOptions);
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
