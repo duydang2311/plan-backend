@@ -58,7 +58,7 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
         query = command
             .Order.Where(static x =>
                 x.Name.EqualsEither(
-                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber", "Priority", "Status.Rank"],
+                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber", "Priority", "StatusRank", "Status.Rank"],
                     StringComparison.OrdinalIgnoreCase
                 )
             )
