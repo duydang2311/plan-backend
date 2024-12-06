@@ -3,11 +3,11 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
-using Microsoft.Extensions.Caching.Hybrid;
 
 namespace WebApp.Api.V1.Common.Authentications;
 
@@ -63,19 +63,20 @@ public class BasicAuthenticationSchemeHandler(
             return AuthenticateResult.Fail(BadToken);
         }
 
-        var userId = await cache.GetOrCreateAsync(
-            $"session-{parseResult.Value}",
-            (token: (SessionToken)parseResult.Value, db),
-            static async (state, token) =>
-            {
-                return await state.db
-                        .UserSessions.Where(a => a.Token == state.token)
+        var userId = await cache
+            .GetOrCreateAsync(
+                $"session-{parseResult.Value}",
+                (token: (SessionToken)parseResult.Value, db),
+                static async (state, token) =>
+                {
+                    return await state
+                        .db.UserSessions.Where(a => a.Token == state.token)
                         .Select(a => a.UserId)
-                        .FirstOrDefaultAsync()
+                        .FirstOrDefaultAsync(CancellationToken.None)
                         .ConfigureAwait(false);
-            })
+                }
+            )
             .ConfigureAwait(false);
-        Console.WriteLine("Session = " + userId);
 
         if (userId == UserId.Empty)
         {
@@ -90,9 +91,6 @@ public class BasicAuthenticationSchemeHandler(
 
     private Task<UserId> GetUserSessionAsync(SessionToken sessionToken)
     {
-        return db
-            .UserSessions.Where(a => a.Token == sessionToken)
-            .Select(a => a.UserId)
-            .FirstOrDefaultAsync();
+        return db.UserSessions.Where(a => a.Token == sessionToken).Select(a => a.UserId).FirstOrDefaultAsync();
     }
 }
