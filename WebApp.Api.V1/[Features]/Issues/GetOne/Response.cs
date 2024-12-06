@@ -11,6 +11,7 @@ public sealed record Response
     public Instant? UpdatedTime { get; init; }
     public IssueId? Id { get; init; }
     public UserId? AuthorId { get; init; }
+    public User? Author { get; init; }
     public ProjectId? ProjectId { get; init; }
     public Project? Project { get; init; }
     public long? OrderNumber { get; init; }
@@ -25,7 +26,6 @@ public sealed record Response
 [Mapper]
 public static partial class ResponseMapper
 {
-    [MapperIgnoreSource(nameof(Issue.Author))]
     [MapperIgnoreSource(nameof(Issue.IsDeleted))]
     [MapperIgnoreSource(nameof(Issue.DeletedTime))]
     [MapperIgnoreSource(nameof(Issue.Comments))]
