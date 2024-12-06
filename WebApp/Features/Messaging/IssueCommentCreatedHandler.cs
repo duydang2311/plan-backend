@@ -8,19 +8,22 @@ using WebApp.Domain.Events;
 
 namespace WebApp.Features.Messaging;
 
-public sealed class IssueCommentCreatedHandler : IEventHandler<IssueCommentCreated>
+public sealed class IssueCommentCreatedHandler(
+    IServiceScopeFactory serviceScopeFactory,
+    ILogger<IssueCommentCreatedHandler> logger
+) : ICommandHandler<IssueCommentCreated>
 {
-    public async Task HandleAsync(IssueCommentCreated eventModel, CancellationToken ct)
+    public async Task ExecuteAsync(IssueCommentCreated command, CancellationToken ct)
     {
-        var nats = eventModel.ServiceProvider.GetRequiredService<INatsConnection>();
-        var options = eventModel.ServiceProvider.GetRequiredService<IOptions<JsonOptions>>();
-        var logger = eventModel.ServiceProvider.GetRequiredService<ILogger<IssueCommentCreatedHandler>>();
+        await using var scope = serviceScopeFactory.CreateAsyncScope();
+        var nats = scope.ServiceProvider.GetRequiredService<INatsConnection>();
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<JsonOptions>>();
         try
         {
             await nats.PublishAsync(
-                    $"issues.{eventModel.IssueComment.IssueId.ToBase64String()}.comments.created",
+                    $"issues.{command.IssueComment.IssueId.ToBase64String()}.comments.created",
                     JsonSerializer.Serialize(
-                        new { issueCommentId = eventModel.IssueComment.Id.Value, },
+                        new { issueCommentId = command.IssueComment.Id.Value, },
                         options.Value.SerializerOptions
                     ),
                     cancellationToken: ct
@@ -30,6 +33,7 @@ public sealed class IssueCommentCreatedHandler : IEventHandler<IssueCommentCreat
         catch (NatsException e)
         {
             logger.LogError(e, "Failed to publish comments.created message");
+            throw;
         }
     }
 }
