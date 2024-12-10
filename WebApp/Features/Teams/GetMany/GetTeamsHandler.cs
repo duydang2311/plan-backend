@@ -1,6 +1,7 @@
 using System.Linq.Dynamic.Core;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -24,7 +25,7 @@ public sealed class GetTeamsHandler(AppDbContext dbContext) : ICommandHandler<Ge
         }
         if (command.Select is not null)
         {
-            query = query.Select<Team>(command.Select);
+            query = query.Select(ExpressionHelper.Select<Team, Team>(command.Select));
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
