@@ -17,4 +17,5 @@ public sealed record class User
     public UserGoogleAuth? GoogleAuth { get; init; } = null!;
     public ICollection<UserRole> Roles { get; init; } = null!;
     public UserProfile? Profile { get; init; } = null!;
+    public ICollection<Issue> Issues { get; init; } = null!;
 }

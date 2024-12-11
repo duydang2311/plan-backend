@@ -24,6 +24,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);
         builder.HasOne(a => a.Author).WithMany().HasForeignKey(a => a.AuthorId);
         builder.HasOne(a => a.Status).WithMany().HasForeignKey(a => a.StatusId).OnDelete(DeleteBehavior.SetNull);
+        builder.HasMany(a => a.Assignees).WithMany(a => a.Issues).UsingEntity<IssueAssignee>();
         builder.HasIndex(a => new { a.ProjectId, a.OrderNumber }).IsUnique();
         builder.HasIndex(a => a.StatusId);
         builder.HasIndex(a => a.StatusRank);

@@ -26,4 +26,6 @@ public sealed record Issue : ISoftDelete
     public ICollection<IssueField> Fields { get; init; } = null!;
     public ICollection<TeamIssue> TeamIssues { get; init; } = null!;
     public ICollection<Team> Teams { get; init; } = null!;
+    public ICollection<IssueAssignee> IssueAssignees { get; init; } = null!;
+    public ICollection<User> Assignees { get; init; } = null!;
 }
