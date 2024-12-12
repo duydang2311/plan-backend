@@ -1,15 +1,19 @@
 #pragma warning disable EXTEXP0018
 
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
+using WebApp.Features.Users.Search;
 using WebApp.Infrastructure.Mails.Abstractions;
 using WebApp.Infrastructure.Nats.Abstractions;
 using WebApp.Infrastructure.Persistence;
@@ -192,5 +196,16 @@ app.UseJobQueues(options =>
     options.MaxConcurrency = 4;
     options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
 });
+
+static Expression CallExpression(Expression arg1, Expression arg2)
+{
+    var methodInfo = typeof(NpgsqlTrigramsDbFunctionsExtensions).GetMethod(
+        "TrigramsSimilarity",
+        BindingFlags.Static | BindingFlags.Public
+    )!;
+    var functions = Expression.MakeMemberAccess(null, typeof(EF).GetProperty("Functions")!);
+    var call = Expression.Call(null, methodInfo, [functions, arg1, arg2]);
+    return call;
+}
 
 app.Run();

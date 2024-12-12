@@ -20,5 +20,6 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.Email).HasMethod("gin").HasOperators("gin_trgm_ops");
         builder.HasMany(a => a.Issues).WithMany(a => a.Assignees).UsingEntity<IssueAssignee>();
+        builder.HasMany(a => a.Workspaces).WithMany(a => a.Users).UsingEntity<WorkspaceMember>();
     }
 }

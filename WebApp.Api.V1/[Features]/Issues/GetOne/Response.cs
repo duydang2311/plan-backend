@@ -21,7 +21,8 @@ public sealed record Response
     public Status? Status { get; init; }
     public string? StatusRank { get; init; }
     public IssuePriority? Priority { get; init; }
-    public ICollection<Team> Teams { get; init; } = null!;
+    public ICollection<Team>? Teams { get; init; } = null!;
+    public ICollection<User>? Assignees { get; init; } = null!;
 }
 
 [Mapper]
@@ -32,5 +33,6 @@ public static partial class ResponseMapper
     [MapperIgnoreSource(nameof(Issue.Comments))]
     [MapperIgnoreSource(nameof(Issue.Fields))]
     [MapperIgnoreSource(nameof(Issue.TeamIssues))]
+    [MapperIgnoreSource(nameof(Issue.IssueAssignees))]
     public static partial Response ToResponse(this Issue issue);
 }

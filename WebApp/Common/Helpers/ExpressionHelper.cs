@@ -118,6 +118,17 @@ public static class ExpressionHelper
         return Expression.Lambda<Func<TSource, TTarget>>(body, parameter);
     }
 
+    public static MemberInitExpression Init<TSource, TTarget>(ParameterExpression parameter, string members)
+    {
+        return NewObject(
+            typeof(TTarget),
+            parameter,
+            members
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select(a => a.Split('.'))
+        );
+    }
+
     private static MemberInitExpression NewObject(
         Type targetType,
         Expression source,

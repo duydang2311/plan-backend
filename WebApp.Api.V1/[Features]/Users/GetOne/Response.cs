@@ -34,6 +34,8 @@ public static partial class ResponseMapper
     [MapperIgnoreSource(nameof(User.Teams))]
     [MapperIgnoreSource(nameof(User.GoogleAuth))]
     [MapperIgnoreSource(nameof(User.Roles))]
+    [MapperIgnoreSource(nameof(User.Issues))]
+    [MapperIgnoreSource(nameof(User.Workspaces))]
     public static partial Response ToResponse(this User user);
 
     [MapperIgnoreSource(nameof(UserProfile.CreatedTime))]

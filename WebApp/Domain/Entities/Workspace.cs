@@ -15,6 +15,8 @@ public sealed record class Workspace
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
 
+    public ICollection<User> Users { get; init; } = null!;
+
     public ICollection<WorkspaceStatus> Statuses
     {
         get => statuses ??= [];

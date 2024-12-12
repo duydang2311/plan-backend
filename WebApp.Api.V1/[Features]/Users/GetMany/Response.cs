@@ -2,7 +2,7 @@ using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Api.V1.Users.Search;
+namespace WebApp.Api.V1.Users.GetMany;
 
 public sealed record Response : PaginatedList<GetOne.Response> { }
 
@@ -10,5 +10,5 @@ public sealed record Response : PaginatedList<GetOne.Response> { }
 [UseStaticMapper(typeof(GetOne.ResponseMapper))]
 public static partial class ResponseMapper
 {
-    public static partial Response ToResponse(this PaginatedList<User> result);
+    public static partial Response ToResponse(this PaginatedList<User> list);
 }

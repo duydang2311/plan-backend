@@ -18,4 +18,6 @@ public sealed record class User
     public ICollection<UserRole> Roles { get; init; } = null!;
     public UserProfile? Profile { get; init; } = null!;
     public ICollection<Issue> Issues { get; init; } = null!;
+    public ICollection<Workspace> Workspaces { get; init; } = null!;
+    public ICollection<WorkspaceMember> WorkspaceMembers { get; init; } = null!;
 }
