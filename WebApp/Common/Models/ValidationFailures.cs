@@ -35,9 +35,4 @@ public sealed class ValidationFailures
         Failures.Add(new ValidationFailure(name, message) { ErrorCode = code });
         return this;
     }
-
-    public ProblemDetails ToProblemDetails(string? instance = null, string? traceId = null, int? statusCode = null)
-    {
-        return new ProblemDetails(Failures, instance!, traceId!, statusCode ?? 400);
-    }
 }

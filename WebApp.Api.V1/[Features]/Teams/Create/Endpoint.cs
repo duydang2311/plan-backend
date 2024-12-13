@@ -2,6 +2,7 @@ using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Common.Constants;
+using WebApp.Common.Models;
 using WebApp.Features.Teams.Create;
 
 namespace WebApp.Api.V1.Teams.Create;

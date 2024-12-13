@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.IssueComments.Create;
 
