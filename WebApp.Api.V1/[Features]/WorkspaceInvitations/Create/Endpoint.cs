@@ -10,7 +10,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Post("workspace/{WorkspaceId}/invitations");
+        Post("workspaces/{WorkspaceId}/invitations");
         Version(1);
     }
 
