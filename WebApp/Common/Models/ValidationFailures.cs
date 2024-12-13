@@ -1,4 +1,3 @@
-using FastEndpoints;
 using FluentValidation.Results;
 
 namespace WebApp.Common.Models;
