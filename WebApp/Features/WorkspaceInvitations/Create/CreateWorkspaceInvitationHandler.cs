@@ -23,10 +23,7 @@ public sealed class CreateWorkspaceInvitationHandler(AppDbContext db)
                 .ConfigureAwait(false)
         )
         {
-            return ValidationFailures
-                .Many(2)
-                .Add("workspace_id", "User is already a member")
-                .Add("user_id", "User is already a member");
+            return ValidationFailures.Single("userId", "User is already a member", "member_already");
         }
 
         var invitation = new WorkspaceInvitation { WorkspaceId = command.WorkspaceId, UserId = command.UserId };
@@ -41,8 +38,8 @@ public sealed class CreateWorkspaceInvitationHandler(AppDbContext db)
             return e.ToValidationFailures(propertyName =>
                 propertyName switch
                 {
-                    nameof(WorkspaceInvitation.WorkspaceId) => ("workspace_id", "Workspace does not exist"),
-                    nameof(WorkspaceInvitation.UserId) => ("user_id", "User does not exist"),
+                    nameof(WorkspaceInvitation.WorkspaceId) => ("workspaceId", "Workspace does not exist"),
+                    nameof(WorkspaceInvitation.UserId) => ("userId", "User does not exist"),
                     _ => null
                 }
             );
@@ -52,8 +49,7 @@ public sealed class CreateWorkspaceInvitationHandler(AppDbContext db)
             return e.ToValidationFailures(propertyName =>
                 propertyName switch
                 {
-                    nameof(WorkspaceInvitation.WorkspaceId) => ("workspace_id", "User is already invited"),
-                    nameof(WorkspaceInvitation.UserId) => ("user_id", "User is already invited"),
+                    nameof(WorkspaceInvitation.UserId) => ("userId", "User is already invited"),
                     _ => null
                 }
             );
