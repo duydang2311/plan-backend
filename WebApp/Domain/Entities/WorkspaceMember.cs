@@ -1,7 +1,11 @@
+using NodaTime;
+
 namespace WebApp.Domain.Entities;
 
 public sealed record WorkspaceMember
 {
+    public Instant CreatedTime { get; init; }
+    public Instant UpdatedTime { get; init; }
     public WorkspaceMemberId Id { get; init; }
     public UserId UserId { get; init; }
     public User User { get; init; } = null!;

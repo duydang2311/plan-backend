@@ -9,6 +9,8 @@ public sealed class WorkspaceMemberConfiguration : IEntityTypeConfiguration<Work
     public void Configure(EntityTypeBuilder<WorkspaceMember> builder)
     {
         builder.ToTable("workspace_members");
+        builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
+        builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.Id).HasConversion<EntityIdConverter<WorkspaceMemberId, long>>().ValueGeneratedOnAdd();
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.UserId);
