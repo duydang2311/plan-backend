@@ -1,3 +1,4 @@
+using NodaTime;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -8,7 +9,9 @@ public sealed record Response : PaginatedList<Response.Item>
 {
     public sealed record Item
     {
-        public UserRoleId UserRoleId { get; init; }
+        public Instant CreatedTime { get; init; }
+        public Instant UpdatedTime { get; init; }
+        public WorkspaceMemberId Id { get; init; }
         public UserId UserId { get; init; }
         public User User { get; init; } = null!;
         public RoleId RoleId { get; init; }
