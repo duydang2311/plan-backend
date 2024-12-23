@@ -15,6 +15,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.Property(a => a.UpdatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.Id).HasConversion<EntityGuidConverter<IssueId>>().ValueGeneratedOnAdd();
         builder.Property(a => a.Title).HasMaxLength(128);
+        builder.Property(a => a.StatusRank).UseCollation("C");
         builder
             .Property(a => a.Priority)
             .HasConversion<EnumToNumberConverter<IssuePriority, byte>>()
