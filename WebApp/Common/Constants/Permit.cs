@@ -30,4 +30,6 @@ public static class Permit
     public const string CreateWorkspaceStatus = "workspace-status:create";
     public const string DeleteWorkspaceStatus = "workspace-status:delete";
     public const string UpdateWorkspaceStatus = "workspace-status:update";
+
+    public const string DeleteWorkspaceMember = "workspace-member:delete";
 }
