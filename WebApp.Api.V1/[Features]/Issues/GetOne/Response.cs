@@ -11,7 +11,7 @@ public sealed record Response
     public Instant? UpdatedTime { get; init; }
     public IssueId? Id { get; init; }
     public UserId? AuthorId { get; init; }
-    public User? Author { get; init; }
+    public ResponseAuthor? Author { get; init; }
     public ProjectId? ProjectId { get; init; }
     public Project? Project { get; init; }
     public long? OrderNumber { get; init; }
@@ -25,6 +25,13 @@ public sealed record Response
     public ICollection<User>? Assignees { get; init; } = null!;
 }
 
+public sealed record ResponseAuthor
+{
+    public UserId? Id { get; init; }
+    public string? Email { get; init; }
+    public UserProfile? Profile { get; init; } = null!;
+}
+
 [Mapper]
 public static partial class ResponseMapper
 {
@@ -35,4 +42,19 @@ public static partial class ResponseMapper
     [MapperIgnoreSource(nameof(Issue.TeamIssues))]
     [MapperIgnoreSource(nameof(Issue.IssueAssignees))]
     public static partial Response ToResponse(this Issue issue);
+
+    [MapperIgnoreSource(nameof(User.GoogleAuth))]
+    [MapperIgnoreSource(nameof(User.Issues))]
+    [MapperIgnoreSource(nameof(User.IsVerified))]
+    [MapperIgnoreSource(nameof(User.CreatedTime))]
+    [MapperIgnoreSource(nameof(User.UpdatedTime))]
+    [MapperIgnoreSource(nameof(User.PasswordHash))]
+    [MapperIgnoreSource(nameof(User.Salt))]
+    [MapperIgnoreSource(nameof(User.Workspaces))]
+    [MapperIgnoreSource(nameof(User.WorkspaceMembers))]
+    [MapperIgnoreSource(nameof(User.Teams))]
+    [MapperIgnoreSource(nameof(User.Roles))]
+    public static partial ResponseAuthor? NullableResponseAuthor(User? user);
+
+    public static ResponseAuthor? ToResponseAuthor(this User user) => NullableResponseAuthor(user);
 }
