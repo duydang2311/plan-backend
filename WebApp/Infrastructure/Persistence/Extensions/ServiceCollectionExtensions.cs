@@ -3,6 +3,7 @@ using Casbin.Persist;
 using Casbin.Persist.Adapter.EFCore;
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Domain.Constants;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 
@@ -27,12 +28,16 @@ public static partial class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    private static void Configure(DbContextOptionsBuilder builder, PersistenceOptions persistenceOptions)
+    public static void Configure(this DbContextOptionsBuilder builder, PersistenceOptions persistenceOptions)
     {
         builder
             .UseNpgsql(
                 persistenceOptions.ConnectionString,
-                builder => builder.UseNodaTime().MigrationsAssembly(persistenceOptions.MigrationsAssembly)
+                builder =>
+                    builder
+                        .MapEnum<IssueAuditAction>("issue_audit_action")
+                        .UseNodaTime()
+                        .MigrationsAssembly(persistenceOptions.MigrationsAssembly)
             )
             .UseSnakeCaseNamingConvention()
             .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)

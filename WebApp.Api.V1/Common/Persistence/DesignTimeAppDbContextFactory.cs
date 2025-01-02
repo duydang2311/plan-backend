@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using WebApp.Domain.Constants;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 
@@ -20,15 +21,8 @@ public sealed class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<
         var options =
             configuration.GetSection(PersistenceOptions.Section).Get<PersistenceOptions>()
             ?? throw new InvalidOperationException("PersistenceOptions must be configured");
-        return new AppDbContext(
-            new DbContextOptionsBuilder<AppDbContext>()
-                .UseNpgsql(
-                    options.ConnectionString,
-                    builder => builder.UseNodaTime().MigrationsAssembly(options.MigrationsAssembly)
-                )
-                .UseSnakeCaseNamingConvention()
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                .Options
-        );
+        var builder = new DbContextOptionsBuilder<AppDbContext>();
+        builder.Configure(options);
+        return new AppDbContext(builder.Options);
     }
 }
