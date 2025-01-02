@@ -1,8 +1,6 @@
-using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Common.Constants;
 using WebApp.Features.Workspaces.Get;
 using WebApp.Infrastructure.Persistence;
 
@@ -10,7 +8,7 @@ namespace WebApp.Api.V1.Workspaces.Get.ByPath;
 
 using Result = Results<ForbidHttpResult, NotFound, Ok<Response>>;
 
-public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpoint<Request, Result>
+public sealed class Endpoint(AppDbContext dbContext) : Endpoint<Request, Result>
 {
     public override void Configure()
     {
@@ -26,14 +24,15 @@ public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpo
             .Select(x => x.Id)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-        if (
-            !await enforcer
-                .EnforceAsync(req.UserId.ToString(), workspaceId.ToString(), workspaceId.ToString(), Permit.Read)
-                .ConfigureAwait(false)
-        )
-        {
-            return TypedResults.Forbid();
-        }
+        // TODO: Authorize
+        // if (
+        //     !await enforcer
+        //         .EnforceAsync(req.UserId.ToString(), workspaceId.ToString(), workspaceId.ToString(), Permit.Read)
+        //         .ConfigureAwait(false)
+        // )
+        // {
+        //     return TypedResults.Forbid();
+        // }
 
         var oneOf = await new GetWorkspace { WorkspaceId = workspaceId, Select = req.Select, }
             .ExecuteAsync(ct)

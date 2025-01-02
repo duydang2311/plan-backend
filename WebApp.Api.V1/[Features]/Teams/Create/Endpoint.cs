@@ -1,7 +1,5 @@
-using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
-using WebApp.Common.Constants;
 using WebApp.Common.Models;
 using WebApp.Features.Teams.Create;
 
@@ -9,7 +7,7 @@ namespace WebApp.Api.V1.Teams.Create;
 
 using Result = Results<ForbidHttpResult, ProblemDetails, Ok<Response>>;
 
-public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
+public sealed class Endpoint : Endpoint<Request, Result>
 {
     public override void Configure()
     {
@@ -20,19 +18,20 @@ public sealed class Endpoint(IEnforcer enforcer) : Endpoint<Request, Result>
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        if (
-            !await enforcer
-                .EnforceAsync(
-                    req.UserId.ToString(),
-                    req.WorkspaceId!.Value.ToString(),
-                    req.WorkspaceId.Value.ToString(),
-                    Permit.WriteTeam
-                )
-                .ConfigureAwait(false)
-        )
-        {
-            return TypedResults.Forbid();
-        }
+        // TODO: Authorize
+        // if (
+        //     !await enforcer
+        //         .EnforceAsync(
+        //             req.UserId.ToString(),
+        //             req.WorkspaceId!.Value.ToString(),
+        //             req.WorkspaceId.Value.ToString(),
+        //             Permit.WriteTeam
+        //         )
+        //         .ConfigureAwait(false)
+        // )
+        // {
+        //     return TypedResults.Forbid();
+        // }
 
         var oneOf = await new CreateTeam
         {

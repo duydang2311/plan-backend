@@ -22,12 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\casbin_model.conf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\WebApp\WebApp.csproj" />
     <ProjectReference Include="..\WebApp.ServiceDefaults\WebApp.ServiceDefaults.csproj" />
   </ItemGroup>

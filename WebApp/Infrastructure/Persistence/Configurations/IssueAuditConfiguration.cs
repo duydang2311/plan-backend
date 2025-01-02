@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Persistence.Configurations;
@@ -13,7 +15,7 @@ public sealed class IssueAuditConfiguration : IEntityTypeConfiguration<IssueAudi
         builder.Property(a => a.Id).ValueGeneratedOnAdd();
         builder.Property(a => a.IssueId).HasConversion<EntityGuidConverter<IssueId>>().ValueGeneratedNever();
         builder.Property(a => a.UserId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
-        builder.Property(a => a.Action);
+        builder.Property(a => a.Action).HasConversion<EnumToNumberConverter<IssueAuditAction, byte>>();
         builder.Property(a => a.Data);
 
         builder.HasKey(a => a.Id);

@@ -1,6 +1,4 @@
-using Casbin;
 using FastEndpoints;
-using WebApp.Common.Constants;
 using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
@@ -12,17 +10,7 @@ public sealed class TeamCreatedHandler : IEventHandler<TeamCreated>
 {
     public Task HandleAsync(TeamCreated eventModel, CancellationToken ct)
     {
-        var (dbContext, enforcer) = (
-            eventModel.ServiceProvider.GetRequiredService<AppDbContext>(),
-            eventModel.ServiceProvider.GetRequiredService<IEnforcer>()
-        );
-        var sUserId = eventModel.UserId.ToString();
-        var sTeamId = eventModel.Team.Id.ToString();
-        enforcer.AddPolicy(sUserId, string.Empty, sTeamId, Permit.Read);
-        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.Read);
-        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CreateIssue);
-        enforcer.AddPolicy("member", sTeamId, sTeamId, Permit.CommentIssue);
-        enforcer.AddGroupingPolicy(sUserId, "member", sTeamId);
+        var dbContext = eventModel.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Add(
             new TeamMember
             {

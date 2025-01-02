@@ -1,8 +1,6 @@
-using Casbin;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Common.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Features.Teams.GetOne;
 using WebApp.Infrastructure.Persistence;
@@ -11,7 +9,7 @@ namespace WebApp.Api.V1.Teams.GetOne.ByIdentifier;
 
 using Result = Results<ForbidHttpResult, NotFound, Ok<ResponseDto>>;
 
-public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpoint<Request, Result>
+public sealed class Endpoint(AppDbContext dbContext) : Endpoint<Request, Result>
 {
     public override void Configure()
     {
@@ -32,14 +30,15 @@ public sealed class Endpoint(IEnforcer enforcer, AppDbContext dbContext) : Endpo
             return TypedResults.NotFound();
         }
 
-        if (
-            !await enforcer
-                .EnforceAsync(req.UserId.ToString(), string.Empty, teamId.ToString(), Permit.Read)
-                .ConfigureAwait(false)
-        )
-        {
-            return TypedResults.Forbid();
-        }
+        // TODO: Authorize
+        // if (
+        //     !await enforcer
+        //         .EnforceAsync(req.UserId.ToString(), string.Empty, teamId.ToString(), Permit.Read)
+        //         .ConfigureAwait(false)
+        // )
+        // {
+        //     return TypedResults.Forbid();
+        // }
 
         var oneOf = await new GetTeam
         {
