@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using WebApp.Domain.Constants;
 
 #nullable disable
 
@@ -58,10 +58,11 @@ namespace WebApp.Host.Migrations
             migrationBuilder.CreateIndex(name: "ix_issue_audits_user_id", table: "issue_audits", column: "user_id");
 
             migrationBuilder.Sql(
-                """
+                $"""
                     create function create_issue_audits_action_create() returns trigger as $$
                     begin
-                        insert into issue_audits(issue_id, user_id) values (NEW.id, NEW.author_id);
+                        insert into issue_audits(issue_id, user_id, action) values (NEW.id, NEW.author_id, {(byte)
+                    IssueAuditAction.Create});
                         return null;
                     end;
                     $$ language plpgsql;
