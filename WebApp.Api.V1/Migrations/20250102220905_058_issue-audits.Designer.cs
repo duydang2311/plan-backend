@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using WebApp.Domain.Constants;
 using WebApp.Infrastructure.Persistence;
 
 #nullable disable
@@ -16,8 +15,8 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250102183242_059_issue-audits_issue-audit-action-enum")]
-    partial class _059_issueaudits_issueauditactionenum
+    [Migration("20250102220905_058_issue-audits")]
+    partial class _058_issueaudits
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +26,6 @@ namespace WebApp.Host.Migrations
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "issue_audit_action", new[] { "create", "update_description", "update_title" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.HasSequence("StatusSequence");
@@ -214,8 +212,8 @@ namespace WebApp.Host.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<IssueAuditAction>("Action")
-                        .HasColumnType("issue_audit_action")
+                    b.Property<byte>("Action")
+                        .HasColumnType("smallint")
                         .HasColumnName("action");
 
                     b.Property<Instant>("CreatedTime")

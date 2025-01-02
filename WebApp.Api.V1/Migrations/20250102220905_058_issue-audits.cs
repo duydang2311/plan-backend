@@ -30,7 +30,7 @@ namespace WebApp.Host.Migrations
                         defaultValueSql: "now()"
                     ),
                     issue_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    action = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    action = table.Column<byte>(type: "smallint", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     data = table.Column<JsonDocument>(type: "jsonb", nullable: true)
                 },
@@ -75,6 +75,12 @@ namespace WebApp.Host.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(
+                """
+                    drop trigger TR_issues_AI_issue_audits on issues;
+                    drop function create_issue_audits_action_create();
+                """
+            );
             migrationBuilder.DropTable(name: "issue_audits");
         }
     }
