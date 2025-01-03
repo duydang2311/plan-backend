@@ -11,5 +11,5 @@ public sealed record Request
     public string? Select { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
-    public Guid UserId { get; init; }
+    public UserId UserId { get; init; }
 }

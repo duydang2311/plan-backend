@@ -11,27 +11,12 @@ public sealed class Endpoint : Endpoint<Request, Result>
     public override void Configure()
     {
         Get("workspaces/{WorkspaceId}");
-        Verbs(Http.GET);
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        // TODO: Authorize
-        // if (
-        //     !await enforcer
-        //         .EnforceAsync(
-        //             req.UserId.ToString(),
-        //             req.WorkspaceId.ToString(),
-        //             req.WorkspaceId.ToString(),
-        //             Permit.Read
-        //         )
-        //         .ConfigureAwait(false)
-        // )
-        // {
-        //     return TypedResults.Forbid();
-        // }
-
         var oneOf = await new GetWorkspace { WorkspaceId = req.WorkspaceId, Select = req.Select, }
             .ExecuteAsync(ct)
             .ConfigureAwait(false);

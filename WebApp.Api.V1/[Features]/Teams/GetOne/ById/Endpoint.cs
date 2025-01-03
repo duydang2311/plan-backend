@@ -11,22 +11,12 @@ public sealed class Endpoint : Endpoint<Request, Result>
     public override void Configure()
     {
         Get("teams/{Id}");
-        Verbs(Http.GET);
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        // TODO: Authorize
-        // if (
-        //     !await enforcer
-        //         .EnforceAsync(req.UserId.ToString(), string.Empty, req.Id.ToString(), Permit.Read)
-        //         .ConfigureAwait(false)
-        // )
-        // {
-        //     return TypedResults.Forbid();
-        // }
-
         var oneOf = await new GetTeam { TeamId = req.Id, Select = req.Select, }
             .ExecuteAsync(ct)
             .ConfigureAwait(false);

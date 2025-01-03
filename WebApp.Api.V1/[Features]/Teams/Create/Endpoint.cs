@@ -12,31 +12,16 @@ public sealed class Endpoint : Endpoint<Request, Result>
     public override void Configure()
     {
         Post("teams");
-        Verbs(Http.POST);
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
     {
-        // TODO: Authorize
-        // if (
-        //     !await enforcer
-        //         .EnforceAsync(
-        //             req.UserId.ToString(),
-        //             req.WorkspaceId!.Value.ToString(),
-        //             req.WorkspaceId.Value.ToString(),
-        //             Permit.WriteTeam
-        //         )
-        //         .ConfigureAwait(false)
-        // )
-        // {
-        //     return TypedResults.Forbid();
-        // }
-
         var oneOf = await new CreateTeam
         {
             UserId = req.UserId,
-            WorkspaceId = req.WorkspaceId.Value,
+            WorkspaceId = req.WorkspaceId!.Value,
             Name = req.QualifiedName!,
             Identifier = req.QualifiedIdentifier!,
         }

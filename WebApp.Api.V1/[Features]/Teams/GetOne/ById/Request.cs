@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using FastEndpoints;
-using FluentValidation;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Teams.GetOne.ById;
@@ -12,5 +11,5 @@ public sealed record Request
     public string? Select { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
-    public Guid UserId { get; init; }
+    public UserId UserId { get; init; }
 }

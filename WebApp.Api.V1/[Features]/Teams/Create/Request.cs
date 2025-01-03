@@ -22,7 +22,7 @@ public sealed class RequestValidator : Validator<Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.WorkspaceId).NotNull();
+        RuleFor(x => x.WorkspaceId).NotNull().WithErrorCode("required");
         RuleFor(x => x.QualifiedName).NotEmpty().WithErrorCode("required").OverridePropertyName(nameof(Request.Name));
         RuleFor(x => x.QualifiedIdentifier)
             .NotEmpty()

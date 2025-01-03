@@ -16,7 +16,8 @@ public sealed record ProjectRoleDefaults
         Permissions = permissions;
     }
 
-    public static readonly ProjectRoleDefaults Guest = new(new RoleId { Value = 2100 }, "Guest", [Permit.ReadIssue]);
+    public static readonly ProjectRoleDefaults Guest =
+        new(new RoleId { Value = 2100 }, "Guest", [Permit.ReadIssue, Permit.ReadIssueAudit]);
     public static readonly ProjectRoleDefaults Member =
         new(new RoleId { Value = 2200 }, "Member", [.. Guest.Permissions, Permit.CreateIssue]);
     public static readonly ProjectRoleDefaults Manager =

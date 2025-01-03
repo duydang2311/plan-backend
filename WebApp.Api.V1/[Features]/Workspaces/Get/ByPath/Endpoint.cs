@@ -13,8 +13,8 @@ public sealed class Endpoint(AppDbContext dbContext) : Endpoint<Request, Result>
     public override void Configure()
     {
         Get("workspaces/path/{Path}");
-        Verbs(Http.GET);
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Result> ExecuteAsync(Request req, CancellationToken ct)
@@ -24,15 +24,6 @@ public sealed class Endpoint(AppDbContext dbContext) : Endpoint<Request, Result>
             .Select(x => x.Id)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-        // TODO: Authorize
-        // if (
-        //     !await enforcer
-        //         .EnforceAsync(req.UserId.ToString(), workspaceId.ToString(), workspaceId.ToString(), Permit.Read)
-        //         .ConfigureAwait(false)
-        // )
-        // {
-        //     return TypedResults.Forbid();
-        // }
 
         var oneOf = await new GetWorkspace { WorkspaceId = workspaceId, Select = req.Select, }
             .ExecuteAsync(ct)
