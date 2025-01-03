@@ -16,11 +16,9 @@ public sealed record Response : PaginatedList<Response.Item>
         public IssueId? IssueId { get; init; }
         public IssueAuditAction? Action { get; init; }
         public UserId? UserId { get; init; }
-        public Response.User? User { get; init; }
+        public User? User { get; init; }
         public JsonDocument? Data { get; init; }
     }
-
-    public sealed record Issue { }
 
     public sealed record User
     {
