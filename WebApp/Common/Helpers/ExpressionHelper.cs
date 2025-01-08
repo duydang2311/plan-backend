@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Query;
@@ -6,7 +7,7 @@ namespace WebApp.Common.Helpers;
 
 public static class ExpressionHelper
 {
-    private static readonly NullabilityInfoContext nullabilityInfoContext = new();
+    private static readonly ConcurrentDictionary<MemberInfo, NullabilityInfo> nullabilityInfoCache = [];
 
     public static Expression<Func<T, object>> OrderBy<T>(string name)
     {
@@ -237,23 +238,19 @@ public static class ExpressionHelper
         throw new NotImplementedException($"Not implemented transformation for type '{memberType.Name}'");
     }
 
-    static bool IsNullableMember(MemberInfo member)
+    private static bool IsNullableMember(MemberInfo member)
     {
-        return member switch
-        {
-            PropertyInfo m
-                => nullabilityInfoContext.Create(m)
-                    is { WriteState: NullabilityState.Nullable }
-                        or { ReadState: NullabilityState.Nullable },
-            FieldInfo m
-                => nullabilityInfoContext.Create(m)
-                    is { WriteState: NullabilityState.Nullable }
-                        or { ReadState: NullabilityState.Nullable },
-            EventInfo m
-                => nullabilityInfoContext.Create(m)
-                    is { WriteState: NullabilityState.Nullable }
-                        or { ReadState: NullabilityState.Nullable },
-            _ => false,
-        };
+        var nullabilityInfo = nullabilityInfoCache.GetOrAdd(
+            member,
+            member =>
+                member switch
+                {
+                    PropertyInfo m => new NullabilityInfoContext().Create(m),
+                    FieldInfo m => new NullabilityInfoContext().Create(m),
+                    EventInfo m => new NullabilityInfoContext().Create(m),
+                    _ => throw new NotSupportedException(),
+                }
+        );
+        return nullabilityInfo is { WriteState: NullabilityState.Nullable } or { ReadState: NullabilityState.Nullable };
     }
 }
