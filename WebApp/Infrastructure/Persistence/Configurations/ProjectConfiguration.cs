@@ -23,14 +23,8 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasMany(a => a.Teams)
             .WithMany(a => a.Projects)
             .UsingEntity<ProjectTeam>(
-                "project_teams",
                 r => r.HasOne(a => a.Team).WithMany().HasForeignKey(a => a.TeamId),
-                l => l.HasOne(a => a.Project).WithMany().HasForeignKey(a => a.ProjectId),
-                b =>
-                {
-                    b.Property(a => a.ProjectId).HasConversion<EntityGuidConverter<ProjectId>>();
-                    b.Property(a => a.TeamId).HasConversion<EntityGuidConverter<TeamId>>();
-                }
+                l => l.HasOne(a => a.Project).WithMany().HasForeignKey(a => a.ProjectId)
             );
     }
 }
