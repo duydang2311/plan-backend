@@ -24,7 +24,7 @@ public sealed record WorkspaceRoleDefaults
         new(
             new RoleId { Value = 1300 },
             "Manager",
-            [.. Member.Permissions, Permit.CreateProject, Permit.CreateWorkspaceStatus]
+            [.. Member.Permissions, Permit.CreateProject, Permit.CreateWorkspaceStatus, Permit.DeleteProject]
         );
     public static readonly WorkspaceRoleDefaults Admin =
         new(new RoleId { Value = 1400 }, "Administrator", [.. Manager.Permissions, Permit.DeleteWorkspaceMember]);
