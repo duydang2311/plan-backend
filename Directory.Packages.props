@@ -5,7 +5,7 @@
   <ItemGroup>
     <PackageVersion Include="CloudinaryDotNet" Version="1.27.1" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.9.24556.5" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.1" />
     <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
@@ -13,15 +13,15 @@
     <PackageVersion Include="FractionalIndexing" Version="1.0.1" />
     <PackageVersion Include="Google.Apis.Auth" Version="1.68.0" />
     <PackageVersion Include="MailKit" Version="4.9.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <PackageVersion Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="9.5.1" />
-    <PackageVersion Include="NATS.Net" Version="2.5.5" />
-    <PackageVersion Include="NodaTime" Version="3.2.0" />
-    <PackageVersion Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
+    <PackageVersion Include="NATS.Net" Version="2.5.6" />
+    <PackageVersion Include="NodaTime" Version="3.2.1" />
+    <PackageVersion Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
     <PackageVersion Include="Norgerman.Cryptography.Scrypt" Version="2.4.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.2" />
@@ -29,8 +29,8 @@
     <!-- Aspire -->
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.0.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.11.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.10.0" />
