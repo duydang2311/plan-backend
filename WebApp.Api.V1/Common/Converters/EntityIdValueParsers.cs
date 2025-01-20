@@ -13,4 +13,13 @@ public static class EntityIdValueParsers
         }
         return new ParseResult(false, default);
     }
+
+    public static ParseResult ParseInt<T>(object? input, Func<int, T> outputFn)
+    {
+        if (int.TryParse(input?.ToString(), CultureInfo.InvariantCulture, out var value))
+        {
+            return new ParseResult(true, outputFn(value));
+        }
+        return new ParseResult(false, default);
+    }
 }
