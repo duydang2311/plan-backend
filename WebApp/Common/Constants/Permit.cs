@@ -36,4 +36,5 @@ public static class Permit
     public const string ReadIssueAudit = "issue-audits:read";
 
     public const string ReadProjectMember = "project-member:read";
+    public const string DeleteProjectMember = "project-member:delete";
 }
