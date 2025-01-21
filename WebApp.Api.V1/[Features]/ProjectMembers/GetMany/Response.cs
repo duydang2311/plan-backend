@@ -10,7 +10,7 @@ public sealed record Response : PaginatedList<Response.Item>
     public sealed record Item
     {
         public Instant? CreatedTime { get; init; }
-        public UserRoleId? UserRoleId { get; init; }
+        public ProjectMemberId? Id { get; init; }
         public UserId? UserId { get; init; }
         public UserDto? User { get; init; }
         public RoleId? RoleId { get; init; }
@@ -34,25 +34,14 @@ public sealed record Response : PaginatedList<Response.Item>
     }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class ResponseMapper
 {
     public static partial Response ToResponse(this PaginatedList<ProjectMember> list);
 
-    [MapperIgnoreSource(nameof(ProjectMember.ProjectId))]
-    [MapperIgnoreSource(nameof(ProjectMember.Project))]
     public static partial Response.Item ToResponse(ProjectMember list);
 
     public static Response.UserDto? ToNullableUser(this User user) => user?.ToNullableUserInternal();
 
-    [MapperIgnoreSource(nameof(User.Salt))]
-    [MapperIgnoreSource(nameof(User.PasswordHash))]
-    [MapperIgnoreSource(nameof(User.IsVerified))]
-    [MapperIgnoreSource(nameof(User.Teams))]
-    [MapperIgnoreSource(nameof(User.WorkspaceMembers))]
-    [MapperIgnoreSource(nameof(User.Workspaces))]
-    [MapperIgnoreSource(nameof(User.GoogleAuth))]
-    [MapperIgnoreSource(nameof(User.Issues))]
-    [MapperIgnoreSource(nameof(User.Roles))]
     public static partial Response.UserDto? ToNullableUserInternal(this User? user);
 }

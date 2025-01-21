@@ -32,28 +32,11 @@ public sealed record ResponseAuthor
     public UserProfile? Profile { get; init; } = null!;
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class ResponseMapper
 {
-    [MapperIgnoreSource(nameof(Issue.IsDeleted))]
-    [MapperIgnoreSource(nameof(Issue.DeletedTime))]
-    [MapperIgnoreSource(nameof(Issue.Comments))]
-    [MapperIgnoreSource(nameof(Issue.Fields))]
-    [MapperIgnoreSource(nameof(Issue.TeamIssues))]
-    [MapperIgnoreSource(nameof(Issue.IssueAssignees))]
     public static partial Response ToResponse(this Issue issue);
 
-    [MapperIgnoreSource(nameof(User.GoogleAuth))]
-    [MapperIgnoreSource(nameof(User.Issues))]
-    [MapperIgnoreSource(nameof(User.IsVerified))]
-    [MapperIgnoreSource(nameof(User.CreatedTime))]
-    [MapperIgnoreSource(nameof(User.UpdatedTime))]
-    [MapperIgnoreSource(nameof(User.PasswordHash))]
-    [MapperIgnoreSource(nameof(User.Salt))]
-    [MapperIgnoreSource(nameof(User.Workspaces))]
-    [MapperIgnoreSource(nameof(User.WorkspaceMembers))]
-    [MapperIgnoreSource(nameof(User.Teams))]
-    [MapperIgnoreSource(nameof(User.Roles))]
     public static partial ResponseAuthor? NullableResponseAuthor(User? user);
 
     public static ResponseAuthor? ToResponseAuthor(this User user) => NullableResponseAuthor(user);

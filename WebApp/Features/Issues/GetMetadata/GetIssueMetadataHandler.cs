@@ -22,9 +22,9 @@ public sealed class GetIssueMetadataHandler(AppDbContext dbContext)
                     b.UserId == command.UserId && b.Role.Permissions.Any(c => c.Permission.Equals(Permit.ReadIssue))
                 )
                 || a.Teams.Any(b =>
-                    b.Members.Any(b =>
-                        b.Id == command.UserId
-                        && b.Roles.Any(c => c.Role.Permissions.Any(d => d.Permission.Equals(Permit.ReadIssue)))
+                    b.TeamMembers.Any(b =>
+                        b.MemberId == command.UserId
+                        && b.Role.Permissions.Any(c => c.Permission.Equals(Permit.ReadIssue))
                     )
                 )
             );

@@ -28,18 +28,10 @@ public sealed record Response
     }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class ResponseMapper
 {
-    [MapperIgnoreSource(nameof(User.Teams))]
-    [MapperIgnoreSource(nameof(User.GoogleAuth))]
-    [MapperIgnoreSource(nameof(User.Roles))]
-    [MapperIgnoreSource(nameof(User.Issues))]
-    [MapperIgnoreSource(nameof(User.Workspaces))]
     public static partial Response ToResponse(this User user);
 
-    [MapperIgnoreSource(nameof(UserProfile.CreatedTime))]
-    [MapperIgnoreSource(nameof(UserProfile.UpdatedTime))]
-    [MapperIgnoreSource(nameof(UserProfile.User))]
     public static partial Response.ResponseProfile ToResponseProfile(this UserProfile userProfile);
 }

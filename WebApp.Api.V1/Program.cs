@@ -119,7 +119,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceMemberId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserRoleId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
     x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -196,12 +196,12 @@ app.UseFastEndpoints(
             input => EntityIdValueParsers.ParseLong(input, static value => new WorkspaceInvitationId { Value = value }),
             handleNull: true
         );
-        config.Binding.ValueParserFor<UserRoleId>(
-            input => EntityIdValueParsers.ParseLong(input, static value => new UserRoleId { Value = value }),
-            handleNull: true
-        );
         config.Binding.ValueParserFor<RoleId>(
             input => EntityIdValueParsers.ParseInt(input, static value => new RoleId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ProjectMemberId>(
+            input => EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberId { Value = value }),
             handleNull: true
         );
     }

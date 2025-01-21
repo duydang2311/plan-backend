@@ -16,7 +16,7 @@ public sealed class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMembe
         builder.Property(x => x.RoleId).HasConversion<EntityIdConverter<TeamRoleId, int>>();
 
         builder.HasKey(x => new { x.TeamId, x.MemberId });
-        builder.HasOne(x => x.Team).WithMany().HasForeignKey(x => x.TeamId);
+        builder.HasOne(x => x.Team).WithMany(a => a.TeamMembers).HasForeignKey(x => x.TeamId);
         builder.HasOne(x => x.Member).WithMany().HasForeignKey(x => x.MemberId);
         builder.HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId);
     }

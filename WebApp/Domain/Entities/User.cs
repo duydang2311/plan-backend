@@ -15,9 +15,9 @@ public sealed record class User
     // Relationships
     public ICollection<Team> Teams { get; init; } = null!;
     public UserGoogleAuth? GoogleAuth { get; init; } = null!;
-    public ICollection<UserRole> Roles { get; init; } = null!;
     public UserProfile? Profile { get; init; } = null!;
     public ICollection<Issue> Issues { get; init; } = null!;
     public ICollection<Workspace> Workspaces { get; init; } = null!;
     public ICollection<WorkspaceMember> WorkspaceMembers { get; init; } = null!;
+    public ICollection<ProjectMember> ProjectMembers { get; init; } = null!;
 }

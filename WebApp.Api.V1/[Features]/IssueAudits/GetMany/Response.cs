@@ -28,25 +28,13 @@ public sealed record Response : PaginatedList<Response.Item>
     }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class ResponseMapper
 {
     public static partial Response ToResponse(this PaginatedList<IssueAudit> list);
 
-    [MapperIgnoreSource(nameof(IssueAudit.Issue))]
     public static partial Response.Item MapResponseItem(this IssueAudit list);
 
-    [MapperIgnoreSource(nameof(User.CreatedTime))]
-    [MapperIgnoreSource(nameof(User.UpdatedTime))]
-    [MapperIgnoreSource(nameof(User.Salt))]
-    [MapperIgnoreSource(nameof(User.PasswordHash))]
-    [MapperIgnoreSource(nameof(User.IsVerified))]
-    [MapperIgnoreSource(nameof(User.Teams))]
-    [MapperIgnoreSource(nameof(User.GoogleAuth))]
-    [MapperIgnoreSource(nameof(User.Roles))]
-    [MapperIgnoreSource(nameof(User.Issues))]
-    [MapperIgnoreSource(nameof(User.Workspaces))]
-    [MapperIgnoreSource(nameof(User.WorkspaceMembers))]
     public static partial Response.User? MapNullableUser(this User? user);
 
     public static Response.User? MapUser(this User user) => MapNullableUser(user);
