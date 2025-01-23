@@ -157,8 +157,11 @@ app.UseFastEndpoints(
         });
         config.Binding.JsonExceptionTransformer = ex =>
         {
+            var bindEx = ex as JsonBindException;
             return new FluentValidation.Results.ValidationFailure(
-                propertyName: ex.Path,
+                propertyName: ex.Path is null or "$" || ex.Path.StartsWith("$[")
+                    ? bindEx?.FieldName ?? "$"
+                    : ex.Path[2..],
                 errorMessage: ex.InnerException?.Message ?? ex.Message
             )
             {
