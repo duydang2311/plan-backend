@@ -38,4 +38,8 @@ public static class Permit
     public const string ReadProjectMember = "project-member:read";
     public const string DeleteProjectMember = "project-member:delete";
     public const string CreateProjectMember = "project-member:create";
+
+    public const string ReadProjectMemberInvitation = "project-member-invitation:read";
+    public const string DeleteProjectMemberInvitation = "project-member-invitation:delete";
+    public const string CreateProjectMemberInvitation = "project-member-invitation:create";
 }
