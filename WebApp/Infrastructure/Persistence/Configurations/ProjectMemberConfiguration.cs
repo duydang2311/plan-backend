@@ -13,6 +13,7 @@ public sealed class ProjectMemberConfiguration : IEntityTypeConfiguration<Projec
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.UserId);
         builder.HasIndex(a => a.ProjectId);
+        builder.HasIndex(a => new { a.ProjectId, a.UserId }).IsUnique();
         builder.HasOne(a => a.User).WithMany(a => a.ProjectMembers).HasForeignKey(a => a.UserId);
         builder.HasOne(a => a.Role).WithMany().HasForeignKey(a => a.RoleId);
         builder.HasOne(a => a.Project).WithMany(a => a.Members).HasForeignKey(a => a.ProjectId);
