@@ -21,7 +21,11 @@ public sealed record ProjectRoleDefaults
     public static readonly ProjectRoleDefaults Member =
         new(new RoleId { Value = 2200 }, "Member", [.. Guest.Permissions, Permit.CreateIssue]);
     public static readonly ProjectRoleDefaults Manager =
-        new(new RoleId { Value = 2300 }, "Manager", [.. Member.Permissions, Permit.DeleteProjectMember]);
+        new(
+            new RoleId { Value = 2300 },
+            "Manager",
+            [.. Member.Permissions, Permit.DeleteProjectMember, Permit.CreateProjectMember]
+        );
     public static readonly ProjectRoleDefaults Admin =
         new(new RoleId { Value = 2400 }, "Administrator", [.. Manager.Permissions]);
 
