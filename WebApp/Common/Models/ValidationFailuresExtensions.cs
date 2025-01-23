@@ -1,5 +1,6 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebApp.Common.Models;
 
@@ -13,6 +14,17 @@ public static class ValidationFailuresExtensions
     )
     {
         return new ProblemDetails(validationFailures.Failures, instance!, traceId!, statusCode ?? 400);
+    }
+
+    public static UnprocessableEntity<ProblemDetails> ToUnprocessableEntity(
+        this ValidationFailures validationFailures,
+        string? instance = null,
+        string? traceId = null
+    )
+    {
+        return TypedResults.UnprocessableEntity(
+            validationFailures.ToProblemDetails(instance: instance, traceId: traceId, statusCode: 422)
+        );
     }
 
     public static ValidationFailures ToValidationFailures(
