@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace WebApp.Api.V1.Common.Converters;
 
@@ -56,9 +57,9 @@ public sealed class GuidToBase64JsonConverter : JsonConverter<Guid>
         }
     }
 
-    public static ParseResult ValueParser(object? x)
+    public static ParseResult ValueParser(StringValues x)
     {
-        var value = x?.ToString();
+        var value = x.FirstOrDefault();
         if (value is null)
         {
             return new ParseResult(false, Guid.Empty);

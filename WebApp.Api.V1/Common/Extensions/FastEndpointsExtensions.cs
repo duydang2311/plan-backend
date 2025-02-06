@@ -1,32 +1,42 @@
+using Microsoft.Extensions.Primitives;
+
 namespace FastEndpoints;
 
 public static class FastEndpointsExtensions
 {
-    public static bool ValueParserFor<T>(
+    public static void ValueParserFor<T>(
         this BindingOptions options,
-        Func<object?, ParseResult> parse,
+        Func<StringValues, ParseResult> parse,
         bool handleNull = false
     )
     {
-        ParseResult ParseNullable(object? input)
+        ParseResult ParseNullable(StringValues values)
         {
-            if (input is null)
+            var a = values.FirstOrDefault();
+            if (a is null)
             {
                 return new ParseResult(true, null);
             }
-            return parse(input);
+            return parse(a);
         }
 
         if (typeof(T).IsValueType)
         {
-            var ok = options.ValueParserFor<T>(parse);
+            options.ValueParserFor<T>(parse);
             if (handleNull)
             {
-                ok = options.ValueParserFor(typeof(Nullable<>).MakeGenericType(typeof(T)), ParseNullable);
+                options.ValueParserFor(typeof(Nullable<>).MakeGenericType(typeof(T)), ParseNullable);
             }
-            return ok;
+            return;
         }
 
-        return handleNull ? options.ValueParserFor<T>(ParseNullable) : options.ValueParserFor<T>(parse);
+        if (handleNull)
+        {
+            options.ValueParserFor<T>(ParseNullable);
+        }
+        else
+        {
+            options.ValueParserFor<T>(parse);
+        }
     }
 }

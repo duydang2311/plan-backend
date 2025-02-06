@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using Microsoft.Extensions.Primitives;
 using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.Common.Converters;
@@ -34,11 +35,11 @@ public class OrderableArrayJsonConverter : JsonConverter<Orderable[]>
         );
     }
 
-    public static ParseResult ValueParser(object? x)
+    public static ParseResult ValueParser(StringValues x)
     {
         return new ParseResult(
             true,
-            x?.ToString()
+            x.FirstOrDefault()
                 ?.Split(',')
                 .Select(x => x.Trim())
                 .Where(x => !string.IsNullOrEmpty(x) && x.Length > 1)

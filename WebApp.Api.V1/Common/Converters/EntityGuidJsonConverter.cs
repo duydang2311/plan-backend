@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using Microsoft.Extensions.Primitives;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Common.Converters;
@@ -16,7 +17,7 @@ public sealed class EntityGuidJsonConverter<T> : JsonConverter<T>
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) =>
         GuidToBase64JsonConverter.Instance.Write(writer, value.Value, options);
 
-    public static ParseResult ValueParser(object? x)
+    public static ParseResult ValueParser(StringValues x)
     {
         var result = GuidToBase64JsonConverter.ValueParser(x);
         return result.IsSuccess
