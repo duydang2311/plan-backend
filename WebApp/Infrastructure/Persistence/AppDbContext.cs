@@ -27,6 +27,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<WorkspaceInvitation> WorkspaceInvitations => Set<WorkspaceInvitation>();
     public DbSet<IssueAudit> IssueAudits => Set<IssueAudit>();
     public DbSet<ProjectTeam> ProjectTeams => Set<ProjectTeam>();
+    public DbSet<ProjectMemberInvitation> ProjectMemberInvitations => Set<ProjectMemberInvitation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

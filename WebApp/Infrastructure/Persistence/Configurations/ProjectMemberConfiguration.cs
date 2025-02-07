@@ -9,6 +9,7 @@ public sealed class ProjectMemberConfiguration : IEntityTypeConfiguration<Projec
     public void Configure(EntityTypeBuilder<ProjectMember> builder)
     {
         builder.ToTable("project_members");
+        builder.Property(a => a.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.Id).HasConversion<EntityIdConverter<ProjectMemberId, long>>().ValueGeneratedOnAdd();
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.UserId);
