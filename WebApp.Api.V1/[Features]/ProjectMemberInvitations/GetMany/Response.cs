@@ -10,6 +10,7 @@ public sealed record Response : PaginatedList<Response.Item>
     public sealed record Item
     {
         public Instant? CreatedTime { get; init; }
+        public ProjectMemberInvitationId? Id { get; init; }
         public UserId? UserId { get; init; }
         public UserDto? User { get; init; }
         public RoleId? RoleId { get; init; }

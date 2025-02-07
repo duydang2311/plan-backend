@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Api.V1.Common.Helpers;
 using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.IssueComments.Patch;

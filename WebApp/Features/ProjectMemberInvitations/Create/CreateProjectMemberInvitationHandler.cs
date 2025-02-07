@@ -1,5 +1,6 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
@@ -9,13 +10,25 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Features.ProjectMemberInvitations.Create;
 
 public sealed class CreateProjectMemberInvitationHandler(AppDbContext db)
-    : ICommandHandler<CreateProjectMemberInvitation, OneOf<ValidationFailures, ConflictError, Success>>
+    : ICommandHandler<
+        CreateProjectMemberInvitation,
+        OneOf<ValidationFailures, AlreadyIsMemberError, ConflictError, Success>
+    >
 {
-    public async Task<OneOf<ValidationFailures, ConflictError, Success>> ExecuteAsync(
+    public async Task<OneOf<ValidationFailures, AlreadyIsMemberError, ConflictError, Success>> ExecuteAsync(
         CreateProjectMemberInvitation command,
         CancellationToken ct
     )
     {
+        if (
+            await db
+                .ProjectMembers.AnyAsync(a => a.UserId == command.UserId && a.ProjectId == command.ProjectId, ct)
+                .ConfigureAwait(false)
+        )
+        {
+            return new AlreadyIsMemberError();
+        }
+
         var invitation = new ProjectMemberInvitation
         {
             ProjectId = command.ProjectId,
