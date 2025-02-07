@@ -120,6 +120,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
     x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -205,6 +206,11 @@ app.UseFastEndpoints(
         );
         config.Binding.ValueParserFor<ProjectMemberId>(
             input => EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ProjectMemberInvitationId>(
+            input =>
+                EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberInvitationId { Value = value }),
             handleNull: true
         );
     }
