@@ -1,3 +1,4 @@
+using EntityFrameworkCore.Projectables;
 using NodaTime;
 
 namespace WebApp.Domain.Entities;
@@ -14,6 +15,15 @@ public sealed record class Workspace
     public WorkspaceId Id { get; init; } = WorkspaceId.Empty;
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
+
+    [Projectable(UseMemberBody = nameof(totalProjects))]
+    public int TotalProjects { get; init; }
+
+    [Projectable(UseMemberBody = nameof(totalUsers))]
+    public int TotalUsers { get; init; }
+
+    private int totalProjects => Projects.Count;
+    private int totalUsers => Users.Count;
 
     public ICollection<User> Users { get; init; } = null!;
 

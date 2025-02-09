@@ -4,6 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CloudinaryDotNet" Version="1.27.2" />
+    <PackageVersion Include="EntityFrameworkCore.Projectables" Version="4.0.0" />
+    <PackageVersion Include="EntityFrameworkCore.Projectables.Abstractions" Version="4.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0-preview.9.24556.5" />
     <PackageVersion Include="System.Text.Json" Version="9.0.1" />
     <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />

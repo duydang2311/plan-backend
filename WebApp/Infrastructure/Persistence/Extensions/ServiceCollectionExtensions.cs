@@ -26,6 +26,7 @@ public static partial class ServiceCollectionExtensions
             )
             .UseSnakeCaseNamingConvention()
             .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+            .UseProjectables()
 #if DEBUG
             .EnableSensitiveDataLogging()
 #endif

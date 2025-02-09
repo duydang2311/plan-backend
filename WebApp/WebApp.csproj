@@ -11,6 +11,7 @@
     <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+    <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="FractionalIndexing" />
     <PackageReference Include="Google.Apis.Auth" />
