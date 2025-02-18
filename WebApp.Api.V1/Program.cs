@@ -166,7 +166,7 @@ app.UseFastEndpoints(
                 errorMessage: ex.InnerException?.Message ?? ex.Message
             )
             {
-                ErrorCode = "bad_json"
+                ErrorCode = "bad_json",
             };
         };
         config.Binding.ValueParserFor<Orderable[]>(OrderableArrayJsonConverter.ValueParser);
