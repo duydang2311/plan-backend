@@ -1,7 +1,11 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using OneOf;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
@@ -21,21 +25,32 @@ public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommand
             Content = command.Content,
         };
         dbContext.Add(comment);
+        dbContext.Add(
+            new IssueAudit
+            {
+                Action = IssueAuditAction.Comment,
+                IssueId = command.IssueId,
+                UserId = command.AuthorId,
+                Data = JsonValue.Create(new CommentData { Content = command.Content }).Deserialize<JsonDocument>(),
+            }
+        );
         try
         {
             await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
         }
-        catch (ReferenceConstraintException exception)
+        catch (ReferenceConstraintException e)
         {
-            return ValidationFailures.Single(
-                exception.ConstraintProperties[0],
-                "Reference does not exist",
-                "reference"
-            );
+            return e.ToValidationFailures(property => (property, $"Invalid {property} reference"));
         }
         await new IssueCommentCreated { IssueComment = comment }
             .QueueJobAsync(ct: ct)
             .ConfigureAwait(false);
         return comment;
+    }
+
+    public record CommentData
+    {
+        [JsonPropertyName("content")]
+        public string Content { get; init; } = string.Empty;
     }
 }

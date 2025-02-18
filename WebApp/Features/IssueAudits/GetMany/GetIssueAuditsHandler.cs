@@ -20,6 +20,8 @@ public sealed class GetIssueAuditsHandler(AppDbContext db) : ICommandHandler<Get
             query = query.Select(ExpressionHelper.Select<IssueAudit, IssueAudit>(command.Select));
         }
 
+        query = command.Order.SortOrDefault(query, a => a.OrderBy(b => b.CreatedTime));
+
         return PaginatedList.From(
             await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
             totalCount

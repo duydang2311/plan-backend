@@ -6,4 +6,5 @@ public enum IssueAuditAction : byte
     Create,
     UpdateTitle,
     UpdateDescription,
+    Comment,
 }

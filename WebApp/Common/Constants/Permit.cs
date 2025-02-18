@@ -33,7 +33,9 @@ public static class Permit
 
     public const string DeleteWorkspaceMember = "workspace-member:delete";
 
-    public const string ReadIssueAudit = "issue-audits:read";
+    public const string ReadIssueAudit = "issue-audit:read";
+    public const string DeleteIssueAudit = "issue-audit:delete";
+    public const string CreateIssueAuditComment = "issue-audit-comment:create";
 
     public const string ReadProjectMember = "project-member:read";
     public const string DeleteProjectMember = "project-member:delete";
