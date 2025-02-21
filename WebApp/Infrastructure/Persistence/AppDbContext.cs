@@ -28,6 +28,8 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<IssueAudit> IssueAudits => Set<IssueAudit>();
     public DbSet<ProjectTeam> ProjectTeams => Set<ProjectTeam>();
     public DbSet<ProjectMemberInvitation> ProjectMemberInvitations => Set<ProjectMemberInvitation>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

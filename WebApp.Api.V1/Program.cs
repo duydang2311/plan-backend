@@ -121,6 +121,8 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<NotificationId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
     x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -211,6 +213,14 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<ProjectMemberInvitationId>(
             input =>
                 EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberInvitationId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<NotificationId>(
+            input => EntityIdValueParsers.ParseLong(input, static value => new NotificationId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<UserNotificationId>(
+            input => EntityIdValueParsers.ParseLong(input, static value => new UserNotificationId { Value = value }),
             handleNull: true
         );
     }
