@@ -31,6 +31,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
             query = query.Select(ExpressionHelper.Select<UserNotification, UserNotification>(command.Select));
         }
 
+        query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
+
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         for (var i = 0; i != items.Count; ++i)
         {
