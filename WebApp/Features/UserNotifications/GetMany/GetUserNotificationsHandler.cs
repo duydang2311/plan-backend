@@ -83,20 +83,19 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         jsonOptions.Value.SerializerOptions
                     );
                     break;
-                case NotificationType.CommentCreated:
+                case NotificationType.IssueCommentCreated:
                     if (
                         string.IsNullOrEmpty(command.SelectComment)
-                        || !item.Notification.Data.RootElement.TryGetProperty("commentId", out var commentIdElement)
-                        || !Guid.TryParseExact(commentIdElement.GetString(), "D", out var commentGuid)
+                        || !item.Notification.Data.RootElement.TryGetProperty("issueAuditId", out var auditIdElement)
+                        || !auditIdElement.TryGetInt64(out var auditId)
                     )
                     {
                         break;
                     }
-                    var commentId = new IssueCommentId { Value = commentGuid };
                     newData = JsonSerializer.SerializeToDocument(
                         await db
-                            .IssueComments.Where(a => a.Id == commentId)
-                            .Select(ExpressionHelper.Select<IssueComment, IssueComment>(command.SelectComment))
+                            .IssueAudits.Where(a => a.Id == auditId)
+                            .Select(ExpressionHelper.Select<IssueAudit, IssueAudit>(command.SelectComment))
                             .FirstOrDefaultAsync(ct)
                             .ConfigureAwait(false),
                         jsonOptions.Value.SerializerOptions

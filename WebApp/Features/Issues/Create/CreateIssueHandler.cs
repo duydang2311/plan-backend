@@ -1,4 +1,5 @@
 using System.Data;
+using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using FractionalIndexing;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,7 @@ namespace WebApp.Features.Issues.Create;
 
 using Result = OneOf<ValidationFailures, Issue>;
 
-public sealed class CreateIssueHandler(AppDbContext db, IServiceProvider serviceProvider)
-    : ICommandHandler<CreateIssue, Result>
+public sealed class CreateIssueHandler(AppDbContext db) : ICommandHandler<CreateIssue, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssue command, CancellationToken ct)
     {
@@ -41,17 +41,26 @@ public sealed class CreateIssueHandler(AppDbContext db, IServiceProvider service
         };
 
         db.Add(issue);
-        await new IssueCreated
+        try
         {
-            ServiceProvider = serviceProvider,
-            AuthorId = command.AuthorId,
-            ProjectId = command.ProjectId,
-            Issue = issue
+            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+            await transaction.CommitAsync(ct).ConfigureAwait(false);
         }
+        catch (ReferenceConstraintException e)
+        {
+            return e.ToValidationFailures(property =>
+                property switch
+                {
+                    nameof(Issue.AuthorId) => ("authorId", "Invalid author reference"),
+                    nameof(Issue.ProjectId) => ("projectId", "Invalid project reference"),
+                    _ => null,
+                }
+            );
+        }
+
+        await new IssueCreated { Issue = issue }
             .PublishAsync(cancellation: ct)
             .ConfigureAwait(false);
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
-        await transaction.CommitAsync(ct).ConfigureAwait(false);
 
         return issue;
     }

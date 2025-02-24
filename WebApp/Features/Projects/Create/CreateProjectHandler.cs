@@ -5,6 +5,7 @@ using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Projects.Create;
@@ -22,7 +23,7 @@ public sealed class CreateProjectHandler(AppDbContext db) : ICommandHandler<Crea
             Name = command.Name,
             Description = command.Description,
             Identifier = command.Identifier,
-            Members = [new ProjectMember { UserId = command.UserId, RoleId = ProjectRoleDefaults.Admin.Id }]
+            Members = [new ProjectMember { UserId = command.UserId, RoleId = ProjectRoleDefaults.Admin.Id }],
         };
 
         db.Add(new SharedCounter { Id = project.Id.Value });
@@ -48,6 +49,10 @@ public sealed class CreateProjectHandler(AppDbContext db) : ICommandHandler<Crea
             }
             throw;
         }
+
+        await new ProjectCreated { Project = project }
+            .PublishAsync(Mode.WaitForAll, ct)
+            .ConfigureAwait(false);
 
         return project;
     }
