@@ -15,8 +15,10 @@ public sealed class JobRecordConfiguration : IEntityTypeConfiguration<JobRecord>
         builder.Property(x => x.ExecuteAfter);
         builder.Property(x => x.ExpireOn);
         builder.Property(x => x.IsComplete);
+        builder.Property(x => x.ResultJson).HasColumnType("jsonb");
 
         builder.HasKey(x => x.TrackingID);
         builder.Ignore(x => x.Command);
+        builder.Ignore(x => x.Result);
     }
 }
