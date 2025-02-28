@@ -17,6 +17,6 @@ public sealed class IssueCommentConfiguration : IEntityTypeConfiguration<IssueCo
         builder.HasOne(x => x.Issue).WithMany(x => x.Comments).HasForeignKey(x => x.IssueId);
         builder.HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
         builder.HasIndex(x => x.IssueId);
-        builder.HasQueryFilter(x => !x.Issue.IsDeleted);
+        builder.HasQueryFilter(a => a.Issue.DeletedTime == null);
     }
 }

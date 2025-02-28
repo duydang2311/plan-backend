@@ -22,6 +22,6 @@ public sealed class IssueAuditConfiguration : IEntityTypeConfiguration<IssueAudi
         builder.HasIndex(a => a.IssueId);
         builder.HasOne(a => a.Issue).WithMany().HasForeignKey(a => a.IssueId);
         builder.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId);
-        builder.HasQueryFilter(a => !a.Issue.IsDeleted);
+        builder.HasQueryFilter(a => a.Issue.DeletedTime == null);
     }
 }

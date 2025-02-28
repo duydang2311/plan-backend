@@ -16,6 +16,6 @@ public sealed class IssueAssigneeConfiguration : IEntityTypeConfiguration<IssueA
         builder.HasKey(a => new { a.IssueId, a.UserId });
         builder.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId);
         builder.HasOne(a => a.Issue).WithMany(a => a.IssueAssignees).HasForeignKey(a => a.IssueId);
-        builder.HasQueryFilter(a => !a.Issue.IsDeleted);
+        builder.HasQueryFilter(a => a.Issue.DeletedTime == null);
     }
 }

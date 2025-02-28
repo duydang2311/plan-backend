@@ -20,6 +20,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .Property(a => a.Priority)
             .HasConversion<EnumToNumberConverter<IssuePriority, byte>>()
             .HasDefaultValue(IssuePriority.None);
+        builder.Property(a => a.DeletedTime);
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);
@@ -29,6 +30,6 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasIndex(a => new { a.ProjectId, a.OrderNumber }).IsUnique();
         builder.HasIndex(a => a.StatusId);
         builder.HasIndex(a => a.StatusRank);
-        builder.HasQueryFilter(a => !a.IsDeleted);
+        builder.HasQueryFilter(a => a.DeletedTime == null);
     }
 }

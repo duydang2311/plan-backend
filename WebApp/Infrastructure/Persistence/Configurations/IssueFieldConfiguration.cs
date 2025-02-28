@@ -19,6 +19,6 @@ public sealed class IssueFieldConfiguration : IEntityTypeConfiguration<IssueFiel
         builder.Property(a => a.Name).HasMaxLength(32);
         builder.HasKey(a => new { a.IssueId, a.Name });
         builder.HasOne(a => a.Issue).WithMany(a => a.Fields).HasForeignKey(a => a.IssueId);
-        builder.HasQueryFilter(x => !x.Issue.IsDeleted);
+        builder.HasQueryFilter(a => a.Issue.DeletedTime == null);
     }
 }

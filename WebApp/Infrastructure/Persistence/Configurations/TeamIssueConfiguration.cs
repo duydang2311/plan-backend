@@ -17,6 +17,6 @@ public sealed class TeamIssueConfiguration : IEntityTypeConfiguration<TeamIssue>
         builder.HasKey(a => new { a.TeamId, a.IssueId });
         builder.HasOne(a => a.Team).WithMany(a => a.TeamIssues).HasForeignKey(a => a.TeamId);
         builder.HasOne(a => a.Issue).WithMany(a => a.TeamIssues).HasForeignKey(a => a.IssueId);
-        builder.HasQueryFilter(a => !a.Issue.IsDeleted);
+        builder.HasQueryFilter(a => a.Issue.DeletedTime == null);
     }
 }
