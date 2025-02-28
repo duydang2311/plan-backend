@@ -1,13 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using FastEndpoints;
 using Google.Apis.Auth;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using OneOf;
 using WebApp.Common.Helpers;
-using WebApp.Common.Jwts.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -16,7 +11,7 @@ namespace WebApp.Features.Tokens.Authenticate.WithGoogle;
 
 using Result = OneOf<ValidationFailures, AuthenticateResult>;
 
-public sealed class AuthenticateWithGoogleHandler(IOptions<JwtOptions> options, IJwtService jwtService, AppDbContext db)
+public sealed class AuthenticateWithGoogleHandler(AppDbContext db)
     : ICommandHandler<AuthenticateWithGoogleCommand, Result>
 {
     public async Task<Result> ExecuteAsync(AuthenticateWithGoogleCommand command, CancellationToken ct)
@@ -42,32 +37,12 @@ public sealed class AuthenticateWithGoogleHandler(IOptions<JwtOptions> options, 
             return ValidationFailures.Single("user", "User has not been registered", "unregistered");
         }
 
-        var userRefreshToken = new UserRefreshToken { UserId = user.Id };
         var session = new UserSession { Token = IdHelper.NewSessionId(), UserId = user.Id };
-        db.Add(userRefreshToken);
         db.Add(session);
-
-        var o = options.Value;
-        var task = db.SaveChangesAsync(ct);
-        var now = DateTime.UtcNow;
-        var accessTokenMaxAge = TimeSpan.FromMinutes(5);
-        var accessToken = jwtService.CreateToken(
-            issuer: o.ValidIssuers.FirstOrDefault(),
-            audience: o.ValidAudiences.FirstOrDefault(),
-            claims: [new Claim(JwtRegisteredClaimNames.Sub, Base64UrlTextEncoder.Encode(user.Id.Value.ToByteArray()))],
-            notBefore: now,
-            expires: now.Add(accessTokenMaxAge),
-            issuedAt: now
-        );
-
-        await task.ConfigureAwait(false);
+        await db.SaveChangesAsync(ct).ConfigureAwait(false);
 
         return new AuthenticateResult
         {
-            AccessToken = jwtService.WriteToken(accessToken),
-            RefreshToken = userRefreshToken.Token,
-            AccessTokenMaxAge = (int)accessTokenMaxAge.TotalSeconds,
-            RefreshTokenMaxAge = (int)TimeSpan.FromDays(1).TotalSeconds,
             SessionId = session.Token,
             SessionMaxAge = (int)TimeSpan.FromDays(45).TotalSeconds,
         };

@@ -94,7 +94,6 @@ builder
 builder
     .Services.AddPersistence(persistenceOptions)
     .AddHashers()
-    .AddJwts()
     .AddMails()
     .AddAuthorization()
     .AddNATS()
