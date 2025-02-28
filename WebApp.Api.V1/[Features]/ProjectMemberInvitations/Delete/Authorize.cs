@@ -26,7 +26,7 @@ public sealed class Authorize : IPreProcessor<Request>
         }
         var canDelete =
             await db
-                .ProjectMemberInvitations.AnyAsync(
+                .ProjectMembers.AnyAsync(
                     a =>
                         a.UserId == context.Request.RequestingUserId
                         && a.ProjectId == data.ProjectId
