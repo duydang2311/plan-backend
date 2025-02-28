@@ -76,7 +76,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     var issueId = new IssueId { Value = issueGuid };
                     newData = JsonSerializer.SerializeToDocument(
                         await db
-                            .Issues.Where(a => a.Id == issueId)
+                            .Issues.IgnoreQueryFilters()
+                            .Where(a => a.Id == issueId)
                             .Select(ExpressionHelper.Select<Issue, Issue>(command.SelectIssue))
                             .FirstOrDefaultAsync(ct)
                             .ConfigureAwait(false),
