@@ -24,7 +24,7 @@ public sealed record WorkspaceRoleDefaults
     public static readonly WorkspaceRoleDefaults Member = new(
         new RoleId { Value = 1200 },
         "Member",
-        [.. Guest.Permissions]
+        [.. Guest.Permissions, Permit.CreateIssue, Permit.ReadProjectMemberInvitation]
     );
     public static readonly WorkspaceRoleDefaults Manager = new(
         new RoleId { Value = 1300 },
@@ -35,6 +35,10 @@ public sealed record WorkspaceRoleDefaults
             Permit.CreateWorkspaceStatus,
             Permit.DeleteProject,
             Permit.CreateTeam,
+            Permit.DeleteProjectMember,
+            Permit.CreateProjectMember,
+            Permit.CreateProjectMemberInvitation,
+            Permit.DeleteProjectMemberInvitation,
         ]
     );
     public static readonly WorkspaceRoleDefaults Admin = new(
