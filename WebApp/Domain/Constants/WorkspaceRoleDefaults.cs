@@ -39,6 +39,7 @@ public sealed record WorkspaceRoleDefaults
             Permit.CreateProjectMember,
             Permit.CreateProjectMemberInvitation,
             Permit.DeleteProjectMemberInvitation,
+            Permit.UpdateWorkspaceStatus,
         ]
     );
     public static readonly WorkspaceRoleDefaults Admin = new(
