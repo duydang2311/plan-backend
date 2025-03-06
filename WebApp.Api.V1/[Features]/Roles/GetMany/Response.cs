@@ -25,8 +25,11 @@ public static partial class ResponseMapper
 {
     public static partial Response ToResponse(this PaginatedList<Role> list);
 
-    public static Response.RolePermission? ToRolePermission(this RolePermission rolePermission) =>
-        rolePermission?.ToRolePermissionInternal();
+    public static ICollection<Response.RolePermission>? ToRolePermissions(
+        this ICollection<RolePermission> collection
+    ) => collection?.ToRolePermissionsInternal();
 
-    public static partial Response.RolePermission? ToRolePermissionInternal(this RolePermission rolePermission);
+    public static partial ICollection<Response.RolePermission>? ToRolePermissionsInternal(
+        this ICollection<RolePermission>? collection
+    );
 }

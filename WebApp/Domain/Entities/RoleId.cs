@@ -19,4 +19,14 @@ public readonly record struct RoleId : IEntityId<int>
         output = ok ? new RoleId { Value = value } : Empty;
         return ok;
     }
+
+    public static bool operator >(RoleId a, RoleId b)
+    {
+        return a.Value > b.Value;
+    }
+
+    public static bool operator <(RoleId a, RoleId b)
+    {
+        return a.Value < b.Value;
+    }
 }
