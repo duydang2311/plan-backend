@@ -6,4 +6,5 @@ public enum NotificationType : byte
     ProjectCreated,
     IssueCreated,
     IssueCommentCreated,
+    ProjectMemberInvited,
 }

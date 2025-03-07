@@ -3,18 +3,14 @@ using FastEndpoints;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.Features.UserNotifications.GetMany;
+using WebApp.Features.ProjectMemberInvitations.GetOne;
 
-namespace WebApp.Api.V1.UserNotifications.GetMany;
+namespace WebApp.Api.V1.ProjectMemberInvitations.GetOne;
 
 public sealed record Request : Collective
 {
-    public UserId UserId { get; init; }
+    public ProjectMemberInvitationId ProjectMemberInvitationId { get; init; }
     public string? Select { get; init; }
-    public string? SelectProject { get; init; }
-    public string? SelectIssue { get; init; }
-    public string? SelectComment { get; init; }
-    public string? SelectProjectMemberInvitation { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }
@@ -23,5 +19,6 @@ public sealed record Request : Collective
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
-    public static partial GetUserNotifications ToCommand(this Request request);
+    [MapperIgnoreSource(nameof(Request.RequestingUserId))]
+    public static partial GetProjectMemberInvitation ToCommand(this Request request);
 }

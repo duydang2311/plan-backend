@@ -11,4 +11,5 @@ public sealed record GetUserNotifications : Collective, ICommand<PaginatedList<U
     public string? SelectProject { get; init; }
     public string? SelectIssue { get; init; }
     public string? SelectComment { get; init; }
+    public string? SelectProjectMemberInvitation { get; init; }
 }

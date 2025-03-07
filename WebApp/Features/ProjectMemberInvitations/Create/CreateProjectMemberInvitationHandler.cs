@@ -5,6 +5,7 @@ using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.ProjectMemberInvitations.Create;
@@ -33,7 +34,7 @@ public sealed class CreateProjectMemberInvitationHandler(AppDbContext db)
         {
             ProjectId = command.ProjectId,
             UserId = command.UserId,
-            RoleId = command.RoleId
+            RoleId = command.RoleId,
         };
 
         db.Add(invitation);
@@ -52,10 +53,15 @@ public sealed class CreateProjectMemberInvitationHandler(AppDbContext db)
                 {
                     nameof(ProjectMember.ProjectId) => ("projectId", "Project does not exist"),
                     nameof(ProjectMember.UserId) => ("userId", "User does not exist"),
-                    _ => (property, $"{property} is invalid")
+                    _ => (property, $"{property} is invalid"),
                 }
             );
         }
+
+        await new ProjectMemberInvited { ProjectMemberInvitation = invitation }
+            .PublishAsync(Mode.WaitForAll, ct)
+            .ConfigureAwait(false);
+
         return new Success();
     }
 }

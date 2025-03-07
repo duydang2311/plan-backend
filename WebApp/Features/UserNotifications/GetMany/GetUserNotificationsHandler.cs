@@ -17,7 +17,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
     public async Task<PaginatedList<UserNotification>> ExecuteAsync(GetUserNotifications command, CancellationToken ct)
     {
         var query = db.UserNotifications.Where(a => a.UserId == command.UserId);
-        var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+        var countTask = query.CountAsync(ct);
 
         var select = string.IsNullOrEmpty(command.Select)
             ? string.IsNullOrEmpty(command.SelectProject)
@@ -33,6 +33,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
 
         query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
+        var totalCount = await countTask.ConfigureAwait(false);
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         for (var i = 0; i != items.Count; ++i)
         {
@@ -46,6 +47,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
             switch (item.Notification.Type)
             {
                 case NotificationType.ProjectCreated:
+                {
                     if (
                         string.IsNullOrEmpty(command.SelectProject)
                         || !item.Notification.Data.RootElement.TryGetProperty("projectId", out var projectIdElement)
@@ -64,7 +66,9 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         jsonOptions.Value.SerializerOptions
                     );
                     break;
+                }
                 case NotificationType.IssueCreated:
+                {
                     if (
                         string.IsNullOrEmpty(command.SelectIssue)
                         || !item.Notification.Data.RootElement.TryGetProperty("issueId", out var issueIdElement)
@@ -84,7 +88,9 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         jsonOptions.Value.SerializerOptions
                     );
                     break;
+                }
                 case NotificationType.IssueCommentCreated:
+                {
                     if (
                         string.IsNullOrEmpty(command.SelectComment)
                         || !item.Notification.Data.RootElement.TryGetProperty("issueAuditId", out var auditIdElement)
@@ -102,6 +108,36 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         jsonOptions.Value.SerializerOptions
                     );
                     break;
+                }
+                case NotificationType.ProjectMemberInvited:
+                {
+                    if (
+                        string.IsNullOrEmpty(command.SelectProjectMemberInvitation)
+                        || !item.Notification.Data.RootElement.TryGetProperty(
+                            "projectMemberInvitationId",
+                            out var projectMemberInvitationIdElement
+                        )
+                        || !projectMemberInvitationIdElement.TryGetInt64(out var projectMemberInvitationIdValue)
+                    )
+                    {
+                        break;
+                    }
+                    newData = JsonSerializer.SerializeToDocument(
+                        await db
+                            .ProjectMemberInvitations.Where(a =>
+                                a.Id == new ProjectMemberInvitationId { Value = projectMemberInvitationIdValue }
+                            )
+                            .Select(
+                                ExpressionHelper.Select<ProjectMemberInvitation, ProjectMemberInvitation>(
+                                    command.SelectProjectMemberInvitation
+                                )
+                            )
+                            .FirstOrDefaultAsync(ct)
+                            .ConfigureAwait(false),
+                        jsonOptions.Value.SerializerOptions
+                    );
+                    break;
+                }
             }
             if (newData is not null)
             {
