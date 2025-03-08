@@ -16,7 +16,7 @@ namespace WebApp.Host.Migrations
                 returns trigger as
                 $$
                 begin
-                    delete from "notifications" where "data"->>'projectMemberInvitationId'::bigint = old.id;
+                    delete from "notifications" where ("data"->>'projectMemberInvitationId')::bigint = old.id;
                     return old;
                 END;
                 $$
