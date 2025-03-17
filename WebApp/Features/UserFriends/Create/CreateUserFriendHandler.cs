@@ -1,37 +1,24 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
-using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
-namespace WebApp.Features.UserFriendRequests.Create;
+namespace WebApp.Features.UserFriends.Create;
 
-public sealed record CreateUserFriendRequestHandler(AppDbContext db)
-    : ICommandHandler<CreateUserFriendRequest, OneOf<ValidationFailures, DuplicatedError, Success>>
+public sealed record CreateUserFriendHandler(AppDbContext db)
+    : ICommandHandler<CreateUserFriend, OneOf<ValidationFailures, DuplicatedError, Success>>
 {
     public async Task<OneOf<ValidationFailures, DuplicatedError, Success>> ExecuteAsync(
-        CreateUserFriendRequest command,
+        CreateUserFriend command,
         CancellationToken ct
     )
     {
-        if (
-            await db
-                .UserFriendRequests.AnyAsync(
-                    x => x.SenderId == command.ReceiverId && x.ReceiverId == command.SenderId,
-                    ct
-                )
-                .ConfigureAwait(false)
-        )
-        {
-            return new DuplicatedError();
-        }
+        var userFriend = new UserFriend { UserId = command.UserId, FriendId = command.FriendId };
 
-        var userFriendRequest = new UserFriendRequest { SenderId = command.SenderId, ReceiverId = command.ReceiverId };
-
-        db.Add(userFriendRequest);
+        db.Add(userFriend);
         try
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
