@@ -2,7 +2,6 @@ using NodaTime;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.Features.UserFriendRequests.GetMany;
 
 namespace WebApp.Api.V1.UserFriendRequests.GetMany;
 
