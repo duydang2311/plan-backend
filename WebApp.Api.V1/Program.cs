@@ -231,4 +231,8 @@ app.UseJobQueues(options =>
     options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
 });
 
+// var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+// using var scope = scopeFactory.CreateScope();
+// var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
 app.Run();

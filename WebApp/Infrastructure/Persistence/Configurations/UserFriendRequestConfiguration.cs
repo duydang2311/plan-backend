@@ -8,13 +8,7 @@ public sealed class UserFriendRequestConfiguration : IEntityTypeConfiguration<Us
 {
     public void Configure(EntityTypeBuilder<UserFriendRequest> builder)
     {
-        builder.ToTable(
-            "user_friend_requests",
-            a =>
-            {
-                a.HasCheckConstraint("CHK_user_friend_requests_sender_id_receiver_id", "sender_id < receiver_id");
-            }
-        );
+        builder.ToTable("user_friend_requests");
         builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
         builder.Property(x => x.SenderId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
         builder.Property(x => x.ReceiverId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();

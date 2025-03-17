@@ -31,6 +31,8 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
     public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserFriend> UserFriends => Set<UserFriend>();
+    public DbSet<UserFriendRequest> UserFriendRequests => Set<UserFriendRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
