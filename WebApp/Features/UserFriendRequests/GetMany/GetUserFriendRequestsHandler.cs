@@ -27,7 +27,7 @@ public sealed record GetUserFriendRequestsHandler(AppDbContext db)
         }
         if (command.ReceiverId.HasValue)
         {
-            query = query.Where(x => x.SenderId == command.ReceiverId.Value);
+            query = query.Where(x => x.ReceiverId == command.ReceiverId.Value);
         }
 
         var countTask = query.CountAsync(ct);
