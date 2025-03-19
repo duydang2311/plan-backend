@@ -9,7 +9,8 @@ namespace WebApp.Api.V1.UserFriends.GetMany;
 
 public sealed record Request : Collective
 {
-    public UserId UserId { get; init; }
+    public UserId? UserId { get; init; }
+    public UserId? FriendId { get; init; }
     public string? Select { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]

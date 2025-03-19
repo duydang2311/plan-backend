@@ -11,7 +11,24 @@ public sealed record GetUserFriendsHandler(AppDbContext db) : ICommandHandler<Ge
 {
     public async Task<PaginatedList<UserFriend>> ExecuteAsync(GetUserFriends command, CancellationToken ct)
     {
-        var query = db.UserFriends.Where(a => a.UserId == command.UserId);
+        var query = db.UserFriends.AsQueryable();
+
+        if (command.UserId.HasValue && command.FriendId.HasValue)
+        {
+            query = query.Where(a => a.UserId == command.UserId.Value || a.FriendId == command.FriendId.Value);
+        }
+        else
+        {
+            if (command.UserId.HasValue)
+            {
+                query = query.Where(a => a.UserId == command.UserId.Value);
+            }
+
+            if (command.FriendId.HasValue)
+            {
+                query = query.Where(a => a.FriendId == command.FriendId.Value);
+            }
+        }
 
         var countTask = query.CountAsync(ct);
         if (!string.IsNullOrEmpty(command.Select))

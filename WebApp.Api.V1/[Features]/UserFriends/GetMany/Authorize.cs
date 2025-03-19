@@ -11,7 +11,11 @@ public sealed class Authorize : IPreProcessor<Request>
             return Task.CompletedTask;
         }
 
-        if (context.Request.UserId != context.Request.RequestingUserId)
+        if (
+            (!context.Request.UserId.HasValue && !context.Request.FriendId.HasValue)
+            || (context.Request.UserId.HasValue && context.Request.UserId.Value != context.Request.RequestingUserId)
+            || (context.Request.FriendId.HasValue && context.Request.FriendId.Value != context.Request.RequestingUserId)
+        )
         {
             return context.HttpContext.Response.SendForbiddenAsync(ct);
         }

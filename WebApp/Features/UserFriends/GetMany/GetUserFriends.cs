@@ -6,6 +6,7 @@ namespace WebApp.Features.UserFriends.GetMany;
 
 public sealed record GetUserFriends : Collective, ICommand<PaginatedList<UserFriend>>
 {
-    public required UserId UserId { get; init; }
+    public UserId? UserId { get; init; }
+    public UserId? FriendId { get; init; }
     public string? Select { get; init; }
 }

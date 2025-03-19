@@ -9,7 +9,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Get("user-friends/{UserId}");
+        Get("user-friends");
         Version(1);
         PreProcessor<Authorize>();
     }
