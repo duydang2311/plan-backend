@@ -15,7 +15,9 @@ public sealed record GetUserFriendsHandler(AppDbContext db) : ICommandHandler<Ge
 
         if (command.UserId.HasValue && command.FriendId.HasValue)
         {
-            query = query.Where(a => a.UserId == command.UserId.Value || a.FriendId == command.FriendId.Value);
+            query = query
+                .Where(a => a.UserId == command.UserId.Value)
+                .Concat(db.UserFriends.Where(b => b.FriendId == command.FriendId.Value));
         }
         else
         {
@@ -38,6 +40,9 @@ public sealed record GetUserFriendsHandler(AppDbContext db) : ICommandHandler<Ge
         query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
         var totalCount = await countTask.ConfigureAwait(false);
-        return PaginatedList.From(await query.ToListAsync(ct).ConfigureAwait(false), totalCount);
+        return PaginatedList.From(
+            await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
+            totalCount
+        );
     }
 }

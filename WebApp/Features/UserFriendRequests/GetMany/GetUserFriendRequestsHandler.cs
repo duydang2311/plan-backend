@@ -38,6 +38,9 @@ public sealed record GetUserFriendRequestsHandler(AppDbContext db)
         query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
         var totalCount = await countTask.ConfigureAwait(false);
-        return PaginatedList.From(await query.ToListAsync(ct).ConfigureAwait(false), totalCount);
+        return PaginatedList.From(
+            await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
+            totalCount
+        );
     }
 }
