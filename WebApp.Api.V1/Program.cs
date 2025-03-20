@@ -1,5 +1,3 @@
-#pragma warning disable EXTEXP0018
-
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FastEndpoints;
