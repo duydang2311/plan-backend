@@ -23,6 +23,14 @@ public sealed record Response : PaginatedList<Response.Item>
         public UserId? Id { get; init; }
         public string? Email { get; init; }
         public bool? IsVerified { get; init; }
+        public UserProfileDto? Profile { get; init; }
+    }
+
+    public sealed record UserProfileDto
+    {
+        public string? Name { get; init; }
+        public string? DisplayName { get; init; }
+        public Asset? Image { get; init; }
     }
 }
 
