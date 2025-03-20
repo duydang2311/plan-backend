@@ -14,9 +14,9 @@ public sealed class SearchUsersHandler(AppDbContext db) : ICommandHandler<Search
 {
     public async Task<PaginatedList<User>> ExecuteAsync(SearchUsers command, CancellationToken ct)
     {
-        await using var transaction = (
-            await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct).ConfigureAwait(false)
-        );
+        await using var transaction = await db
+            .Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
+            .ConfigureAwait(false);
 
         await db.Database.ExecuteSqlRawAsync("SET pg_trgm.similarity_threshold = 0.1", ct).ConfigureAwait(false);
 
@@ -25,6 +25,26 @@ public sealed class SearchUsersHandler(AppDbContext db) : ICommandHandler<Search
         if (command.WorkspaceId.HasValue)
         {
             query = query.Where(a => a.Workspaces.Any(b => b.Id == command.WorkspaceId));
+        }
+
+        if (command.ExcludeFriendsWithUserId.HasValue)
+        {
+            query = query.Where(a =>
+                a.Id != command.ExcludeFriendsWithUserId
+                && !a.UserFriends.Any(b =>
+                    b.UserId == command.ExcludeFriendsWithUserId.Value
+                    || b.FriendId == command.ExcludeFriendsWithUserId.Value
+                )
+            );
+        }
+
+        if (command.ExcludeFriendRequestedWithUserId.HasValue)
+        {
+            query = query.Where(a =>
+                a.Id != command.ExcludeFriendRequestedWithUserId
+                && !a.UserSentFriendRequests.Any(b => b.ReceiverId == command.ExcludeFriendRequestedWithUserId.Value)
+                && !a.UserReceivedFriendRequests.Any(b => b.SenderId == command.ExcludeFriendRequestedWithUserId.Value)
+            );
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
@@ -39,7 +59,7 @@ public sealed class SearchUsersHandler(AppDbContext db) : ICommandHandler<Search
                 TrigramsSimilarity(
                     Expression.Property(parameter, nameof(User.Email)),
                     Expression.Property(Expression.Constant(command), nameof(SearchUsers.Query))
-                )
+                ),
             ],
             typeof(UserWithSimilarity).GetProperties()
         );

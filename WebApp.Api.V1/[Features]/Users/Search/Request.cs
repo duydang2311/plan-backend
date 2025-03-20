@@ -12,6 +12,8 @@ public sealed record Request : Collective
     public string? Query { get; init; }
     public WorkspaceId? WorkspaceId { get; init; }
     public string? Select { get; init; }
+    public UserId? ExcludeFriendsWithUserId { get; init; }
+    public UserId? ExcludeFriendRequestedWithUserId { get; init; }
 }
 
 public sealed class RequestValidator : Validator<Request>

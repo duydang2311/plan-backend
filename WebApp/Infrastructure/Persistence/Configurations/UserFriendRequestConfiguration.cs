@@ -14,7 +14,7 @@ public sealed class UserFriendRequestConfiguration : IEntityTypeConfiguration<Us
         builder.Property(x => x.ReceiverId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
 
         builder.HasKey(x => new { x.SenderId, x.ReceiverId });
-        builder.HasOne(a => a.Sender).WithMany().HasForeignKey(a => a.SenderId);
-        builder.HasOne(a => a.Receiver).WithMany().HasForeignKey(a => a.ReceiverId);
+        builder.HasOne(a => a.Sender).WithMany(a => a.UserSentFriendRequests).HasForeignKey(a => a.SenderId);
+        builder.HasOne(a => a.Receiver).WithMany(a => a.UserReceivedFriendRequests).HasForeignKey(a => a.ReceiverId);
     }
 }

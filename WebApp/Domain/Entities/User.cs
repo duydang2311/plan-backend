@@ -20,4 +20,7 @@ public sealed record class User
     public ICollection<Workspace> Workspaces { get; init; } = null!;
     public ICollection<WorkspaceMember> WorkspaceMembers { get; init; } = null!;
     public ICollection<ProjectMember> ProjectMembers { get; init; } = null!;
+    public ICollection<UserFriend> UserFriends { get; init; } = null!;
+    public ICollection<UserFriendRequest> UserSentFriendRequests { get; init; } = null!;
+    public ICollection<UserFriendRequest> UserReceivedFriendRequests { get; init; } = null!;
 }

@@ -20,7 +20,7 @@ public sealed class UserFriendConfiguration : IEntityTypeConfiguration<UserFrien
         builder.Property(x => x.FriendId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
 
         builder.HasKey(x => new { x.UserId, x.FriendId });
-        builder.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId);
+        builder.HasOne(a => a.User).WithMany(a => a.UserFriends).HasForeignKey(a => a.UserId);
         builder.HasOne(a => a.Friend).WithMany().HasForeignKey(a => a.FriendId);
     }
 }
