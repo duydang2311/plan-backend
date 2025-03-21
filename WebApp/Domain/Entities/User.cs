@@ -23,4 +23,6 @@ public sealed record class User
     public ICollection<UserFriend> UserFriends { get; init; } = null!;
     public ICollection<UserFriendRequest> UserSentFriendRequests { get; init; } = null!;
     public ICollection<UserFriendRequest> UserReceivedFriendRequests { get; init; } = null!;
+    public ICollection<ChatMember> ChatMembers { get; init; } = null!;
+    public ICollection<Chat> Chats { get; init; } = null!;
 }
