@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  nats:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "4223:4223"
+    networks:
+      - nats_network
+
+  plan-go-mailer:
+    build:
+      context: ../plan-go-mailer
+      dockerfile: Dockerfile
+    environment:
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      NATS_URL: ${NATS_URL}
+      NATS_USER: ${NATS_USER}
+      NATS_PASSWORD: ${NATS_PASSWORD}
+    depends_on:
+      - nats
+    networks:
+      - nats_network
+
+networks:
+  nats_network:
+    driver: bridge
