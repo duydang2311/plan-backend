@@ -9,16 +9,18 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("users");
-        builder.Property(x => x.CreatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
-        builder.Property(x => x.Id).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedOnAdd();
-        builder.Property(x => x.Email).HasMaxLength(254);
-        builder.Property(x => x.Salt);
-        builder.Property(x => x.PasswordHash);
-        builder.Property(x => x.IsVerified).HasDefaultValue(false);
+        builder.Property(a => a.CreatedTime).HasDefaultValueSql("now()");
+        builder.Property(a => a.UpdatedTime).HasDefaultValueSql("now()");
+        builder.Property(a => a.Id).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedOnAdd();
+        builder.Property(a => a.Email).HasMaxLength(254);
+        builder.Property(a => a.Salt);
+        builder.Property(a => a.PasswordHash);
+        builder.Property(a => a.IsVerified).HasDefaultValue(false);
+        builder.Property(a => a.Trigrams).HasComputedColumnSql("\"email\"", stored: true);
 
-        builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Email).HasMethod("gin").HasOperators("gin_trgm_ops");
+        builder.HasKey(a => a.Id);
+        builder.HasIndex(a => a.Email);
+        builder.HasIndex(a => a.Trigrams).HasMethod("gin").HasOperators("gin_trgm_ops");
         builder.HasMany(a => a.Issues).WithMany(a => a.Assignees).UsingEntity<IssueAssignee>();
         builder.HasMany(a => a.Workspaces).WithMany(a => a.Users).UsingEntity<WorkspaceMember>();
     }

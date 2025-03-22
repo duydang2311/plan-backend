@@ -1,4 +1,5 @@
 using NodaTime;
+using NpgsqlTypes;
 
 namespace WebApp.Domain.Entities;
 
@@ -11,6 +12,7 @@ public sealed record class User
     public byte[]? Salt { get; init; }
     public byte[]? PasswordHash { get; init; }
     public bool IsVerified { get; init; }
+    public string Trigrams { get; init; } = null!;
 
     // Relationships
     public ICollection<Team> Teams { get; init; } = null!;

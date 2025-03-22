@@ -25,9 +25,11 @@ public sealed class UserProfileConfiguration : IEntityTypeConfiguration<UserProf
         );
         builder.Property(a => a.DisplayName).HasMaxLength(64);
         builder.Property(a => a.Bio).HasMaxLength(256);
+        builder.Property(a => a.Trigrams).HasComputedColumnSql("\"name\" || ' ' || \"display_name\"", stored: true);
 
         builder.HasKey(a => a.UserId);
         builder.HasIndex(a => a.Name).IsUnique();
+        builder.HasIndex(a => a.Trigrams).HasMethod("gin").HasOperators("gin_trgm_ops");
         builder.HasOne(a => a.User).WithOne(a => a.Profile).HasForeignKey<UserProfile>(a => a.UserId);
     }
 }

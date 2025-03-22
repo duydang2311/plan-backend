@@ -18,9 +18,12 @@ public sealed class SearchUsersHandler(AppDbContext db) : ICommandHandler<Search
             .Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
             .ConfigureAwait(false);
 
-        await db.Database.ExecuteSqlRawAsync("SET pg_trgm.similarity_threshold = 0.1", ct).ConfigureAwait(false);
+        await db.Database.ExecuteSqlRawAsync("SET pg_trgm.similarity_threshold = 0.2", ct).ConfigureAwait(false);
 
-        var query = db.Users.Where(a => EF.Functions.TrigramsAreSimilar(a.Email, command.Query));
+        var query = db.Users.Where(a =>
+            EF.Functions.TrigramsAreSimilar(a.Trigrams, command.Query)
+            || (a.Profile != null && EF.Functions.TrigramsAreSimilar(a.Profile.Trigrams, command.Query))
+        );
 
         if (command.WorkspaceId.HasValue)
         {
@@ -56,9 +59,25 @@ public sealed class SearchUsersHandler(AppDbContext db) : ICommandHandler<Search
                 string.IsNullOrEmpty(command.Select)
                     ? parameter
                     : ExpressionHelper.Init<User, User>(parameter, command.Select),
-                TrigramsSimilarity(
-                    Expression.Property(parameter, nameof(User.Email)),
-                    Expression.Property(Expression.Constant(command), nameof(SearchUsers.Query))
+                Expression.Add(
+                    TrigramsSimilarity(
+                        Expression.Property(parameter, nameof(User.Trigrams)),
+                        Expression.Property(Expression.Constant(command), nameof(SearchUsers.Query))
+                    ),
+                    Expression.Condition(
+                        Expression.Equal(
+                            Expression.Property(parameter, nameof(User.Profile)),
+                            Expression.Constant(null, typeof(UserProfile))
+                        ),
+                        Expression.Constant(0.0, typeof(double)),
+                        TrigramsSimilarity(
+                            Expression.Property(
+                                Expression.Property(parameter, nameof(User.Profile)),
+                                nameof(UserProfile.Trigrams)
+                            ),
+                            Expression.Property(Expression.Constant(command), nameof(SearchUsers.Query))
+                        )
+                    )
                 ),
             ],
             typeof(UserWithSimilarity).GetProperties()

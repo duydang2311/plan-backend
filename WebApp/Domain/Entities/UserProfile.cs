@@ -13,5 +13,6 @@ public sealed record class UserProfile
     public string DisplayName { get; init; } = string.Empty;
     public Asset Image { get; init; } = Asset.Empty;
     public string? Bio { get; init; }
+    public string Trigrams { get; init; } = null!;
     public ICollection<UserSocialLink>? SocialLinks { get; init; }
 }
