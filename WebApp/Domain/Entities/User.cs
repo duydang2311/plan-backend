@@ -1,5 +1,4 @@
 using NodaTime;
-using NpgsqlTypes;
 
 namespace WebApp.Domain.Entities;
 
@@ -27,4 +26,5 @@ public sealed record class User
     public ICollection<UserFriendRequest> UserReceivedFriendRequests { get; init; } = null!;
     public ICollection<ChatMember> ChatMembers { get; init; } = null!;
     public ICollection<Chat> Chats { get; init; } = null!;
+    public ICollection<Chat> OwnedChats { get; init; } = null!;
 }

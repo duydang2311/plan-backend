@@ -26,10 +26,12 @@ public sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
         builder.Property(a => a.Type).HasConversion<EnumToNumberConverter<ChatType, byte>>();
         builder.Property(a => a.Title).HasMaxLength(128);
         builder.Property(a => a.DeletedTime);
+        builder.Property(a => a.OwnerId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
 
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.DeletedTime);
         builder.HasMany(a => a.Members).WithMany(a => a.Chats).UsingEntity<ChatMember>();
+        builder.HasOne(a => a.Owner).WithMany(a => a.OwnedChats).HasForeignKey(a => a.OwnerId);
         builder.HasQueryFilter(a => a.DeletedTime == null);
     }
 }

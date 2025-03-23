@@ -12,6 +12,8 @@ public sealed record Chat : ISoftDelete
     public ChatType Type { get; init; }
     public string? Title { get; init; }
     public Instant? DeletedTime { get; init; }
+    public UserId OwnerId { get; init; } = UserId.Empty;
+    public User Owner { get; init; } = null!;
 
     public ICollection<ChatMember> ChatMembers { get; init; } = null!;
     public ICollection<User> Members { get; init; } = null!;

@@ -33,6 +33,9 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserFriend> UserFriends => Set<UserFriend>();
     public DbSet<UserFriendRequest> UserFriendRequests => Set<UserFriendRequest>();
+    public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<ChatMember> ChatMembers => Set<ChatMember>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
