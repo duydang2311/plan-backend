@@ -9,5 +9,4 @@ public sealed record GetUserFriends : Collective, ICommand<PaginatedList<UserFri
     public UserId? UserId { get; init; }
     public UserId? FriendId { get; init; }
     public string? Select { get; init; }
-    public string? Query { get; init; }
 }
