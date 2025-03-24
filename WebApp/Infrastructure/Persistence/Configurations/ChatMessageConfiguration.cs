@@ -16,6 +16,7 @@ public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMess
         builder.Property(a => a.Content);
 
         builder.HasKey(a => a.Id);
+        builder.HasIndex(a => a.CreatedTime);
         builder.HasOne(a => a.Chat).WithMany(a => a.ChatMessages).HasForeignKey(a => a.ChatId);
         builder.HasOne(a => a.Sender).WithMany().HasForeignKey(a => a.SenderId);
         builder.HasQueryFilter(a => a.Chat.DeletedTime == null);
