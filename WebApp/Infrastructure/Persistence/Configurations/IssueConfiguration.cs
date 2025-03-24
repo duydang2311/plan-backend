@@ -30,6 +30,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasIndex(a => new { a.ProjectId, a.OrderNumber }).IsUnique();
         builder.HasIndex(a => a.StatusId);
         builder.HasIndex(a => a.StatusRank);
+        builder.HasIndex(a => a.DeletedTime);
         builder.HasQueryFilter(a => a.DeletedTime == null);
     }
 }
