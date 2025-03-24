@@ -120,6 +120,8 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<NotificationId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
+    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ChatId>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
     x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -218,6 +220,11 @@ app.UseFastEndpoints(
         );
         config.Binding.ValueParserFor<UserNotificationId>(
             input => EntityIdValueParsers.ParseLong(input, static value => new UserNotificationId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ChatId>(EntityGuidJsonConverter<ChatId>.ValueParser, handleNull: true);
+        config.Binding.ValueParserFor<ChatMessageId>(
+            input => EntityIdValueParsers.ParseLong(input, static value => new ChatMessageId { Value = value }),
             handleNull: true
         );
     }
