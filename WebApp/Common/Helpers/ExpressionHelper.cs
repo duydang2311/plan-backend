@@ -107,14 +107,21 @@ public static class ExpressionHelper
     }
 
     // ref: https://stackoverflow.com/a/66334073
-    public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(string members) =>
+    public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(
+        string members,
+        ParameterExpression? parameter = null
+    ) =>
         Select<TSource, TTarget>(
-            members.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray()
+            members.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray(),
+            parameter
         );
 
-    public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(IEnumerable<string> members)
+    public static Expression<Func<TSource, TTarget>> Select<TSource, TTarget>(
+        IEnumerable<string> members,
+        ParameterExpression? parameter = null
+    )
     {
-        var parameter = Expression.Parameter(typeof(TSource), "e");
+        parameter ??= Expression.Parameter(typeof(TSource), "e");
         var body = NewObject(typeof(TTarget), parameter, members.Select(m => m.Split('.')));
         return Expression.Lambda<Func<TSource, TTarget>>(body, parameter);
     }

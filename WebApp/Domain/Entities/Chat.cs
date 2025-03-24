@@ -1,3 +1,4 @@
+using EntityFrameworkCore.Projectables;
 using NodaTime;
 using WebApp.Common.Interfaces;
 using WebApp.Domain.Constants;
@@ -18,4 +19,7 @@ public sealed record Chat : ISoftDelete
     public ICollection<ChatMember> ChatMembers { get; init; } = null!;
     public ICollection<User> Members { get; init; } = null!;
     public ICollection<ChatMessage> ChatMessages { get; init; } = null!;
+
+    // Ignored
+    public ChatMessage? LastChatMessage { get; init; }
 }

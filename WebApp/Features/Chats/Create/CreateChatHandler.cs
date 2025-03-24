@@ -22,7 +22,11 @@ public sealed record CreateChatHandler(AppDbContext db)
         var chat = new Chat
         {
             OwnerId = command.OwnerId,
-            ChatMembers = [.. command.MemberIds.Select(a => new ChatMember { MemberId = a })],
+            ChatMembers =
+            [
+                new ChatMember { MemberId = command.OwnerId },
+                .. command.MemberIds.Select(a => new ChatMember { MemberId = a }),
+            ],
             Type = command.MemberIds.Count switch
             {
                 1 => ChatType.OneOnOne,
@@ -42,7 +46,7 @@ public sealed record CreateChatHandler(AppDbContext db)
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
         }
-        catch (DbUpdateException e)
+        catch (DbUpdateException)
         {
             return ValidationFailures.Single("memberIds", "Chat with these members already exists", "chat_exists");
         }

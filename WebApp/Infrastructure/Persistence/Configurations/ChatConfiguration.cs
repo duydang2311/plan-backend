@@ -27,6 +27,7 @@ public sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
         builder.Property(a => a.Title).HasMaxLength(128);
         builder.Property(a => a.DeletedTime);
         builder.Property(a => a.OwnerId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
+        builder.Ignore(a => a.LastChatMessage);
 
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.DeletedTime);
