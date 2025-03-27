@@ -12,4 +12,14 @@ public readonly record struct ChatMessageId : IEntityId<long>
     {
         return Value.ToString(CultureInfo.InvariantCulture);
     }
+
+    public static bool operator >(ChatMessageId a, ChatMessageId b)
+    {
+        return a.Value > b.Value;
+    }
+
+    public static bool operator <(ChatMessageId a, ChatMessageId b)
+    {
+        return a.Value < b.Value;
+    }
 }

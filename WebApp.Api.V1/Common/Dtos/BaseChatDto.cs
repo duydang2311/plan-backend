@@ -15,4 +15,6 @@ public sealed record BaseChatDto
     public UserId? OwnerId { get; init; }
     public BaseUserDto? Owner { get; init; }
     public BaseChatMessageDto? LastChatMessage { get; init; }
+
+    public ICollection<BaseUserDto>? Members { get; init; }
 }
