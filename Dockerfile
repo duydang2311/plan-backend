@@ -1,4 +1,4 @@
-FROM nats:latest
+FROM nats:alpine
 
 ADD nats-server.conf /nats-server.conf
 
