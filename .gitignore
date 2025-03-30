@@ -1,1 +1,2 @@
 nats-server.conf
+.env.docker-compose
