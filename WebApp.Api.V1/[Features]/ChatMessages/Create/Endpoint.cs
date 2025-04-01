@@ -4,7 +4,7 @@ using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.ChatMessages.Create;
 
-using Results = Results<ForbidHttpResult, ProblemDetails, NoContent>;
+using Results = Results<ForbidHttpResult, ProblemDetails, Ok<Response>>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -20,7 +20,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
         return oneOf.Match<Results>(
             validationFailures => validationFailures.ToProblemDetails(),
-            success => TypedResults.NoContent()
+            chatMessage => TypedResults.Ok(chatMessage.ToResponse())
         );
     }
 }

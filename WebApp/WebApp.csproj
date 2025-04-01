@@ -26,6 +26,9 @@
     <PackageReference Include="Norgerman.Cryptography.Scrypt" />
     <PackageReference Include="Riok.Mapperly" />
     <PackageReference Include="StringBetween" />
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" />
+    <PackageReference Include="WolverineFx.Postgresql" />
   </ItemGroup>
 
 </Project>

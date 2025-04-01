@@ -1,18 +1,25 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using Oakton;
+using Oakton.Resources;
 using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Mails.Abstractions;
+using WebApp.Infrastructure.Messaging;
 using WebApp.Infrastructure.Nats.Abstractions;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 using WebApp.Infrastructure.Storages.Abstractions;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,6 +145,17 @@ builder.Services.AddFastEndpoints(
 
 builder.Services.AddHybridCache();
 
+builder.Host.UseWolverine(a =>
+{
+    a.PersistMessagesWithPostgresql(persistenceOptions.ConnectionString, "wolverine");
+    a.UseEntityFrameworkCoreTransactions();
+    a.Policies.UseDurableLocalQueues();
+    a.Policies.AutoApplyTransactions();
+    a.Discovery.IncludeAssembly(typeof(ChatMessageCreatedHandler).Assembly);
+});
+
+builder.Host.UseResourceSetupOnStartup();
+
 var app = builder.Build();
 app.UseDefaultExceptionHandler();
 if (app.Environment.IsDevelopment())
@@ -240,4 +258,4 @@ app.UseJobQueues(options =>
 // using var scope = scopeFactory.CreateScope();
 // var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-app.Run();
+return await app.RunOaktonCommands(args).ConfigureAwait(false);

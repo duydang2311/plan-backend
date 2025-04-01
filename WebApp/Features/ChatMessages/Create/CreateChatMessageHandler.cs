@@ -6,13 +6,20 @@ using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
+using Wolverine.EntityFrameworkCore;
 
 namespace WebApp.Features.ChatMessages.Create;
 
-public sealed record CreateChatMessageHandler(AppDbContext db, ILogger<CreateChatMessageHandler> logger)
-    : ICommandHandler<CreateChatMessage, OneOf<ValidationFailures, Success>>
+public sealed record CreateChatMessageHandler(
+    AppDbContext db,
+    ILogger<CreateChatMessageHandler> logger,
+    IDbContextOutbox outbox
+) : ICommandHandler<CreateChatMessage, OneOf<ValidationFailures, ChatMessage>>
 {
-    public async Task<OneOf<ValidationFailures, Success>> ExecuteAsync(CreateChatMessage command, CancellationToken ct)
+    public async Task<OneOf<ValidationFailures, ChatMessage>> ExecuteAsync(
+        CreateChatMessage command,
+        CancellationToken ct
+    )
     {
         var chatMessage = new ChatMessage
         {
@@ -40,21 +47,25 @@ public sealed record CreateChatMessageHandler(AppDbContext db, ILogger<CreateCha
             );
         }
 
-        var createdEvent = new ChatMessageCreated { ChatMessageId = chatMessage.Id, ChatId = chatMessage.ChatId };
-        db.Add(createdEvent.CreateJob<JobRecord>(executeAfter: DateTime.UtcNow));
         try
         {
-            await db.SaveChangesAsync(ct).ConfigureAwait(false);
-            await transaction.CommitAsync(ct).ConfigureAwait(false);
+            outbox.Enroll(db);
+            await outbox
+                .PublishAsync(new ChatMessageCreated { ChatMessageId = chatMessage.Id, ChatId = chatMessage.ChatId })
+                .ConfigureAwait(false);
+            await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to save job record for chat message created event");
+            logger.LogError(
+                e,
+                "Failed to publish ChatMessageCreated message for chat message {ChatMessageId}",
+                chatMessage.Id
+            );
+            await transaction.RollbackAsync(ct).ConfigureAwait(false);
             throw;
         }
 
-        createdEvent.TriggerJobExecution();
-
-        return new Success();
+        return chatMessage;
     }
 }

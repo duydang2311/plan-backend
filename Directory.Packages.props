@@ -38,5 +38,8 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
     <PackageVersion Include="Riok.Mapperly" Version="4.1.1" />
     <PackageVersion Include="StringBetween" Version="1.0.0" />
+    <PackageVersion Include="WolverineFx" Version="3.11.0" />
+    <PackageVersion Include="WolverineFx.EntityFrameworkCore" Version="3.11.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="3.11.0" />
   </ItemGroup>
 </Project>

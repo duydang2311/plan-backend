@@ -2,6 +2,7 @@ using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
+using Wolverine.EntityFrameworkCore;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,10 @@ public static partial class ServiceCollectionExtensions
     {
         serviceCollection.AddPooledDbContextFactory<AppDbContext>((builder) => Configure(builder, persistenceOptions));
         serviceCollection.AddDbContextPool<AppDbContext>((builder) => Configure(builder, persistenceOptions));
+        serviceCollection.AddDbContextWithWolverineIntegration<AppDbContext>(
+            builder => Configure(builder, persistenceOptions),
+            "wolverine"
+        );
         return serviceCollection;
     }
 
