@@ -1,7 +1,6 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using OneOf;
-using OneOf.Types;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
