@@ -19,6 +19,10 @@ public class Orderable
     public IOrderedQueryable<T> Sort<T>(IQueryable<T> query)
         where T : notnull
     {
+        if (query is IOrderedQueryable<T> orderedQuery)
+        {
+            return Sort(orderedQuery);
+        }
         return Order == Order.Ascending
             ? query.OrderBy(ExpressionHelper.OrderBy<T>(UppercasedName))
             : query.OrderByDescending(ExpressionHelper.OrderBy<T>(UppercasedName));
