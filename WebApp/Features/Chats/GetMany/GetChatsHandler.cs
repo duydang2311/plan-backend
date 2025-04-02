@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
+using WebApp.Common.Constants;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -21,6 +22,24 @@ public sealed class GetChatsHandler(AppDbContext db) : ICommandHandler<GetChats,
         }
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        var chatMessageCreatedTimeOrder = command.Order.FirstOrDefault(a =>
+            a.Name.Equals("ChatMessageCreatedTime", StringComparison.OrdinalIgnoreCase)
+        );
+        if (chatMessageCreatedTimeOrder is not null)
+        {
+            query = chatMessageCreatedTimeOrder.Order switch
+            {
+                Common.Constants.Order.Ascending => query.OrderBy(a => a.ChatMessages.Min(b => b.CreatedTime)),
+                Common.Constants.Order.Descending => query.OrderByDescending(a =>
+                    a.ChatMessages.Max(b => b.CreatedTime)
+                ),
+                _ => query,
+            };
+        }
+        query = command
+            .Order.Where(a => !a.Name.EqualsEither(["ChatMessageCreatedTime"]))
+            .SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
         if (!string.IsNullOrEmpty(command.Select))
         {
@@ -67,8 +86,6 @@ public sealed class GetChatsHandler(AppDbContext db) : ICommandHandler<GetChats,
             }
             query = query.Select(selectExpression);
         }
-
-        query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
         return PaginatedList.From(
             await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
