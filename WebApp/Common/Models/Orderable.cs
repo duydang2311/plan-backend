@@ -19,9 +19,9 @@ public class Orderable
     public IOrderedQueryable<T> Sort<T>(IQueryable<T> query)
         where T : notnull
     {
-        if (query is IOrderedQueryable<T> orderedQuery)
+        if (query.Expression.Type == typeof(IOrderedQueryable<T>))
         {
-            return Sort(orderedQuery);
+            return Sort((IOrderedQueryable<T>)query);
         }
         return Order == Order.Ascending
             ? query.OrderBy(ExpressionHelper.OrderBy<T>(UppercasedName))
