@@ -12,6 +12,8 @@ public sealed record Request : Collective
     public UserId? UserId { get; init; }
     public string? Select { get; init; }
     public string? SelectLastChatMessage { get; init; }
+    public UserId? FilterChatMemberId { get; init; }
+    public string? SelectChatMember { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }
