@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
+using NATS.Client.Core;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Oakton;
@@ -19,6 +20,7 @@ using WebApp.Infrastructure.Persistence.Abstractions;
 using WebApp.Infrastructure.Storages.Abstractions;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
+using Wolverine.ErrorHandling;
 using Wolverine.Postgresql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -152,6 +154,9 @@ builder.Host.UseWolverine(a =>
     a.Policies.UseDurableLocalQueues();
     a.Policies.AutoApplyTransactions();
     a.Discovery.IncludeAssembly(typeof(ChatMessageCreatedHandler).Assembly);
+    a.OnException<NatsException>()
+        .RetryWithCooldown(512.Milliseconds(), 2048.Milliseconds(), 8192.Milliseconds())
+        .Then.MoveToErrorQueue();
 });
 
 builder.Host.UseResourceSetupOnStartup();
