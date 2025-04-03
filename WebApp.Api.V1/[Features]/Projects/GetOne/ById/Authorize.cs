@@ -10,7 +10,7 @@ public sealed class Authorize : IPreProcessor<Request>
 {
     public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
-        if (context.Request is null)
+        if (context.Request is null || context.HasValidationFailures)
         {
             return Task.CompletedTask;
         }

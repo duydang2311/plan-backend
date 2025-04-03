@@ -6,7 +6,7 @@ public abstract class AuthorizePreProcessor<TRequest> : IPreProcessor<TRequest>
 {
     public async Task PreProcessAsync(IPreProcessorContext<TRequest> context, CancellationToken ct)
     {
-        if (context.Request is null)
+        if (context.Request is null || context.HasValidationFailures)
         {
             return;
         }
