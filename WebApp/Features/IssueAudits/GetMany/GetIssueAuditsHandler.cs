@@ -15,15 +15,22 @@ public sealed class GetIssueAuditsHandler(AppDbContext db) : ICommandHandler<Get
 
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
+        if (command.Cursor.HasValue)
+        {
+            query = query.Where(a => a.Id > command.Cursor.Value);
+        }
+
+        query = command.Order.SortOrDefault(query, a => a.OrderBy(b => b.CreatedTime));
+
         if (!string.IsNullOrEmpty(command.Select))
         {
             query = query.Select(ExpressionHelper.Select<IssueAudit, IssueAudit>(command.Select));
         }
 
-        query = command.Order.SortOrDefault(query, a => a.OrderBy(b => b.CreatedTime));
-
         return PaginatedList.From(
-            await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
+            command.Cursor.HasValue
+                ? await query.Take(command.Size).ToListAsync(ct).ConfigureAwait(false)
+                : await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false),
             totalCount
         );
     }

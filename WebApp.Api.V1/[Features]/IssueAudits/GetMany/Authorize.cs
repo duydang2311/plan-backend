@@ -1,4 +1,3 @@
-using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
@@ -8,33 +7,27 @@ namespace WebApp.Api.V1.IssueAudits.GetMany;
 
 public sealed class Authorize : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (!context.Request.IssueId.HasValue)
         {
-            return context.HttpContext.Response.SendForbiddenAsync(ct);
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            return;
         }
 
-        return AuthorizeAsync(context, ct);
-    }
-
-    private static async Task AuthorizeAsync(IPreProcessorContext<Request> context, CancellationToken ct)
-    {
-        Guard.Against.Null(context.Request);
         var db = context.HttpContext.Resolve<AppDbContext>();
-
         var issue = await db
             .Issues.Where(a => a.Id == context.Request.IssueId)
             .Select(a => new
             {
                 a.AuthorId,
                 a.ProjectId,
-                a.Project.WorkspaceId
+                a.Project.WorkspaceId,
             })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);

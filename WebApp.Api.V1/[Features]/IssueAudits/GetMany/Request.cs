@@ -7,10 +7,11 @@ using WebApp.Features.IssueAudits.GetMany;
 
 namespace WebApp.Api.V1.IssueAudits.GetMany;
 
-public sealed record Request : Collective
+public sealed record Request : Collective, IKeysetPagination<long?>
 {
     public IssueId? IssueId { get; init; }
     public string? Select { get; init; }
+    public long? Cursor { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }
