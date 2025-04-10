@@ -1,0 +1,13 @@
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\bin\Debug\net9.0\WebApp.ServiceDefaults.deps.json
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\bin\Debug\net9.0\WebApp.ServiceDefaults.dll
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\bin\Debug\net9.0\WebApp.ServiceDefaults.pdb
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.csproj.AssemblyReference.cache
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.AssemblyInfoInputs.cache
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.AssemblyInfo.cs
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.csproj.CoreCompileInputs.cache
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.sourcelink.json
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.dll
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\refint\WebApp.ServiceDefaults.dll
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\WebApp.ServiceDefaults.pdb
+C:\Users\duyda\Documents\Projects\plan\plan-backend\WebApp.ServiceDefaults\obj\Debug\net9.0\ref\WebApp.ServiceDefaults.dll

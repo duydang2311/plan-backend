@@ -273,7 +273,7 @@ app.UseFastEndpoints(
         );
     }
 );
-app.MapDefaultEndpoints();
+
 app.UseJobQueues(options =>
 {
     options.MaxConcurrency = 4;

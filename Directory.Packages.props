@@ -31,14 +31,6 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
-    <!-- Aspire -->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.1.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.1.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.2" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
     <PackageVersion Include="Riok.Mapperly" Version="4.2.0" />
     <PackageVersion Include="StringBetween" Version="1.0.0" />
     <PackageVersion Include="WolverineFx" Version="3.11.0" />
