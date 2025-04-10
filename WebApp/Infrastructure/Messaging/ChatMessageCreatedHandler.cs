@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using NATS.Client.Core;
@@ -24,10 +25,10 @@ public static class ChatMessageCreatedHandler
             await using var nats = natsFactory.CreateNatsConnection();
 #pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
             await nats.PublishAsync(
-                    $"chats.{created.ChatId.ToBase64String()}.messages.created",
+                    $"chats.messages.created",
                     JsonSerializer.Serialize(
-                        new { chatMessageId = created.ChatMessageId },
-                        options.Value.SerializerOptions
+                        new ChatMessageCreatedPayload(created.ChatId.ToBase64String(), created.ChatMessageId.Value),
+                        ChatMessageCreatedJsonContext.Default.ChatMessageCreatedPayload
                     ),
                     cancellationToken: ct
                 )
@@ -40,3 +41,9 @@ public static class ChatMessageCreatedHandler
         }
     }
 }
+
+public sealed record ChatMessageCreatedPayload(string chatId, long ChatMessageId) { }
+
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
+[JsonSerializable(typeof(ChatMessageCreatedPayload))]
+internal partial class ChatMessageCreatedJsonContext : JsonSerializerContext;
