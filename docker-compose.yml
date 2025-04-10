@@ -8,7 +8,23 @@ services:
       - "8222:8222"
       - "4223:4223"
     networks:
-      - nats_network
+      - app_network
+    restart: unless-stopped
+
+  api_v1:
+    build:
+      context: .
+      dockerfile: ./WebApp.Api.V1/Dockerfile
+    env_file:
+      - .env.docker-compose
+    depends_on:
+      - nats
+    networks:
+      - app_network
+    ports:
+      - "5051:5051"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     restart: always
 
   mailer:
@@ -20,10 +36,24 @@ services:
     depends_on:
       - nats
     networks:
-      - nats_network
+      - app_network
     volumes:
       - ../plan-go-mailer:/app
     restart: always
+  
+  hubs:
+    build:
+      context: .
+      dockerfile: ./WebApp.Hubs/Dockerfile
+    depends_on:
+      - nats
+    networks:
+      - app_network
+    ports:
+      - "5054:5054"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    restart: always
 
 networks:
-  nats_network:
+  app_network:

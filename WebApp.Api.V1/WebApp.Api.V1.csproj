@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebApp\WebApp.csproj" />
-    <ProjectReference Include="..\WebApp.ServiceDefaults\WebApp.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -35,8 +35,6 @@ var cloudinaryOptions =
     builder.Configuration.GetRequiredSection(CloudinaryOptions.Section).Get<CloudinaryOptions>()
     ?? throw new InvalidOperationException("CloudinaryOptions must be configured");
 
-builder.AddServiceDefaults();
-
 builder
     .Services.AddOptions<NatsOptions>()
     .BindConfiguration(NatsOptions.Section)
