@@ -11,21 +11,21 @@ services:
       - app_network
     restart: unless-stopped
 
-  api_v1:
-    build:
-      context: .
-      dockerfile: ./WebApp.Api.V1/Dockerfile
-    env_file:
-      - .env.docker-compose
-    depends_on:
-      - nats
-    networks:
-      - app_network
-    ports:
-      - "5051:5051"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    restart: always
+  # api_v1:
+  #   build:
+  #     context: .
+  #     dockerfile: ./WebApp.Api.V1/Dockerfile
+  #   env_file:
+  #     - .env.docker-compose
+  #   depends_on:
+  #     - nats
+  #   networks:
+  #     - app_network
+  #   ports:
+  #     - "5051:5051"
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   restart: always
 
   mailer:
     build:
@@ -41,19 +41,36 @@ services:
       - ../plan-go-mailer:/app
     restart: always
   
-  hubs:
-    build:
-      context: .
-      dockerfile: ./WebApp.Hubs/Dockerfile
-    depends_on:
-      - nats
+  # hubs:
+  #   build:
+  #     context: .
+  #     dockerfile: ./WebApp.Hubs/Dockerfile
+  #   depends_on:
+  #     - nats
+  #   networks:
+  #     - app_network
+  #   ports:
+  #     - "5054:5054"
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   restart: always
+  
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: webapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - app_network
-    ports:
-      - "5054:5054"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    restart: always
 
 networks:
   app_network:
+
+volumes:
+  postgres-data:
