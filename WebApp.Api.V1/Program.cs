@@ -1,8 +1,10 @@
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -67,11 +69,32 @@ builder
     .ValidateOnStart();
 
 builder
-    .Services.AddAuthentication()
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = BasicAuthenticationSchemeOptions.AuthenticationScheme;
+    })
     .AddScheme<BasicAuthenticationSchemeOptions, BasicAuthenticationSchemeHandler>(
-        BasicAuthenticationSchemeOptions.DefaultScheme,
-        options => { }
-    );
+        BasicAuthenticationSchemeOptions.AuthenticationScheme,
+        null
+    )
+    .AddJwtBearer(options =>
+    {
+        var jwtOptions =
+            builder.Configuration.GetSection(JwtOptions.Section).Get<JwtOptions>()
+            ?? throw new InvalidOperationException("JwtOptions must be configured");
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(jwtOptions.PublicKey);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateLifetime = true,
+            ValidateAudience = true,
+            ValidAudience = "WebApp",
+            IssuerSigningKey = new RsaSecurityKey(rsa),
+            ValidateIssuerSigningKey = true,
+        };
+    });
 
 // builder.Services
 // .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -262,5 +285,21 @@ app.UseJobQueues(options =>
 // var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 // using var scope = scopeFactory.CreateScope();
 // var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+// var tokenHandler = new JwtSecurityTokenHandler();
+// var rsa = RSA.Create();
+// rsa.ImportFromPem(app.Services.GetRequiredService<IOptions<JwtOptions>>().Value.PrivateKey);
+
+// var tokenDescriptor = new SecurityTokenDescriptor
+// {
+//     Subject = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "HUBS"), new Claim(ClaimTypes.Role, "HUBS")]),
+//     Expires = DateTime.UtcNow.AddYears(4),
+//     Issuer = app.Services.GetRequiredService<IOptions<JwtOptions>>().Value.Issuer,
+//     Audience = "WebApp",
+//     SigningCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256),
+// };
+
+// var token = tokenHandler.CreateToken(tokenDescriptor);
+// Console.WriteLine("Token: " + tokenHandler.WriteToken(token));
 
 return await app.RunOaktonCommands(args).ConfigureAwait(false);
