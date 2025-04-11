@@ -16,16 +16,14 @@ public sealed class ChatBroadcastService(
         return Task.CompletedTask;
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-        if (natsClient is not null)
-        {
-            await natsClient.DisposeAsync().ConfigureAwait(false);
-        }
+        return Task.CompletedTask;
     }
 
     async Task SubscribeToChatMessageCreatedAsync(CancellationToken ct)
     {
+        logger.LogInformation("Subscribing to chat message created events");
         try
         {
             await foreach (
