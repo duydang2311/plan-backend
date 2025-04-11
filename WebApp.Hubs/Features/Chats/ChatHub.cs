@@ -25,7 +25,7 @@ public sealed class ChatHub(IApiHttpClientFactory httpClientFactory, ILogger<Cha
         using var httpClient = httpClientFactory.CreateClient();
         try
         {
-            var response = await httpClient.GetAsync($"get-user-chat-ids/v1?userId={userId}", ct).ConfigureAwait(false);
+            var response = await httpClient.GetAsync($"get-user-chat-ids/v1?userId={userId}", ct).ConfigureAwait(true);
             if (!response.IsSuccessStatusCode)
             {
                 return;
@@ -39,7 +39,7 @@ public sealed class ChatHub(IApiHttpClientFactory httpClientFactory, ILogger<Cha
 
             foreach (var chatId in chatIds)
             {
-                await Groups.AddToGroupAsync(connectionId, ChatUtils.GroupName(chatId), ct).ConfigureAwait(true);
+                _ = Groups.AddToGroupAsync(connectionId, ChatUtils.GroupName(chatId), ct).ConfigureAwait(true);
             }
         }
         catch (HttpRequestException e)
