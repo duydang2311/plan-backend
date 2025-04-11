@@ -10,4 +10,5 @@ public sealed record CreateChatMessage : ICommand<OneOf<ValidationFailures, Chat
     public required ChatId ChatId { get; init; }
     public required UserId SenderId { get; init; }
     public required string Content { get; init; }
+    public string? OptimisticId { get; init; }
 }

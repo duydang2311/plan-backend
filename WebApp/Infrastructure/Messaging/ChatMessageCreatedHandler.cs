@@ -24,7 +24,7 @@ public static class ChatMessageCreatedHandler
                 .PublishAsync(
                     $"chats.messages.created",
                     JsonSerializer.Serialize(
-                        new Payload(created.ChatId.ToBase64String(), created.ChatMessageId.Value),
+                        new Payload(created.ChatId.ToBase64String(), created.ChatMessageId.Value, created.OptimisticId),
                         ChatMessageCreatedJsonContext.Default.Payload
                     ),
                     cancellationToken: ct
@@ -38,7 +38,7 @@ public static class ChatMessageCreatedHandler
         }
     }
 
-    public sealed record Payload(string ChatId, long ChatMessageId) { }
+    public sealed record Payload(string ChatId, long ChatMessageId, string? OptimisticId) { }
 }
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]

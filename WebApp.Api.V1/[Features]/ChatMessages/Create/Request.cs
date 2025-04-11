@@ -11,6 +11,7 @@ public sealed record Request
 {
     public ChatId? ChatId { get; init; }
     public string? Content { get; init; }
+    public string? OptimisticId { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }

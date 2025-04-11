@@ -50,7 +50,14 @@ public sealed record CreateChatMessageHandler(
         {
             outbox.Enroll(db);
             await outbox
-                .PublishAsync(new ChatMessageCreated { ChatMessageId = chatMessage.Id, ChatId = chatMessage.ChatId })
+                .PublishAsync(
+                    new ChatMessageCreated
+                    {
+                        ChatMessageId = chatMessage.Id,
+                        ChatId = chatMessage.ChatId,
+                        OptimisticId = command.OptimisticId,
+                    }
+                )
                 .ConfigureAwait(false);
             await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
         }

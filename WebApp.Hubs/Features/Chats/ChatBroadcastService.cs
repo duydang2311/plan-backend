@@ -61,7 +61,7 @@ public sealed class ChatBroadcastService(
     }
 }
 
-public sealed record ChatMessageCreatedPayload(string ChatId, long ChatMessageId) { }
+public sealed record ChatMessageCreatedPayload(string ChatId, long ChatMessageId, string? OptimisticId) { }
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(ChatMessageCreatedPayload))]
