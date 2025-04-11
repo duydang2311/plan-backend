@@ -25,9 +25,7 @@ public sealed class ChatHub(IApiHttpClientFactory httpClientFactory, ILogger<Cha
         using var httpClient = httpClientFactory.CreateClient();
         try
         {
-            var response = await httpClient
-                .GetAsync($"api/internals/get-user-chat-ids?userId={userId}/v1", ct)
-                .ConfigureAwait(false);
+            var response = await httpClient.GetAsync($"get-user-chat-ids/v1?userId={userId}", ct).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 return;
