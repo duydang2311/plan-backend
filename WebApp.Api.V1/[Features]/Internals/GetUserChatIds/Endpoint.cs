@@ -18,14 +18,7 @@ public sealed class Endpoint(AppDbContext db) : EndpointWithoutRequest<Ok<List<C
 
     public override async Task<Ok<List<ChatId>>> ExecuteAsync(CancellationToken ct)
     {
-        var userId = new UserId
-        {
-            Value = Guid.ParseExact(
-                Query<string>("userId", isRequired: true) ?? throw new InvalidOperationException(),
-                "D"
-            ),
-        };
-
+        var userId = Query<UserId>("userId", isRequired: true);
         var ids = await db
             .ChatMembers.Where(a => a.MemberId == userId)
             .Select(a => a.ChatId)
