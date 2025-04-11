@@ -1,39 +1,35 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.SignalR;
 using NATS.Client.Core;
-using WebApp.Infrastructure.Nats.Abstractions;
 
 namespace WebApp.Hubs.Features.Chats;
 
 public sealed class ChatBroadcastService(
-    INatsConnectionFactory natsConnectionFactory,
+    INatsClient natsClient,
     IHubContext<ChatHub> chatHubContext,
     ILogger<ChatBroadcastService> logger
 ) : IHostedService
 {
-    INatsConnection? natsConnection;
-
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        natsConnection = natsConnectionFactory.CreateNatsConnection();
-        _ = SubscribeToChatMessageCreatedAsync(natsConnection, cancellationToken);
+        _ = SubscribeToChatMessageCreatedAsync(cancellationToken);
         return Task.CompletedTask;
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        if (natsConnection is not null)
+        if (natsClient is not null)
         {
-            await natsConnection.DisposeAsync().ConfigureAwait(false);
+            await natsClient.DisposeAsync().ConfigureAwait(false);
         }
     }
 
-    async Task SubscribeToChatMessageCreatedAsync(INatsConnection natsConnection, CancellationToken ct)
+    async Task SubscribeToChatMessageCreatedAsync(CancellationToken ct)
     {
         try
         {
             await foreach (
-                var msg in natsConnection
+                var msg in natsClient
                     .SubscribeAsync(
                         "chats.messages.created",
                         serializer: new NatsJsonContextSerializer<ChatMessageCreatedPayload>(

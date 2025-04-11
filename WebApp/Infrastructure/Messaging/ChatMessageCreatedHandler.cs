@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using NATS.Client.Core;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
-using WebApp.Infrastructure.Nats.Abstractions;
 
 namespace WebApp.Infrastructure.Messaging;
 
@@ -13,7 +12,7 @@ public static class ChatMessageCreatedHandler
 {
     public static async Task HandleAsync(
         ChatMessageCreated created,
-        INatsConnectionFactory natsFactory,
+        INatsClient natsClient,
         ILogger logger,
         IOptions<JsonOptions> options,
         CancellationToken ct
@@ -21,14 +20,12 @@ public static class ChatMessageCreatedHandler
     {
         try
         {
-#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
-            await using var nats = natsFactory.CreateNatsConnection();
-#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
-            await nats.PublishAsync(
+            await natsClient
+                .PublishAsync(
                     $"chats.messages.created",
                     JsonSerializer.Serialize(
-                        new ChatMessageCreatedPayload(created.ChatId.ToBase64String(), created.ChatMessageId.Value),
-                        ChatMessageCreatedJsonContext.Default.ChatMessageCreatedPayload
+                        new Payload(created.ChatId.ToBase64String(), created.ChatMessageId.Value),
+                        ChatMessageCreatedJsonContext.Default.Payload
                     ),
                     cancellationToken: ct
                 )
@@ -40,10 +37,10 @@ public static class ChatMessageCreatedHandler
             throw;
         }
     }
+
+    public sealed record Payload(string ChatId, long ChatMessageId) { }
 }
 
-public sealed record ChatMessageCreatedPayload(string chatId, long ChatMessageId) { }
-
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
-[JsonSerializable(typeof(ChatMessageCreatedPayload))]
+[JsonSerializable(typeof(ChatMessageCreatedHandler.Payload))]
 internal partial class ChatMessageCreatedJsonContext : JsonSerializerContext;

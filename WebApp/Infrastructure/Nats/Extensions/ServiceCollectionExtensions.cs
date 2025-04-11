@@ -1,3 +1,4 @@
+using NATS.Client.Core;
 using WebApp.Infrastructure.Nats;
 using WebApp.Infrastructure.Nats.Abstractions;
 
@@ -13,10 +14,12 @@ public static partial class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
         serviceCollection.AddSingleton<INatsConnectionFactory, NatsConnectionFactory>();
-        serviceCollection.AddScoped(provider =>
+        serviceCollection.AddSingleton(provider =>
         {
-            return provider.GetRequiredService<INatsConnectionFactory>().CreateNatsConnection();
+            var factory = provider.GetRequiredService<INatsConnectionFactory>();
+            return factory.CreateNatsConnection();
         });
+        serviceCollection.AddSingleton<INatsClient>(provider => provider.GetRequiredService<INatsConnection>());
         return serviceCollection;
     }
 }
