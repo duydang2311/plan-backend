@@ -20,6 +20,10 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
     )
     {
         Expression<Func<SetPropertyCalls<Issue>, SetPropertyCalls<Issue>>>? updateEx = default;
+        if (command.Patch.TryGetValue(a => a.Title, out var title) && !string.IsNullOrEmpty(title))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Title, title));
+        }
         if (command.Patch.TryGetValue(a => a.Description, out var description))
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Description, description));

@@ -14,6 +14,7 @@ public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, NotFoundErr
 
     public sealed record Patchable : Patchable<Patchable>
     {
+        public string? Title { get; init; }
         public string Description { get; init; } = string.Empty;
         public IssuePriority Priority { get; init; }
         public StatusId StatusId { get; init; }
