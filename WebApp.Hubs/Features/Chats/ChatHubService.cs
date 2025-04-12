@@ -1,14 +1,17 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.SignalR;
 using NATS.Client.Core;
+using WebApp.Hubs.Common;
+using WebApp.Hubs.Features.Hubs;
 
 namespace WebApp.Hubs.Features.Chats;
 
-public sealed class ChatBroadcastService(
+public sealed class ChatHubService(
     INatsClient natsClient,
-    IHubContext<ChatHub> chatHubContext,
-    ILogger<ChatBroadcastService> logger
-) : IHostedService
+    IHubContext<MainHub> mainHubContext,
+    IApiHttpClientFactory httpClientFactory,
+    ILogger<ChatHubService> logger
+) : IHostedService, IHubService
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -19,6 +22,58 @@ public sealed class ChatBroadcastService(
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    public async Task OnConnectedAsync(HubCallerContext context)
+    {
+        if (string.IsNullOrEmpty(context.UserIdentifier))
+        {
+            return;
+        }
+        await AddUserToChatGroupsAsync(context.ConnectionId, context.UserIdentifier, context.ConnectionAborted)
+            .ConfigureAwait(true);
+    }
+
+    public Task OnDisconnectedAsync(HubCallerContext context, Exception? exception)
+    {
+        return Task.CompletedTask;
+    }
+
+    async Task AddUserToChatGroupsAsync(string connectionId, string userId, CancellationToken ct)
+    {
+        using var httpClient = httpClientFactory.CreateClient();
+        try
+        {
+            var response = await httpClient.GetAsync($"get-user-chat-ids/v1?userId={userId}", ct).ConfigureAwait(true);
+            if (!response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var chatIds = await response.Content.ReadFromJsonAsync<List<string>>(ct).ConfigureAwait(true);
+            if (chatIds is null)
+            {
+                return;
+            }
+
+            foreach (var chatId in chatIds)
+            {
+                Console.WriteLine("Add to group " + ChatUtils.GroupName(chatId));
+                _ = mainHubContext
+                    .Groups.AddToGroupAsync(connectionId, ChatUtils.GroupName(chatId), ct)
+                    .ConfigureAwait(true);
+            }
+        }
+        catch (HttpRequestException e)
+        {
+            logger.LogError(e, "Failed to add user to chat groups due to HTTP request error");
+            throw;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "An exception occurred while adding user to chat groups");
+            throw;
+        }
     }
 
     async Task SubscribeToChatMessageCreatedAsync(CancellationToken ct)
@@ -47,7 +102,7 @@ public sealed class ChatBroadcastService(
                 {
                     continue;
                 }
-                await chatHubContext
+                await mainHubContext
                     .Clients.Group(ChatUtils.GroupName(msg.Data.ChatId))
                     .SendAsync("new_chat_message", msg.Data, ct)
                     .ConfigureAwait(false);

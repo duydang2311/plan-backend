@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApp.Common.Models;
 using WebApp.Hubs.Common;
 using WebApp.Hubs.Features.Chats;
+using WebApp.Hubs.Features.Hubs;
 using WebApp.Infrastructure.Nats.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,10 +57,7 @@ builder
             OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
-                if (
-                    !string.IsNullOrEmpty(accessToken)
-                    && context.HttpContext.Request.Path.StartsWithSegments("/hubs/chat")
-                )
+                if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments("/hub"))
                 {
                     context.Token = accessToken;
                 }
@@ -90,7 +88,9 @@ builder
 builder.Services.AddSingleton<IApiHttpClientFactory, ApiHttpClientFactory>();
 
 builder.Services.AddNATS();
-builder.Services.AddHostedService<ChatBroadcastService>();
+builder.Services.AddSingleton<ChatHubService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<ChatHubService>());
+builder.Services.AddSingleton<IHubService, ChatHubService>(provider => provider.GetRequiredService<ChatHubService>());
 
 builder.Services.AddSignalR().AddMessagePackProtocol();
 builder.Services.AddCors();
@@ -110,21 +110,6 @@ app.UseCors(builder =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<ChatHub>("/hubs/chat");
-
-// var httpClient = app.Services.GetRequiredService<IApiHttpClientFactory>().CreateClient();
-// for (var i = 0; i != 1e3; ++i)
-// {
-//     var response = await httpClient
-//         .GetAsync(
-//             "api/internals/get-user-chat-ids/v1?userId=356b2b9e-9ccd-4935-8b93-e1a7ae18b824",
-//             app.Lifetime.ApplicationStopping
-//         )
-//         .ConfigureAwait(false);
-//     var list = await response
-//         .Content.ReadFromJsonAsync<List<string>>(app.Lifetime.ApplicationStopping)
-//         .ConfigureAwait(false);
-// }
-// httpClient.Dispose();
+app.MapHub<MainHub>("/hub");
 
 app.Run();
