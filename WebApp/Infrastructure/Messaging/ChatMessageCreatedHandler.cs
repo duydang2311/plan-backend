@@ -1,7 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.Options;
 using NATS.Client.Core;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
@@ -14,7 +11,6 @@ public static class ChatMessageCreatedHandler
         ChatMessageCreated created,
         INatsClient natsClient,
         ILogger logger,
-        IOptions<JsonOptions> options,
         CancellationToken ct
     )
     {
@@ -24,8 +20,12 @@ public static class ChatMessageCreatedHandler
                 .PublishAsync(
                     $"chats.messages.created",
                     JsonSerializer.Serialize(
-                        new Payload(created.ChatId.ToBase64String(), created.ChatMessageId.Value, created.OptimisticId),
-                        ChatMessageCreatedJsonContext.Default.Payload
+                        new ChatMessageCreatedPayload(
+                            created.ChatId.ToBase64String(),
+                            created.ChatMessageId.Value,
+                            created.OptimisticId
+                        ),
+                        MessagingJsonContext.Default.ChatMessageCreatedPayload
                     ),
                     cancellationToken: ct
                 )
@@ -37,10 +37,6 @@ public static class ChatMessageCreatedHandler
             throw;
         }
     }
-
-    public sealed record Payload(string ChatId, long ChatMessageId, string? OptimisticId) { }
 }
 
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
-[JsonSerializable(typeof(ChatMessageCreatedHandler.Payload))]
-internal partial class ChatMessageCreatedJsonContext : JsonSerializerContext;
+public sealed record ChatMessageCreatedPayload(string ChatId, long ChatMessageId, string? OptimisticId) { }

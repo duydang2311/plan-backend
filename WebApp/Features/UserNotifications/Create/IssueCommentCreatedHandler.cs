@@ -9,7 +9,7 @@ namespace WebApp.Features.UserNotifications.Create;
 
 public static class IssueCommentCreatedHandler
 {
-    public static async Task HandleAsync(
+    public static async Task<IEnumerable<IssueCommentCreatedUserNotified>?> HandleAsync(
         IssueCommentCreated created,
         AppDbContext db,
         ILogger logger,
@@ -29,7 +29,35 @@ public static class IssueCommentCreatedHandler
             .ToListAsync(ct)
             .ConfigureAwait(false);
         var notification = new Notification { Type = NotificationType.IssueCommentCreated, Data = data };
-        db.AddRange(userIds.Select(a => new UserNotification { UserId = a, Notification = notification }));
+        var userNotifications = userIds
+            .Select(a => new UserNotification { UserId = a, Notification = notification })
+            .ToList();
+        db.AddRange(userNotifications);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
+
+        var issue = await db
+            .Issues.Where(a => a.Id == created.IssueId)
+            .Select(a => new
+            {
+                a.OrderNumber,
+                a.Title,
+                ProjectIdentifier = a.Project.Identifier,
+                WorkspacePath = a.Project.Workspace.Path,
+            })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+
+        return issue is null
+            ? null
+            : userNotifications.Select(a => new IssueCommentCreatedUserNotified
+            {
+                UserId = a.UserId,
+                UserNotificationId = a.Id,
+                Type = NotificationType.IssueCommentCreated,
+                OrderNumber = issue.OrderNumber,
+                Title = issue.Title,
+                ProjectIdentifier = issue.ProjectIdentifier,
+                WorkspacePath = issue.WorkspacePath,
+            });
     }
 }
