@@ -17,133 +17,221 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
     public async Task<PaginatedList<UserNotification>> ExecuteAsync(GetUserNotifications command, CancellationToken ct)
     {
         var query = db.UserNotifications.Where(a => a.UserId == command.UserId);
-        var countTask = query.CountAsync(ct);
+        var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
         var select = string.IsNullOrEmpty(command.Select)
             ? string.IsNullOrEmpty(command.SelectProject)
             && string.IsNullOrEmpty(command.SelectIssue)
             && string.IsNullOrEmpty(command.SelectComment)
                 ? null
-                : "Notification.Type"
+                : "Notification.Type,Notification.Data"
             : command.Select;
-        if (!string.IsNullOrEmpty(command.Select))
+
+        if (!string.IsNullOrEmpty(select))
         {
-            query = query.Select(ExpressionHelper.Select<UserNotification, UserNotification>(command.Select));
+            query = query.Select(ExpressionHelper.Select<UserNotification, UserNotification>(select));
         }
 
         query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
 
-        var totalCount = await countTask.ConfigureAwait(false);
-        var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
-        for (var i = 0; i != items.Count; ++i)
+        var userNotifications = await query
+            .Skip(command.Offset)
+            .Take(command.Size)
+            .ToListAsync(ct)
+            .ConfigureAwait(false);
+
+        var projectIdsToLoad = new HashSet<ProjectId>();
+        var issueIdsToLoad = new HashSet<IssueId>();
+        var issueAuditIdsToLoad = new HashSet<long>();
+        var invitationIdsToLoad = new HashSet<ProjectMemberInvitationId>();
+
+        foreach (var un in userNotifications)
         {
-            var item = items[i];
-            if (item.Notification is null || item.Notification.Data is null)
+            if (un.Notification?.Data is null)
             {
                 continue;
             }
 
-            JsonDocument? newData = default;
-            switch (item.Notification.Type)
+            switch (un.Notification.Type)
             {
                 case NotificationType.ProjectCreated:
-                {
                     if (
-                        string.IsNullOrEmpty(command.SelectProject)
-                        || !item.Notification.Data.RootElement.TryGetProperty("projectId", out var projectIdElement)
-                        || !Guid.TryParseExact(projectIdElement.GetString(), "D", out var projectGuid)
+                        !string.IsNullOrEmpty(command.SelectProject)
+                        && un.Notification.Data.RootElement.TryGetProperty("projectId", out var projIdElem)
+                        && Guid.TryParseExact(projIdElem.GetString(), "D", out var projGuid)
                     )
                     {
-                        break;
+                        projectIdsToLoad.Add(new ProjectId { Value = projGuid });
                     }
-                    var projectId = new ProjectId { Value = projectGuid };
-                    newData = JsonSerializer.SerializeToDocument(
-                        await db
-                            .Projects.Where(a => a.Id == projectId)
-                            .Select(ExpressionHelper.Select<Project, Project>(command.SelectProject))
-                            .FirstOrDefaultAsync(ct)
-                            .ConfigureAwait(false),
-                        jsonOptions.Value.SerializerOptions
-                    );
                     break;
-                }
                 case NotificationType.IssueCreated:
-                {
                     if (
-                        string.IsNullOrEmpty(command.SelectIssue)
-                        || !item.Notification.Data.RootElement.TryGetProperty("issueId", out var issueIdElement)
-                        || !Guid.TryParseExact(issueIdElement.GetString(), "D", out var issueGuid)
+                        !string.IsNullOrEmpty(command.SelectIssue)
+                        && un.Notification.Data.RootElement.TryGetProperty("issueId", out var issueIdElem)
+                        && Guid.TryParseExact(issueIdElem.GetString(), "D", out var issueGuid)
                     )
                     {
-                        break;
+                        issueIdsToLoad.Add(new IssueId { Value = issueGuid });
                     }
-                    var issueId = new IssueId { Value = issueGuid };
-                    newData = JsonSerializer.SerializeToDocument(
-                        await db
-                            .Issues.IgnoreQueryFilters()
-                            .Where(a => a.Id == issueId)
-                            .Select(ExpressionHelper.Select<Issue, Issue>(command.SelectIssue))
-                            .FirstOrDefaultAsync(ct)
-                            .ConfigureAwait(false),
-                        jsonOptions.Value.SerializerOptions
-                    );
                     break;
-                }
                 case NotificationType.IssueCommentCreated:
-                {
                     if (
-                        string.IsNullOrEmpty(command.SelectComment)
-                        || !item.Notification.Data.RootElement.TryGetProperty("issueAuditId", out var auditIdElement)
-                        || !auditIdElement.TryGetInt64(out var auditId)
+                        !string.IsNullOrEmpty(command.SelectComment)
+                        && un.Notification.Data.RootElement.TryGetProperty("issueAuditId", out var auditIdElem)
+                        && auditIdElem.TryGetInt64(out var auditId)
                     )
                     {
-                        break;
+                        issueAuditIdsToLoad.Add(auditId);
                     }
-                    newData = JsonSerializer.SerializeToDocument(
-                        await db
-                            .IssueAudits.Where(a => a.Id == auditId)
-                            .Select(ExpressionHelper.Select<IssueAudit, IssueAudit>(command.SelectComment))
-                            .FirstOrDefaultAsync(ct)
-                            .ConfigureAwait(false),
-                        jsonOptions.Value.SerializerOptions
-                    );
                     break;
-                }
                 case NotificationType.ProjectMemberInvited:
-                {
                     if (
-                        string.IsNullOrEmpty(command.SelectProjectMemberInvitation)
-                        || !item.Notification.Data.RootElement.TryGetProperty(
+                        !string.IsNullOrEmpty(command.SelectProjectMemberInvitation)
+                        && un.Notification.Data.RootElement.TryGetProperty(
                             "projectMemberInvitationId",
-                            out var projectMemberInvitationIdElement
+                            out var inviteIdElem
                         )
-                        || !projectMemberInvitationIdElement.TryGetInt64(out var projectMemberInvitationIdValue)
+                        && inviteIdElem.TryGetInt64(out var inviteIdValue)
                     )
                     {
-                        break;
+                        invitationIdsToLoad.Add(new ProjectMemberInvitationId { Value = inviteIdValue });
                     }
-                    newData = JsonSerializer.SerializeToDocument(
-                        await db
-                            .ProjectMemberInvitations.Where(a =>
-                                a.Id == new ProjectMemberInvitationId { Value = projectMemberInvitationIdValue }
-                            )
-                            .Select(
-                                ExpressionHelper.Select<ProjectMemberInvitation, ProjectMemberInvitation>(
-                                    command.SelectProjectMemberInvitation
-                                )
-                            )
-                            .FirstOrDefaultAsync(ct)
-                            .ConfigureAwait(false),
-                        jsonOptions.Value.SerializerOptions
-                    );
                     break;
-                }
-            }
-            if (newData is not null)
-            {
-                items[i] = item with { Notification = item.Notification with { Data = newData } };
             }
         }
-        return PaginatedList.From(items, totalCount);
+
+        var projectsMap =
+            !string.IsNullOrEmpty(command.SelectProject) && projectIdsToLoad.Count > 0
+                ? await db
+                    .Projects.Where(p => projectIdsToLoad.Contains(p.Id))
+                    .Select(ExpressionHelper.Select<Project, Project>(command.SelectProject))
+                    .ToDictionaryAsync(p => p.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
+        var issuesMap =
+            !string.IsNullOrEmpty(command.SelectIssue) && issueIdsToLoad.Count > 0
+                ? await db
+                    .Issues.Where(i => issueIdsToLoad.Contains(i.Id))
+                    .Select(ExpressionHelper.Select<Issue, Issue>(command.SelectIssue))
+                    .ToDictionaryAsync(i => i.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
+        var auditsMap =
+            !string.IsNullOrEmpty(command.SelectComment) && issueAuditIdsToLoad.Count > 0
+                ? await db
+                    .IssueAudits.Where(a => issueAuditIdsToLoad.Contains(a.Id))
+                    .Select(ExpressionHelper.Select<IssueAudit, IssueAudit>(command.SelectComment))
+                    .ToDictionaryAsync(a => a.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
+        var invitationsMap =
+            !string.IsNullOrEmpty(command.SelectProjectMemberInvitation) && invitationIdsToLoad.Count > 0
+                ? await db
+                    .ProjectMemberInvitations.Where(inv => invitationIdsToLoad.Contains(inv.Id))
+                    .Select(
+                        ExpressionHelper.Select<ProjectMemberInvitation, ProjectMemberInvitation>(
+                            command.SelectProjectMemberInvitation
+                        )
+                    )
+                    .ToDictionaryAsync(inv => inv.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
+        var finalItems = new List<UserNotification>(userNotifications.Count);
+        foreach (var originalUserNotification in userNotifications)
+        {
+            var currentItem = originalUserNotification;
+            if (currentItem.Notification?.Data is null)
+            {
+                finalItems.Add(currentItem);
+                continue;
+            }
+
+            Attempt<JsonDocument, Exception>? serializeAttempt = default;
+
+            // TODO: Strategy pattern here when types go wild
+            switch (currentItem.Notification.Type)
+            {
+                case NotificationType.ProjectCreated:
+                    if (
+                        !string.IsNullOrEmpty(command.SelectProject)
+                        && currentItem.Notification.Data.RootElement.TryGetProperty("projectId", out var projIdElem)
+                        && Guid.TryParseExact(projIdElem.GetString(), "D", out var projGuid)
+                    )
+                    {
+                        var projectId = new ProjectId { Value = projGuid };
+                        if (projectsMap.TryGetValue(projectId, out var project))
+                        {
+                            serializeAttempt = Attempt(
+                                () => JsonSerializer.SerializeToDocument(project, jsonOptions.Value.SerializerOptions)
+                            );
+                        }
+                    }
+                    break;
+                case NotificationType.IssueCreated:
+                    if (
+                        !string.IsNullOrEmpty(command.SelectIssue)
+                        && currentItem.Notification.Data.RootElement.TryGetProperty("issueId", out var issueIdElem)
+                        && Guid.TryParseExact(issueIdElem.GetString(), "D", out var issueGuid)
+                    )
+                    {
+                        var issueId = new IssueId { Value = issueGuid };
+                        if (issuesMap.TryGetValue(issueId, out var issue))
+                        {
+                            serializeAttempt = Attempt(
+                                () => JsonSerializer.SerializeToDocument(issue, jsonOptions.Value.SerializerOptions)
+                            );
+                        }
+                    }
+                    break;
+                case NotificationType.IssueCommentCreated:
+                    if (
+                        !string.IsNullOrEmpty(command.SelectComment)
+                        && currentItem.Notification.Data.RootElement.TryGetProperty("issueAuditId", out var auditIdElem)
+                        && auditIdElem.TryGetInt64(out var auditId)
+                    )
+                    {
+                        if (auditsMap.TryGetValue(auditId, out var audit))
+                        {
+                            serializeAttempt = Attempt(
+                                () => JsonSerializer.SerializeToDocument(audit, jsonOptions.Value.SerializerOptions)
+                            );
+                        }
+                    }
+                    break;
+                case NotificationType.ProjectMemberInvited:
+                    if (
+                        !string.IsNullOrEmpty(command.SelectProjectMemberInvitation)
+                        && currentItem.Notification.Data.RootElement.TryGetProperty(
+                            "projectMemberInvitationId",
+                            out var inviteIdElem
+                        )
+                        && inviteIdElem.TryGetInt64(out var inviteIdValue)
+                    )
+                    {
+                        var inviteId = new ProjectMemberInvitationId { Value = inviteIdValue };
+                        if (invitationsMap.TryGetValue(inviteId, out var invitation))
+                        {
+                            serializeAttempt = Attempt(
+                                () =>
+                                    JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
+                            );
+                        }
+                    }
+                    break;
+            }
+
+            if (serializeAttempt is not null && serializeAttempt.TryGetData(out var data))
+            {
+                currentItem = currentItem with { Notification = currentItem.Notification with { Data = data } };
+            }
+
+            finalItems.Add(currentItem);
+        }
+
+        return PaginatedList.From(finalItems, totalCount);
     }
 }
