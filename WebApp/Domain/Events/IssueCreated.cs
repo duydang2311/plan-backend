@@ -1,9 +1,9 @@
-using FastEndpoints;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Domain.Events;
 
-public sealed record IssueCreated : IEvent
+public sealed record IssueCreated
 {
-    public required Issue Issue { get; init; }
+    public required IssueId IssueId { get; init; }
+    public required ProjectId ProjectId { get; init; }
 }

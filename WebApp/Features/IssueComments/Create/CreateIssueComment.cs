@@ -6,7 +6,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Features.IssueComments.Create;
 
-public sealed record CreateIssueComment : ICommand<OneOf<ValidationFailures, Success>>
+public sealed record CreateIssueComment : ICommand<OneOf<ValidationFailures, ServerError, Success>>
 {
     public required IssueId IssueId { get; init; }
     public required UserId AuthorId { get; init; }

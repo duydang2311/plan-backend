@@ -3,20 +3,28 @@ using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using OneOf;
 using OneOf.Types;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
+using Wolverine.EntityFrameworkCore;
 
 namespace WebApp.Features.IssueComments.Create;
 
-using Result = OneOf<ValidationFailures, Success>;
+using Result = OneOf<ValidationFailures, ServerError, Success>;
 
-public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommandHandler<CreateIssueComment, Result>
+public sealed class CreateIssueCommentHandler(
+    AppDbContext db,
+    IDbContextOutbox outbox,
+    ILogger<CreateIssueCommentHandler> logger
+) : ICommandHandler<CreateIssueComment, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssueComment command, CancellationToken ct)
     {
+        using var transaction = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
+
         var audit = new IssueAudit
         {
             Action = IssueAuditAction.Comment,
@@ -25,19 +33,29 @@ public sealed class CreateIssueCommentHandler(AppDbContext dbContext) : ICommand
             Data = JsonSerializer.SerializeToDocument(new { content = command.Content }).Deserialize<JsonDocument>(),
         };
 
-        dbContext.Add(audit);
+        db.Add(audit);
         try
         {
-            await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
+            await db.SaveChangesAsync(ct).ConfigureAwait(false);
         }
         catch (ReferenceConstraintException e)
         {
             return e.ToValidationFailures(property => (property, $"Invalid {property} reference"));
         }
 
-        await new IssueCommentCreated { IssueAudit = audit }
-            .PublishAsync(cancellation: ct)
-            .ConfigureAwait(false);
+        try
+        {
+            outbox.Enroll(db);
+            await outbox
+                .PublishAsync(new IssueCommentCreated { IssueId = audit.IssueId, IssueAuditId = audit.Id })
+                .ConfigureAwait(false);
+            await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to publish IssueCommentCreated message");
+            return Errors.Outbox();
+        }
 
         return new Success();
     }

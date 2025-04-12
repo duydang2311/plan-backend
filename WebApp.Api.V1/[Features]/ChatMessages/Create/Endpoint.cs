@@ -1,10 +1,11 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Api.V1.Common.Helpers;
 using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.ChatMessages.Create;
 
-using Results = Results<ForbidHttpResult, ProblemDetails, Ok<Response>>;
+using Results = Results<ForbidHttpResult, ProblemDetails, InternalServerError<ProblemDetails>, Ok<Response>>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -20,6 +21,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
         return oneOf.Match<Results>(
             validationFailures => validationFailures.ToProblemDetails(),
+            serverError => serverError.ToProblemDetails(),
             chatMessage => TypedResults.Ok(chatMessage.ToResponse())
         );
     }

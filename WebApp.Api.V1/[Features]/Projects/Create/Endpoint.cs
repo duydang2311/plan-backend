@@ -5,7 +5,7 @@ using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.Projects.Create;
 
-using Results = Results<ForbidHttpResult, ProblemDetails, Conflict, Ok<Response>>;
+using Results = Results<ForbidHttpResult, ProblemDetails, Conflict, InternalServerError<ProblemDetails>, Ok<Response>>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -22,6 +22,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
         return oneOf.Match<Results>(
             conflict => TypedResults.Conflict(),
             failures => failures.ToProblemDetails(),
+            serverError => serverError.ToProblemDetails(),
             project => TypedResults.Ok(project.ToResponse())
         );
     }

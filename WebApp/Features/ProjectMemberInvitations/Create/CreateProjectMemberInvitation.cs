@@ -7,7 +7,7 @@ using WebApp.Domain.Entities;
 namespace WebApp.Features.ProjectMemberInvitations.Create;
 
 public sealed record CreateProjectMemberInvitation
-    : ICommand<OneOf<ValidationFailures, AlreadyIsMemberError, ConflictError, Success>>
+    : ICommand<OneOf<ValidationFailures, AlreadyIsMemberError, ConflictError, ServerError, Success>>
 {
     public required ProjectId ProjectId { get; init; }
     public required UserId UserId { get; init; }

@@ -9,19 +9,16 @@ using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
+using Wolverine.EntityFrameworkCore;
 
 namespace WebApp.Features.Issues.Create;
 
 using Result = OneOf<ValidationFailures, Issue>;
 
-public sealed class CreateIssueHandler(AppDbContext db) : ICommandHandler<CreateIssue, Result>
+public sealed class CreateIssueHandler(AppDbContext db, IDbContextOutbox outbox) : ICommandHandler<CreateIssue, Result>
 {
     public async Task<Result> ExecuteAsync(CreateIssue command, CancellationToken ct)
     {
-        await using var transaction = await db
-            .Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
-            .ConfigureAwait(false);
-
         var lastIssueWithSameStatus = await db
             .Issues.Where(a => a.ProjectId == command.ProjectId && a.StatusId == command.StatusId)
             .Select(a => new { a.StatusRank })
@@ -43,8 +40,11 @@ public sealed class CreateIssueHandler(AppDbContext db) : ICommandHandler<Create
         db.Add(issue);
         try
         {
-            await db.SaveChangesAsync(ct).ConfigureAwait(false);
-            await transaction.CommitAsync(ct).ConfigureAwait(false);
+            outbox.Enroll(db);
+            await outbox
+                .PublishAsync(new IssueCreated { IssueId = issue.Id, ProjectId = issue.ProjectId })
+                .ConfigureAwait(false);
+            await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
         }
         catch (ReferenceConstraintException e)
         {
@@ -57,10 +57,6 @@ public sealed class CreateIssueHandler(AppDbContext db) : ICommandHandler<Create
                 }
             );
         }
-
-        await new IssueCreated { Issue = issue }
-            .PublishAsync(cancellation: ct)
-            .ConfigureAwait(false);
 
         return issue;
     }

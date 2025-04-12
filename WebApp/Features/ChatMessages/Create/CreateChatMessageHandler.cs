@@ -1,6 +1,7 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using OneOf;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
@@ -13,9 +14,9 @@ public sealed record CreateChatMessageHandler(
     AppDbContext db,
     ILogger<CreateChatMessageHandler> logger,
     IDbContextOutbox outbox
-) : ICommandHandler<CreateChatMessage, OneOf<ValidationFailures, ChatMessage>>
+) : ICommandHandler<CreateChatMessage, OneOf<ValidationFailures, ServerError, ChatMessage>>
 {
-    public async Task<OneOf<ValidationFailures, ChatMessage>> ExecuteAsync(
+    public async Task<OneOf<ValidationFailures, ServerError, ChatMessage>> ExecuteAsync(
         CreateChatMessage command,
         CancellationToken ct
     )
@@ -63,13 +64,8 @@ public sealed record CreateChatMessageHandler(
         }
         catch (Exception e)
         {
-            logger.LogError(
-                e,
-                "Failed to publish ChatMessageCreated message for chat message {ChatMessageId}",
-                chatMessage.Id
-            );
-            await transaction.RollbackAsync(ct).ConfigureAwait(false);
-            throw;
+            logger.LogError(e, "Failed to publish ChatMessageCreated message");
+            return Errors.Outbox();
         }
 
         return chatMessage;

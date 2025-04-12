@@ -10,6 +10,7 @@ using Results = Results<
     UnprocessableEntity<ProblemDetails>,
     Conflict<ProblemDetails>,
     Conflict,
+    InternalServerError<ProblemDetails>,
     NoContent
 >;
 
@@ -34,6 +35,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
                     .Failure("root", "Invitation is already created", "invitation_conflict")
                     .ToProblemDetails()
                     .ToConflict(),
+            serverError => serverError.ToProblemDetails(),
             success => TypedResults.NoContent()
         );
     }

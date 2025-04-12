@@ -1,9 +1,9 @@
-using FastEndpoints;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Domain.Events;
 
-public sealed record ProjectMemberInvited : IEvent
+public sealed record ProjectMemberInvited
 {
-    public required ProjectMemberInvitation ProjectMemberInvitation { get; init; }
+    public required ProjectMemberInvitationId ProjectMemberInvitationId { get; init; }
+    public required UserId MemberId { get; init; }
 }

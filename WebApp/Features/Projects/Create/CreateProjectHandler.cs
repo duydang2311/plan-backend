@@ -7,12 +7,14 @@ using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
+using Wolverine.EntityFrameworkCore;
 
 namespace WebApp.Features.Projects.Create;
 
-using Result = OneOf<ConflictError, ValidationFailures, Project>;
+using Result = OneOf<ConflictError, ValidationFailures, ServerError, Project>;
 
-public sealed class CreateProjectHandler(AppDbContext db) : ICommandHandler<CreateProject, Result>
+public sealed class CreateProjectHandler(AppDbContext db, IDbContextOutbox outbox, ILogger<CreateProjectHandler> logger)
+    : ICommandHandler<CreateProject, Result>
 {
     public async Task<Result> ExecuteAsync(CreateProject command, CancellationToken ct)
     {
@@ -31,7 +33,11 @@ public sealed class CreateProjectHandler(AppDbContext db) : ICommandHandler<Crea
 
         try
         {
-            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+            outbox.Enroll(db);
+            await outbox
+                .PublishAsync(new ProjectCreated { ProjectId = project.Id, WorkspaceId = project.WorkspaceId })
+                .ConfigureAwait(false);
+            await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
         }
         catch (UniqueConstraintException)
         {
@@ -49,10 +55,11 @@ public sealed class CreateProjectHandler(AppDbContext db) : ICommandHandler<Crea
             }
             throw;
         }
-
-        await new ProjectCreated { Project = project }
-            .PublishAsync(Mode.WaitForAll, ct)
-            .ConfigureAwait(false);
+        catch (Exception e)
+        {
+            logger.LogError(e, "Failed to publish ProjectCreated event");
+            return Errors.Outbox();
+        }
 
         return project;
     }
