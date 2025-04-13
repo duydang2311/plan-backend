@@ -49,15 +49,17 @@ public static class IssueCommentCreatedHandler
 
         return issue is null
             ? null
-            : userNotifications.Select(a => new IssueCommentCreatedUserNotified
-            {
-                UserId = a.UserId,
-                UserNotificationId = a.Id,
-                Type = NotificationType.IssueCommentCreated,
-                OrderNumber = issue.OrderNumber,
-                Title = issue.Title,
-                ProjectIdentifier = issue.ProjectIdentifier,
-                WorkspacePath = issue.WorkspacePath,
-            });
+            : userNotifications
+                .Select(a => new IssueCommentCreatedUserNotified
+                {
+                    UserId = a.UserId,
+                    UserNotificationId = a.Id,
+                    Type = NotificationType.IssueCommentCreated,
+                    OrderNumber = issue.OrderNumber,
+                    Title = issue.Title,
+                    ProjectIdentifier = issue.ProjectIdentifier,
+                    WorkspacePath = issue.WorkspacePath,
+                })
+                .ToList();
     }
 }

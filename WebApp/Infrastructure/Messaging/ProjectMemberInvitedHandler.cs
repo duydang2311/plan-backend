@@ -1,8 +1,8 @@
 using System.Text.Json;
 using NATS.Client.Core;
-using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
+using WebApp.Infrastructure.Messaging.Common;
 
 namespace WebApp.Infrastructure.Messaging;
 
@@ -17,11 +17,12 @@ public static class ProjectMemberInvitedHandler
     {
         try
         {
+            var headers = new NatsHeaders(1) { { "Notification-Type", notified.Type.ToString() } };
             await natsClient
                 .PublishAsync(
-                    $"users.notifications",
+                    "users.notifications",
                     JsonSerializer.Serialize(
-                        new ProjectMemberInvitedPayload(
+                        new ProjectMemberInvitedEvent(
                             notified.UserId.ToBase64String(),
                             notified.UserNotificationId.Value,
                             notified.Type,
@@ -29,8 +30,9 @@ public static class ProjectMemberInvitedHandler
                             notified.ProjectIdentifier,
                             notified.ProjectName
                         ),
-                        MessagingJsonContext.Default.ProjectMemberInvitedPayload
+                        MessagingJsonContext.Default.ProjectMemberInvitedEvent
                     ),
+                    headers: headers,
                     cancellationToken: ct
                 )
                 .ConfigureAwait(false);
@@ -42,12 +44,3 @@ public static class ProjectMemberInvitedHandler
         }
     }
 }
-
-public sealed record ProjectMemberInvitedPayload(
-    string UserId,
-    long UserNotificationId,
-    NotificationType Type,
-    long ProjectMemberInvitationId,
-    string ProjectIdentifier,
-    string ProjectName
-) { }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using NATS.Client.Core;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
+using WebApp.Infrastructure.Messaging.Common;
 
 namespace WebApp.Infrastructure.Messaging;
 
@@ -18,14 +19,14 @@ public static class ChatMessageCreatedHandler
         {
             await natsClient
                 .PublishAsync(
-                    $"chats.messages.created",
+                    "chats.messages.created",
                     JsonSerializer.Serialize(
-                        new ChatMessageCreatedPayload(
+                        new ChatMessageCreatedEvent(
                             created.ChatId.ToBase64String(),
                             created.ChatMessageId.Value,
                             created.OptimisticId
                         ),
-                        MessagingJsonContext.Default.ChatMessageCreatedPayload
+                        MessagingJsonContext.Default.ChatMessageCreatedEvent
                     ),
                     cancellationToken: ct
                 )
@@ -38,5 +39,3 @@ public static class ChatMessageCreatedHandler
         }
     }
 }
-
-public sealed record ChatMessageCreatedPayload(string ChatId, long ChatMessageId, string? OptimisticId) { }

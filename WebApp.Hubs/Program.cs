@@ -6,6 +6,7 @@ using WebApp.Common.Models;
 using WebApp.Hubs.Common;
 using WebApp.Hubs.Features.Chats;
 using WebApp.Hubs.Features.Hubs;
+using WebApp.Hubs.Features.Notifications;
 using WebApp.Infrastructure.Nats.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,9 +89,16 @@ builder
 builder.Services.AddSingleton<IApiHttpClientFactory, ApiHttpClientFactory>();
 
 builder.Services.AddNATS();
+
 builder.Services.AddSingleton<ChatHubService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<ChatHubService>());
 builder.Services.AddSingleton<IHubService, ChatHubService>(provider => provider.GetRequiredService<ChatHubService>());
+
+builder.Services.AddSingleton<NotificationHubService>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<NotificationHubService>());
+builder.Services.AddSingleton<IHubService, NotificationHubService>(provider =>
+    provider.GetRequiredService<NotificationHubService>()
+);
 
 builder.Services.AddSignalR().AddMessagePackProtocol();
 builder.Services.AddCors();

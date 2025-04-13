@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace WebApp.Common.Helpers;
 
 public sealed record Attempt<TData, TError>
@@ -8,27 +10,39 @@ public sealed record Attempt<TData, TError>
 
 public static class AttemptExtensions
 {
-    public static bool TryGetData<TData, TError>(this Attempt<TData, TError> attempt, out TData data)
-    {
-        if (attempt.Data is null)
-        {
-            data = default!;
-            return false;
-        }
-
-        data = attempt.Data;
-        return true;
-    }
-
-    public static bool TryGetError<TData, TError>(this Attempt<TData, TError> attempt, out TError error)
+    public static bool TryGetData<TData, TError>(
+        this Attempt<TData, TError> attempt,
+        [NotNullWhen(true)] out TData? data,
+        [NotNullWhen(false)] out TError? error
+    )
     {
         if (attempt.Error is null)
         {
-            error = default!;
+            error = default;
+            data = attempt.Data!;
+            return true;
+        }
+
+        error = attempt.Error;
+        data = default;
+        return false;
+    }
+
+    public static bool TryGetError<TData, TError>(
+        this Attempt<TData, TError> attempt,
+        [NotNullWhen(true)] out TError? error,
+        [NotNullWhen(false)] out TData? data
+    )
+    {
+        if (attempt.Error is null)
+        {
+            error = default;
+            data = attempt.Data!;
             return false;
         }
 
         error = attempt.Error;
+        data = default;
         return true;
     }
 }

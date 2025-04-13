@@ -224,7 +224,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     break;
             }
 
-            if (serializeAttempt is not null && serializeAttempt.TryGetData(out var data))
+            if (serializeAttempt is not null && serializeAttempt.TryGetData(out var data, out _))
             {
                 currentItem = currentItem with { Notification = currentItem.Notification with { Data = data } };
             }
