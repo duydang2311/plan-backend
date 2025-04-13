@@ -17,7 +17,7 @@ public static class ProjectMemberInvitedHandler
     {
         try
         {
-            var headers = new NatsHeaders(1) { { "Notification-Type", notified.Type.ToString() } };
+            var headers = new NatsHeaders(1) { { "Notification-Type", notified.Type.ToString("D") } };
             await natsClient
                 .PublishAsync(
                     "users.notifications",

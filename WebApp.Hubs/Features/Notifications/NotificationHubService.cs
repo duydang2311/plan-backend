@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using MessagePack;
 using Microsoft.AspNetCore.SignalR;
 using NATS.Client.Core;
 using WebApp.Domain.Constants;
@@ -39,105 +38,130 @@ public sealed class NotificationHubService(
     async Task SubscribeToNotificationAsync(CancellationToken ct)
     {
         logger.LogInformation("Subscribing to notification messages");
-        await foreach (
-            var msg in natsClient
-                .SubscribeAsync<string>("users.notifications", cancellationToken: ct)
-                .ConfigureAwait(false)
-        )
+        try
         {
-            if (msg.Error is not null)
+            await foreach (
+                var msg in natsClient
+                    .SubscribeAsync<string>("users.notifications", cancellationToken: ct)
+                    .ConfigureAwait(false)
+            )
             {
-                logger.LogError(msg.Error, "Error while receiving notification message");
-                continue;
-            }
-
-            if (msg.Data is null)
-            {
-                logger.LogError(msg.Error, "Message data is null");
-                continue;
-            }
-
-            var notificationType = msg.Headers?["Notification-Type"].FirstOrDefault();
-            if (notificationType is null)
-            {
-                logger.LogError("Notification-Type header is missing in the message");
-                continue;
-            }
-            // TODO: strategy pattern
-            switch (notificationType)
-            {
-                case nameof(NotificationType.ProjectCreated):
+                if (msg.Error is not null)
                 {
-                    var deserializeAttempt = Attempt(
-                        () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectCreatedEvent)
-                    );
-                    if (deserializeAttempt.TryGetError(out var e, out var data))
-                    {
-                        logger.LogError(e, "Error while deserializing ProjectCreatedEvent message");
-                        continue;
-                    }
-                    await mainHubContext
-                        .Clients.User(data.UserId)
-                        .SendAsync("new_notification", data, ct)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                case nameof(NotificationType.IssueCreated):
-                {
-                    var deserializeAttempt = Attempt(
-                        () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCreatedEvent)
-                    );
-                    if (deserializeAttempt.TryGetError(out var e, out var data))
-                    {
-                        logger.LogError(e, "Error while deserializing IssueCreatedEvent message");
-                        continue;
-                    }
-                    await mainHubContext
-                        .Clients.User(data.UserId)
-                        .SendAsync("new_notification", data, ct)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                case nameof(NotificationType.IssueCommentCreated):
-                {
-                    var deserializeAttempt = Attempt(
-                        () =>
-                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCommentCreatedEvent)
-                    );
-                    if (deserializeAttempt.TryGetError(out var e, out var data))
-                    {
-                        logger.LogError(e, "Error while deserializing IssueCommentCreatedEvent message");
-                        continue;
-                    }
-                    await mainHubContext
-                        .Clients.User(data.UserId)
-                        .SendAsync("new_notification", data, ct)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                case nameof(NotificationType.ProjectMemberInvited):
-                {
-                    var deserializeAttempt = Attempt(
-                        () =>
-                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectMemberInvitedEvent)
-                    );
-                    if (deserializeAttempt.TryGetError(out var e, out var data))
-                    {
-                        logger.LogError(e, "Error while deserializing ProjectMemberInvitedEvent message");
-                        continue;
-                    }
-                    await mainHubContext
-                        .Clients.User(data.UserId)
-                        .SendAsync("new_notification", data, ct)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                default:
-                {
-                    logger.LogWarning("Unknown notification type: {NotificationType}", notificationType);
+                    logger.LogError(msg.Error, "Error while receiving notification message");
                     continue;
                 }
+
+                if (msg.Data is null)
+                {
+                    logger.LogError("Notification message data is null");
+                    continue;
+                }
+
+                var notificationTypeString = msg.Headers?["Notification-Type"].FirstOrDefault();
+                if (notificationTypeString is null)
+                {
+                    logger.LogError("Notification-Type header is missing in the message");
+                    continue;
+                }
+
+                if (
+                    !Enum.TryParse<NotificationType>(notificationTypeString, true, out var notificationType)
+                    || !Enum.IsDefined(notificationType)
+                )
+                {
+                    logger.LogError(
+                        "Invalid Notification-Type header value: {NotificationType}",
+                        notificationTypeString
+                    );
+                    continue;
+                }
+                // TODO: strategy pattern
+                switch (notificationType)
+                {
+                    case NotificationType.ProjectCreated:
+                    {
+                        var deserializeAttempt = Attempt(
+                            () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectCreatedEvent)
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing ProjectCreatedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+                    case NotificationType.IssueCreated:
+                    {
+                        var deserializeAttempt = Attempt(
+                            () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCreatedEvent)
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing IssueCreatedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+                    case NotificationType.IssueCommentCreated:
+                    {
+                        var deserializeAttempt = Attempt(
+                            () =>
+                                JsonSerializer.Deserialize(
+                                    msg.Data,
+                                    MessagingJsonContext.Default.IssueCommentCreatedEvent
+                                )
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing IssueCommentCreatedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+                    case NotificationType.ProjectMemberInvited:
+                    {
+                        var deserializeAttempt = Attempt(
+                            () =>
+                                JsonSerializer.Deserialize(
+                                    msg.Data,
+                                    MessagingJsonContext.Default.ProjectMemberInvitedEvent
+                                )
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing ProjectMemberInvitedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+                    default:
+                    {
+                        logger.LogWarning("Unknown notification type: {NotificationType}", notificationTypeString);
+                        continue;
+                    }
+                }
             }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error while subscribing to notification messages");
         }
     }
 }
