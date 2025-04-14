@@ -58,7 +58,6 @@ public sealed class ChatHubService(
 
             foreach (var chatId in chatIds)
             {
-                Console.WriteLine("Add to group " + ChatUtils.GroupName(chatId));
                 _ = mainHubContext
                     .Groups.AddToGroupAsync(connectionId, ChatUtils.GroupName(chatId), ct)
                     .ConfigureAwait(true);
