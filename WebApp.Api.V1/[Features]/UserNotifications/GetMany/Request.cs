@@ -7,9 +7,10 @@ using WebApp.Features.UserNotifications.GetMany;
 
 namespace WebApp.Api.V1.UserNotifications.GetMany;
 
-public sealed record Request : Collective
+public sealed record Request : Collective, IKeysetPagination<UserNotificationId?>
 {
     public UserId UserId { get; init; }
+    public UserNotificationId? Cursor { get; init; }
     public string? Select { get; init; }
     public string? SelectProject { get; init; }
     public string? SelectIssue { get; init; }

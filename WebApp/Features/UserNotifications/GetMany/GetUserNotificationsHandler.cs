@@ -27,19 +27,23 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                 : "Notification.Type,Notification.Data"
             : command.Select;
 
+        query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
+
         if (!string.IsNullOrEmpty(select))
         {
             query = query.Select(ExpressionHelper.Select<UserNotification, UserNotification>(select));
         }
+        if (command.Cursor is not null)
+        {
+            query = query.Where(a => a.Id < command.Cursor);
+        }
 
-        query = command.Order.SortOrDefault(query, a => a.OrderByDescending(b => b.CreatedTime));
+        if (command.Cursor is null)
+        {
+            query = query.Skip(command.Offset);
+        }
 
-        var userNotifications = await query
-            .Skip(command.Offset)
-            .Take(command.Size)
-            .ToListAsync(ct)
-            .ConfigureAwait(false);
-
+        var userNotifications = await query.Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         var projectIdsToLoad = new HashSet<ProjectId>();
         var issueIdsToLoad = new HashSet<IssueId>();
         var issueAuditIdsToLoad = new HashSet<long>();

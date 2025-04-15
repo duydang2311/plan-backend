@@ -12,4 +12,14 @@ public readonly struct UserNotificationId : IEntityId<long>
     {
         return Value.ToString(CultureInfo.InvariantCulture);
     }
+
+    public static bool operator >(UserNotificationId a, UserNotificationId b)
+    {
+        return a.Value > b.Value;
+    }
+
+    public static bool operator <(UserNotificationId a, UserNotificationId b)
+    {
+        return a.Value < b.Value;
+    }
 }
