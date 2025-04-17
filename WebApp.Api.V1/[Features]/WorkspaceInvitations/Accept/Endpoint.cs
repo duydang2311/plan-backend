@@ -1,26 +1,27 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Api.V1.Common.Helpers;
-using WebApp.Common.Models;
 
-namespace WebApp.Api.V1.WorkspaceInvitations.Create;
+namespace WebApp.Api.V1.WorkspaceInvitations.Accept;
 
-using Results = Results<ProblemDetails, InternalServerError<ProblemDetails>, NoContent>;
+using Results = Results<ForbidHttpResult, NotFound, Conflict<ProblemDetails>, NoContent>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Post("workspaces/{WorkspaceId}/invitations");
+        Post("workspace-invitations/{Id}/accept");
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
     {
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
         return oneOf.Match<Results>(
-            failures => failures.ToProblemDetails(),
-            serverError => serverError.ToProblemDetails(),
+            notFoundError => TypedResults.NotFound(),
+            conflictError =>
+                TypedResults.Conflict(Problem.Failure("userId", "User is already a member").ToProblemDetails()),
             success => TypedResults.NoContent()
         );
     }

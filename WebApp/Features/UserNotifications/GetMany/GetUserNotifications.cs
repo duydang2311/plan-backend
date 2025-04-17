@@ -16,4 +16,5 @@ public sealed record GetUserNotifications
     public string? SelectIssue { get; init; }
     public string? SelectComment { get; init; }
     public string? SelectProjectMemberInvitation { get; init; }
+    public string? SelectWorkspaceInvitation { get; init; }
 }

@@ -6,7 +6,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Features.WorkspaceInvitations.Create;
 
-public sealed record CreateWorkspaceInvitation : ICommand<OneOf<ValidationFailures, Success>>
+public sealed record CreateWorkspaceInvitation : ICommand<OneOf<ValidationFailures, ServerError, Success>>
 {
     public required WorkspaceId WorkspaceId { get; init; }
     public required UserId UserId { get; init; }

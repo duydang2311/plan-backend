@@ -151,6 +151,26 @@ public sealed class NotificationHubService(
                             .ConfigureAwait(false);
                         break;
                     }
+                    case NotificationType.WorkspaceMemberInvited:
+                    {
+                        var deserializeAttempt = Attempt(
+                            () =>
+                                JsonSerializer.Deserialize(
+                                    msg.Data,
+                                    MessagingJsonContext.Default.WorkspaceMemberInvitedEvent
+                                )
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing WorkspaceMemberInvitedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
                     default:
                     {
                         logger.LogWarning("Unknown notification type: {NotificationType}", notificationTypeString);
@@ -172,4 +192,5 @@ public sealed class NotificationHubService(
 [JsonSerializable(typeof(IssueCreatedEvent))]
 [JsonSerializable(typeof(ProjectCreatedEvent))]
 [JsonSerializable(typeof(ProjectMemberInvitedEvent))]
+[JsonSerializable(typeof(WorkspaceMemberInvitedEvent))]
 internal partial class MessagingJsonContext : JsonSerializerContext;

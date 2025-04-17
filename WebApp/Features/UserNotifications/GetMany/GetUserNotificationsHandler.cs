@@ -47,7 +47,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
         var projectIdsToLoad = new HashSet<ProjectId>();
         var issueIdsToLoad = new HashSet<IssueId>();
         var issueAuditIdsToLoad = new HashSet<long>();
-        var invitationIdsToLoad = new HashSet<ProjectMemberInvitationId>();
+        var projectMemberInvitationIdsToLoad = new HashSet<ProjectMemberInvitationId>();
+        var workspaceInvitationIdsToLoad = new HashSet<WorkspaceInvitationId>();
 
         foreach (var un in userNotifications)
         {
@@ -98,9 +99,21 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         && inviteIdElem.TryGetInt64(out var inviteIdValue)
                     )
                     {
-                        invitationIdsToLoad.Add(new ProjectMemberInvitationId { Value = inviteIdValue });
+                        projectMemberInvitationIdsToLoad.Add(new ProjectMemberInvitationId { Value = inviteIdValue });
                     }
                     break;
+                case NotificationType.WorkspaceMemberInvited:
+                {
+                    if (
+                        !string.IsNullOrEmpty(command.SelectWorkspaceInvitation)
+                        && un.Notification.Data.RootElement.TryGetProperty("workspaceInvitationId", out var idElement)
+                        && idElement.TryGetInt64(out var idValue)
+                    )
+                    {
+                        workspaceInvitationIdsToLoad.Add(new WorkspaceInvitationId { Value = idValue });
+                    }
+                    break;
+                }
             }
         }
 
@@ -131,13 +144,26 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     .ConfigureAwait(false)
                 : [];
 
-        var invitationsMap =
-            !string.IsNullOrEmpty(command.SelectProjectMemberInvitation) && invitationIdsToLoad.Count > 0
+        var projectMemberInvitationsMap =
+            !string.IsNullOrEmpty(command.SelectProjectMemberInvitation) && projectMemberInvitationIdsToLoad.Count > 0
                 ? await db
-                    .ProjectMemberInvitations.Where(inv => invitationIdsToLoad.Contains(inv.Id))
+                    .ProjectMemberInvitations.Where(inv => projectMemberInvitationIdsToLoad.Contains(inv.Id))
                     .Select(
                         ExpressionHelper.Select<ProjectMemberInvitation, ProjectMemberInvitation>(
                             command.SelectProjectMemberInvitation
+                        )
+                    )
+                    .ToDictionaryAsync(inv => inv.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
+        var workspaceInvitationsMap =
+            !string.IsNullOrEmpty(command.SelectWorkspaceInvitation) && workspaceInvitationIdsToLoad.Count > 0
+                ? await db
+                    .WorkspaceInvitations.Where(a => workspaceInvitationIdsToLoad.Contains(a.Id))
+                    .Select(
+                        ExpressionHelper.Select<WorkspaceInvitation, WorkspaceInvitation>(
+                            command.SelectWorkspaceInvitation
                         )
                     )
                     .ToDictionaryAsync(inv => inv.Id, ct)
@@ -217,7 +243,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     )
                     {
                         var inviteId = new ProjectMemberInvitationId { Value = inviteIdValue };
-                        if (invitationsMap.TryGetValue(inviteId, out var invitation))
+                        if (projectMemberInvitationsMap.TryGetValue(inviteId, out var invitation))
                         {
                             serializeAttempt = Attempt(
                                 () =>
@@ -226,6 +252,28 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         }
                     }
                     break;
+                case NotificationType.WorkspaceMemberInvited:
+                {
+                    if (
+                        !string.IsNullOrEmpty(command.SelectWorkspaceInvitation)
+                        && currentItem.Notification.Data.RootElement.TryGetProperty(
+                            "workspaceInvitationId",
+                            out var idElement
+                        )
+                        && idElement.TryGetInt64(out var idValue)
+                    )
+                    {
+                        var id = new WorkspaceInvitationId { Value = idValue };
+                        if (workspaceInvitationsMap.TryGetValue(id, out var invitation))
+                        {
+                            serializeAttempt = Attempt(
+                                () =>
+                                    JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
+                            );
+                        }
+                    }
+                    break;
+                }
             }
 
             if (serializeAttempt is not null && serializeAttempt.TryGetData(out var data, out _))

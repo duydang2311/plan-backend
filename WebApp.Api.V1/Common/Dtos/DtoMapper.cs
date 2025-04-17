@@ -35,4 +35,15 @@ public static partial class DtoMapper
     public static partial BaseChatMemberDto? ChatMemberToDtoInternal(ChatMember? chatMember);
 
     public static BaseChatMemberDto? ChatMemberToDto(ChatMember chatMember) => ChatMemberToDtoInternal(chatMember);
+
+    public static partial BaseWorkspaceDto? WorkspaceToDtoInternal(Workspace? Workspace);
+
+    public static BaseWorkspaceDto? WorkspaceToDto(Workspace Workspace) => WorkspaceToDtoInternal(Workspace);
+
+    public static partial BaseWorkspaceInvitationDto? WorkspaceInvitationToDtoInternal(
+        WorkspaceInvitation? WorkspaceInvitation
+    );
+
+    public static BaseWorkspaceInvitationDto? WorkspaceInvitationToDto(WorkspaceInvitation WorkspaceInvitation) =>
+        WorkspaceInvitationToDtoInternal(WorkspaceInvitation);
 }
