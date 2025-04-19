@@ -1,41 +1,34 @@
-using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
-using WebApp.Domain.Entities;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Projects.Create;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        return CheckAsync(context, ct);
-        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
-        {
-            Guard.Against.Null(context.Request);
-            var db = context.HttpContext.Resolve<AppDbContext>();
-            var canCreate = await db
-                .Users.AnyAsync(
-                    a =>
-                        a.Id == context.Request.UserId
-                        && a.WorkspaceMembers.Any(a =>
-                            a.WorkspaceId == context.Request.WorkspaceId
-                            && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.CreateProject))
-                        ),
-                    ct
-                )
+        var db = context.HttpContext.Resolve<AppDbContext>();
+        var workspace = await db
+            .Workspaces.Where(a => a.Id == context.Request.WorkspaceId)
+            .Select(a => new { a.Id })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+        var canCreate =
+            workspace is not null
+            && await permissionCache
+                .HasWorkspacePermissionAsync(workspace.Id, context.Request.UserId, Permit.CreateProject, ct)
                 .ConfigureAwait(false);
-            if (!canCreate)
-            {
-                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-            }
+        if (!canCreate)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }
     }
 }

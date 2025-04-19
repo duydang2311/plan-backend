@@ -1,11 +1,12 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.ProjectMemberInvitations.GetOne;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
@@ -15,18 +16,21 @@ public sealed class Authorize : IPreProcessor<Request>
         }
 
         var db = context.HttpContext.Resolve<AppDbContext>();
-        var canRead = await db
-            .ProjectMemberInvitations.AnyAsync(
-                a =>
-                    a.Id == context.Request.ProjectMemberInvitationId
-                    && (
-                        a.UserId == context.Request.RequestingUserId
-                        || a.Role.Permissions.Any(b => b.Permission.Equals(Permit.ReadProjectMemberInvitation))
-                    ),
-                ct
-            )
+        var invitation = await db
+            .ProjectMemberInvitations.Where(a => a.Id == context.Request.ProjectMemberInvitationId)
+            .Select(a => new { a.ProjectId })
+            .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-
+        var canRead =
+            invitation is not null
+            && await permissionCache
+                .HasProjectPermissionAsync(
+                    invitation.ProjectId,
+                    context.Request.RequestingUserId,
+                    Permit.ReadProjectMemberInvitation,
+                    ct
+                )
+                .ConfigureAwait(false);
         if (!canRead)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);

@@ -2,11 +2,12 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Api.V1.Common;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.IssueAudits.Delete;
 
-public sealed class Authorize : AuthorizePreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : AuthorizePreProcessor<Request>
 {
     public override async Task<bool> AuthorizeAsync(
         Request request,
@@ -20,8 +21,8 @@ public sealed class Authorize : AuthorizePreProcessor<Request>
             .Select(a => new
             {
                 a.Id,
-                a.IssueId,
                 a.UserId,
+                a.Issue.ProjectId,
             })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
@@ -30,14 +31,8 @@ public sealed class Authorize : AuthorizePreProcessor<Request>
         return isAuthor
             || (
                 audit is not null
-                && await db
-                    .ProjectMembers.AnyAsync(
-                        a =>
-                            a.UserId == request.RequestingUserId
-                            && a.Project.Issues.Any(b => b.Id == audit.IssueId)
-                            && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.DeleteIssueAudit)),
-                        ct
-                    )
+                && await permissionCache
+                    .HasProjectPermissionAsync(audit.ProjectId, request.RequestingUserId, Permit.DeleteIssueAudit, ct)
                     .ConfigureAwait(false)
             );
     }

@@ -2,7 +2,7 @@ using FastEndpoints;
 using WebApp.Common.Constants;
 using WebApp.Infrastructure.Caching.Common;
 
-namespace WebApp.Api.V1.Projects.GetMany;
+namespace WebApp.Api.V1.Issues.GetOne.ByOrderNumber;
 
 public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
@@ -13,16 +13,11 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
             return;
         }
 
-        var canRead =
-            context.Request.WorkspaceId.HasValue
-            && await permissionCache
-                .HasWorkspacePermissionAsync(
-                    context.Request.WorkspaceId.Value,
-                    context.Request.UserId,
-                    Permit.ReadProject,
-                    ct
-                )
-                .ConfigureAwait(false);
+        var projectPermissions = await permissionCache
+            .GetProjectPermissionsAsync(context.Request.ProjectId, context.Request.UserId, ct)
+            .ConfigureAwait(false);
+        var canRead = projectPermissions.Contains(Permit.ReadIssue);
+
         if (!canRead)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);

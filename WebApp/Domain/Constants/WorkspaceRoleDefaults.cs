@@ -19,7 +19,7 @@ public sealed record WorkspaceRoleDefaults
     public static readonly WorkspaceRoleDefaults Guest = new(
         new RoleId { Value = 1100 },
         "Guest",
-        [Permit.ReadProject, Permit.ReadTeam]
+        [Permit.ReadProject, Permit.ReadTeam, Permit.ReadWorkspaceMember]
     );
     public static readonly WorkspaceRoleDefaults Member = new(
         new RoleId { Value = 1200 },

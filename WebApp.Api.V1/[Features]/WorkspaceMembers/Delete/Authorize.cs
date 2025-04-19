@@ -1,39 +1,39 @@
-using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.WorkspaceMembers.Delete;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        return AuthorizeAsync(context, ct);
-        static async Task AuthorizeAsync(IPreProcessorContext<Request> context, CancellationToken ct)
-        {
-            Guard.Against.Null(context.Request);
-            var db = context.HttpContext.Resolve<AppDbContext>();
-            var canDelete = await db
-                .WorkspaceMembers.AnyAsync(
-                    a =>
-                        a.UserId == context.Request.UserId
-                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.DeleteWorkspaceMember)),
+        var db = context.HttpContext.Resolve<AppDbContext>();
+        var workspaceMember = await db
+            .WorkspaceMembers.Where(a => a.Id == context.Request.Id)
+            .Select(a => new { a.WorkspaceId })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+        var canDelete =
+            workspaceMember is not null
+            && await permissionCache
+                .HasWorkspacePermissionAsync(
+                    workspaceMember.WorkspaceId,
+                    context.Request.UserId,
+                    Permit.DeleteWorkspaceMember,
                     ct
                 )
                 .ConfigureAwait(false);
-
-            if (!canDelete)
-            {
-                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-            }
+        if (!canDelete)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }
-        ;
     }
 }

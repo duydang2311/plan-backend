@@ -1,11 +1,12 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.ProjectMemberInvitations.Delete;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
@@ -21,25 +22,23 @@ public sealed class Authorize : IPreProcessor<Request>
             .ConfigureAwait(false);
         if (data is null)
         {
-            await context.HttpContext.Response.SendNotFoundAsync(ct).ConfigureAwait(false);
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
             return;
         }
         var canDelete =
-            await db
-                .ProjectMembers.AnyAsync(
-                    a =>
-                        a.UserId == context.Request.RequestingUserId
-                        && a.ProjectId == data.ProjectId
-                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.DeleteProjectMemberInvitation)),
+            await permissionCache
+                .HasProjectPermissionAsync(
+                    data.ProjectId,
+                    context.Request.RequestingUserId,
+                    Permit.DeleteProjectMemberInvitation,
                     ct
                 )
                 .ConfigureAwait(false)
-            || await db
-                .WorkspaceMembers.AnyAsync(
-                    a =>
-                        a.UserId == context.Request.RequestingUserId
-                        && a.WorkspaceId == data.WorkspaceId
-                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.DeleteProjectMemberInvitation)),
+            || await permissionCache
+                .HasWorkspacePermissionAsync(
+                    data.WorkspaceId,
+                    context.Request.RequestingUserId,
+                    Permit.DeleteProjectMemberInvitation,
                     ct
                 )
                 .ConfigureAwait(false);

@@ -27,10 +27,12 @@ public static class Permit
     public const string ReadProject = "project:read";
     public const string DeleteProject = "project:delete";
 
+    public const string ReadWorkspaceStatus = "workspace-status:read";
     public const string CreateWorkspaceStatus = "workspace-status:create";
     public const string DeleteWorkspaceStatus = "workspace-status:delete";
     public const string UpdateWorkspaceStatus = "workspace-status:update";
 
+    public const string ReadWorkspaceMember = "workspace-member:read";
     public const string DeleteWorkspaceMember = "workspace-member:delete";
 
     public const string ReadIssueAudit = "issue-audit:read";

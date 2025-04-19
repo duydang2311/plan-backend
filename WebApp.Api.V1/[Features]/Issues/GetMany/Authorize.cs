@@ -2,55 +2,47 @@ using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Issues.GetMany;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        return CheckAsync(context, ct);
-        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+        var db = context.HttpContext.Resolve<AppDbContext>();
+        var canRead = true;
+
+        if (context.Request.TeamId.HasValue)
         {
-            Guard.Against.Null(context.Request);
-            var db = context.HttpContext.Resolve<AppDbContext>();
-            var canRead = true;
+            canRead = await db
+                .TeamMembers.AnyAsync(
+                    a =>
+                        a.MemberId == context.Request.UserId
+                        && a.TeamId == context.Request.TeamId.Value
+                        && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
+                    ct
+                )
+                .ConfigureAwait(false);
+        }
+        else if (context.Request.ProjectId.HasValue)
+        {
+            var projectPermissions = await permissionCache
+                .GetProjectPermissionsAsync(context.Request.ProjectId.Value, context.Request.UserId, ct)
+                .ConfigureAwait(false);
+            canRead = projectPermissions.Contains(Permit.ReadIssue);
+        }
 
-            if (context.Request.TeamId.HasValue)
-            {
-                canRead = await db
-                    .TeamMembers.AnyAsync(
-                        a =>
-                            a.MemberId == context.Request.UserId
-                            && a.TeamId == context.Request.TeamId.Value
-                            && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
-                        ct
-                    )
-                    .ConfigureAwait(false);
-            }
-            else if (context.Request.ProjectId.HasValue)
-            {
-                canRead = await db
-                    .ProjectMembers.AnyAsync(
-                        a =>
-                            a.UserId == context.Request.UserId
-                            && a.ProjectId == context.Request.ProjectId.Value
-                            && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
-                        ct
-                    )
-                    .ConfigureAwait(false);
-            }
-
-            if (!canRead)
-            {
-                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-            }
+        if (!canRead)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }
     }
 }

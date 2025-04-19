@@ -1,44 +1,43 @@
-using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Issues.DeleteOne;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        return CheckAsync(context, ct);
-        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+        var db = context.HttpContext.Resolve<AppDbContext>();
+        var canDelete = await db
+            .Issues.AnyAsync(x => x.Id == context.Request.IssueId && x.AuthorId == context.Request.UserId, ct)
+            .ConfigureAwait(false);
+        if (!canDelete)
         {
-            Guard.Against.Null(context.Request);
-            var db = context.HttpContext.Resolve<AppDbContext>();
-            var isAuthor = await db
-                .Issues.AnyAsync(x => x.Id == context.Request.IssueId && x.AuthorId == context.Request.UserId, ct)
+            var issue = await db
+                .Issues.Where(a => a.Id == context.Request.IssueId)
+                .Select(a => new { a.ProjectId })
+                .FirstOrDefaultAsync(ct)
                 .ConfigureAwait(false);
-            if (!isAuthor)
+            if (issue is not null)
             {
-                var canDelete = await db
-                    .TeamMembers.AnyAsync(
-                        x =>
-                            x.MemberId == context.Request.UserId
-                            && x.Team.Issues.Any(x => x.Id == context.Request.IssueId)
-                            && x.Role.Permissions.Any(x => x.Permission == Permit.DeleteIssue),
-                        ct
-                    )
+                var projectPermissions = await permissionCache
+                    .GetProjectPermissionsAsync(issue.ProjectId, context.Request.UserId, ct)
                     .ConfigureAwait(false);
-                if (!canDelete)
-                {
-                    await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-                }
+                canDelete = projectPermissions.Contains(Permit.DeleteIssue);
             }
-        };
+        }
+
+        if (!canDelete)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+        }
     }
 }

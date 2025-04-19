@@ -1,11 +1,12 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.IssueAudits.GetMany;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
     public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
@@ -34,27 +35,25 @@ public sealed class Authorize : IPreProcessor<Request>
 
         if (issue is null)
         {
-            await context.HttpContext.Response.SendNotFoundAsync(ct).ConfigureAwait(false);
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
             return;
         }
 
         var canRead =
             issue.AuthorId == context.Request.RequestingUserId
-            || await db
-                .ProjectMembers.AnyAsync(
-                    a =>
-                        a.UserId == context.Request.RequestingUserId
-                        && a.ProjectId == issue.ProjectId
-                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.ReadIssueAudit)),
+            || await permissionCache
+                .HasProjectPermissionAsync(
+                    issue.ProjectId,
+                    context.Request.RequestingUserId,
+                    Permit.ReadIssueAudit,
                     ct
                 )
                 .ConfigureAwait(false)
-            || await db
-                .WorkspaceMembers.AnyAsync(
-                    a =>
-                        a.UserId == context.Request.RequestingUserId
-                        && a.WorkspaceId == issue.WorkspaceId
-                        && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.ReadIssueAudit)),
+            || await permissionCache
+                .HasWorkspacePermissionAsync(
+                    issue.WorkspaceId,
+                    context.Request.RequestingUserId,
+                    Permit.ReadIssueAudit,
                     ct
                 )
                 .ConfigureAwait(false);

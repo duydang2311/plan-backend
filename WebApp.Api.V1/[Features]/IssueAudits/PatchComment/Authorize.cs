@@ -16,7 +16,10 @@ public sealed class Authorize : AuthorizePreProcessor<Request>
     {
         var dbContext = context.HttpContext.Resolve<AppDbContext>();
         return await dbContext
-            .IssueAudits.AnyAsync(a => a.UserId == request.UserId && a.Action == IssueAuditAction.Comment, ct)
+            .IssueAudits.AnyAsync(
+                a => a.Id == request.Id && a.UserId == request.UserId && a.Action == IssueAuditAction.Comment,
+                ct
+            )
             .ConfigureAwait(false);
     }
 }

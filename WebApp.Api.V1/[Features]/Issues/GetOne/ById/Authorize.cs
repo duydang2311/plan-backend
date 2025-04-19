@@ -1,10 +1,12 @@
+using Ardalis.GuardClauses;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching;
 using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
-namespace WebApp.Api.V1.WorkspaceStatuses.Delete;
+namespace WebApp.Api.V1.Issues.GetOne.ById;
 
 public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
@@ -16,22 +18,24 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
         }
 
         var db = context.HttpContext.Resolve<AppDbContext>();
-        var workspaceStatus = await db
-            .WorkspaceStatuses.Where(a => a.Id == context.Request.StatusId)
-            .Select(a => new { a.WorkspaceId })
+        var issue = await db
+            .Issues.Where(a => a.Id == context.Request.IssueId)
+            .Select(a => new { a.ProjectId })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-        var canDelete =
-            workspaceStatus is not null
-            && await permissionCache
-                .HasWorkspacePermissionAsync(
-                    workspaceStatus.WorkspaceId,
-                    context.Request.UserId,
-                    Permit.DeleteWorkspaceStatus,
-                    ct
-                )
-                .ConfigureAwait(false);
-        if (!canDelete)
+
+        if (issue is null)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
+            return;
+        }
+
+        var projectPermissions = await permissionCache
+            .GetProjectPermissionsAsync(issue.ProjectId, context.Request.UserId, ct)
+            .ConfigureAwait(false);
+        var canRead = projectPermissions.Contains(Permit.ReadIssue);
+
+        if (!canRead)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }

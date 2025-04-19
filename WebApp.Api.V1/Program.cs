@@ -125,7 +125,8 @@ builder
     .AddMails()
     .AddAuthorization()
     .AddNATS()
-    .AddStorage(cloudinaryOptions);
+    .AddStorage(cloudinaryOptions)
+    .AddCaching();
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

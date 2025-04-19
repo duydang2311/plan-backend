@@ -2,11 +2,12 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Api.V1.Common;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Issues.GetMetadata;
 
-public sealed class Authorize : AuthorizePreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : AuthorizePreProcessor<Request>
 {
     public override async Task<bool> AuthorizeAsync(
         Request request,
@@ -31,15 +32,10 @@ public sealed class Authorize : AuthorizePreProcessor<Request>
         }
         if (!canRead && request.ProjectId.HasValue)
         {
-            canRead = await db
-                .ProjectMembers.AnyAsync(
-                    a =>
-                        a.UserId == request.UserId
-                        && a.ProjectId == request.ProjectId.Value
-                        && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadIssue)),
-                    ct
-                )
+            var projectPermissions = await permissionCache
+                .GetProjectPermissionsAsync(request.ProjectId.Value, request.UserId, ct)
                 .ConfigureAwait(false);
+            canRead = projectPermissions.Contains(Permit.ReadIssue);
         }
 
         return canRead;

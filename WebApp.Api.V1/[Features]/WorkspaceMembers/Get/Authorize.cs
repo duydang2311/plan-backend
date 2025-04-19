@@ -1,39 +1,30 @@
-using Ardalis.GuardClauses;
 using FastEndpoints;
-using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
-using WebApp.Infrastructure.Persistence;
+using WebApp.Infrastructure.Caching.Common;
 
 namespace WebApp.Api.V1.WorkspaceMembers.Get;
 
-public sealed class Authorize : IPreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
+    public async Task PreProcessAsync(IPreProcessorContext<Request> context, CancellationToken ct)
     {
         if (context.Request is null || context.HasValidationFailures)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        return CheckAsync(context, ct);
-        static async Task CheckAsync(IPreProcessorContext<Request> context, CancellationToken ct)
-        {
-            Guard.Against.Null(context.Request);
-            var db = context.HttpContext.Resolve<AppDbContext>();
-            var canRead = await db
-                .WorkspaceMembers.AnyAsync(
-                    a =>
-                        a.WorkspaceId == context.Request.WorkspaceId
-                        && a.UserId == context.Request.UserId
-                        && a.Role.Permissions.Any(a => a.Permission.Equals(Permit.ReadProject)),
-                    ct
-                )
-                .ConfigureAwait(false);
+        var canRead = await permissionCache
+            .HasWorkspacePermissionAsync(
+                context.Request.WorkspaceId,
+                context.Request.UserId,
+                Permit.ReadWorkspaceMember,
+                ct
+            )
+            .ConfigureAwait(false);
 
-            if (!canRead)
-            {
-                await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
-            }
+        if (!canRead)
+        {
+            await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }
     }
 }

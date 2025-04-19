@@ -2,11 +2,12 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Api.V1.Common;
 using WebApp.Common.Constants;
+using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.IssueAudits.CreateComment;
 
-public sealed class Authorize : AuthorizePreProcessor<Request>
+public sealed class Authorize(IPermissionCache permissionCache) : AuthorizePreProcessor<Request>
 {
     public override async Task<bool> AuthorizeAsync(
         Request request,
@@ -15,14 +16,19 @@ public sealed class Authorize : AuthorizePreProcessor<Request>
     )
     {
         var db = context.HttpContext.Resolve<AppDbContext>();
-        return await db
-            .ProjectMembers.AnyAsync(
-                a =>
-                    a.UserId == request.RequestingUserId
-                    && a.Project.Issues.Any(b => b.Id == request.IssueId)
-                    && a.Role.Permissions.Any(b => b.Permission.Equals(Permit.CreateIssueAuditComment)),
-                ct
-            )
+        var issue = await db
+            .Issues.Where(a => a.Id == request.IssueId)
+            .Select(a => new { a.ProjectId })
+            .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
+        if (issue is null)
+        {
+            return false;
+        }
+
+        var projectPermissions = await permissionCache
+            .GetProjectPermissionsAsync(issue.ProjectId, request.RequestingUserId, ct)
+            .ConfigureAwait(false);
+        return projectPermissions.Contains(Permit.CreateIssueAuditComment);
     }
 }
