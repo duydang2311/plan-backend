@@ -1,5 +1,6 @@
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 using Wolverine.EntityFrameworkCore;
@@ -8,15 +9,17 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static partial class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddPersistence(
-        this IServiceCollection serviceCollection,
-        PersistenceOptions persistenceOptions
-    )
+    public static IServiceCollection AddPersistence(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddPooledDbContextFactory<AppDbContext>((builder) => Configure(builder, persistenceOptions));
-        serviceCollection.AddDbContextPool<AppDbContext>((builder) => Configure(builder, persistenceOptions));
+        serviceCollection.AddPooledDbContextFactory<AppDbContext>(
+            (provider, builder) => Configure(builder, provider.GetRequiredService<IOptions<PersistenceOptions>>().Value)
+        );
+        serviceCollection.AddDbContextPool<AppDbContext>(
+            (provider, builder) => Configure(builder, provider.GetRequiredService<IOptions<PersistenceOptions>>().Value)
+        );
         serviceCollection.AddDbContextWithWolverineIntegration<AppDbContext>(
-            builder => Configure(builder, persistenceOptions),
+            (provider, builder) =>
+                Configure(builder, provider.GetRequiredService<IOptions<PersistenceOptions>>().Value),
             "wolverine"
         );
         return serviceCollection;

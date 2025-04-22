@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AsyncAwaitBestPractices" Version="9.0.0" />
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.0-preview.13" />
     <PackageVersion Include="CloudinaryDotNet" Version="1.27.5" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="4.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables.Abstractions" Version="4.0.0" />

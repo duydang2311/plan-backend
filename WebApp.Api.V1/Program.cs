@@ -31,10 +31,6 @@ var persistenceOptions =
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
 
-var cloudinaryOptions =
-    builder.Configuration.GetRequiredSection(CloudinaryOptions.Section).Get<CloudinaryOptions>()
-    ?? throw new InvalidOperationException("CloudinaryOptions must be configured");
-
 builder
     .Services.AddOptions<NatsOptions>()
     .BindConfiguration(NatsOptions.Section)
@@ -63,6 +59,11 @@ builder
 builder
     .Services.AddOptions<CloudinaryOptions>()
     .BindConfiguration(CloudinaryOptions.Section)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder
+    .Services.AddOptions<R2Options>()
+    .BindConfiguration(R2Options.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
@@ -120,12 +121,12 @@ builder
 // });
 
 builder
-    .Services.AddPersistence(persistenceOptions)
+    .Services.AddPersistence()
     .AddHashers()
     .AddMails()
     .AddAuthorization()
     .AddNATS()
-    .AddStorage(cloudinaryOptions)
+    .AddStorage()
     .AddCaching();
 builder.Services.Configure<JsonOptions>(x =>
 {
