@@ -36,6 +36,9 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Chat> Chats => Set<Chat>();
     public DbSet<ChatMember> ChatMembers => Set<ChatMember>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<Resource> Resources => Set<Resource>();
+    public DbSet<WorkspaceResource> WorkspaceResources => Set<WorkspaceResource>();
+    public DbSet<ProjectResource> ProjectResources => Set<ProjectResource>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

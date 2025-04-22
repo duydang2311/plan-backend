@@ -1,8 +1,9 @@
 using NodaTime;
+using WebApp.Common.Interfaces;
 
 namespace WebApp.Domain.Entities;
 
-public sealed record class Project
+public sealed record class Project : ISoftDelete
 {
     public Instant CreatedTime { get; init; }
     public Instant UpdatedTime { get; init; }
@@ -12,6 +13,7 @@ public sealed record class Project
     public string Name { get; init; } = string.Empty;
     public string Identifier { get; init; } = string.Empty;
     public string? Description { get; init; }
+    public Instant? DeletedTime { get; init; }
 
     // public ICollection<Status> Statuses { get; init; } = null!;
     public ICollection<Issue> Issues { get; init; } = null!;

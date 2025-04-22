@@ -14,8 +14,12 @@ public sealed class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
         builder.Property(a => a.Id).HasConversion<EntityGuidConverter<WorkspaceId>>().ValueGeneratedOnAdd();
         builder.Property(a => a.Name).HasMaxLength(64);
         builder.Property(a => a.Path).HasMaxLength(64).UseCollation("case_insensitive");
+        builder.Property(a => a.DeletedTime);
 
         builder.HasKey(a => a.Id);
         builder.HasIndex(a => a.Path).IsUnique();
+        builder.HasIndex(a => a.DeletedTime);
+
+        builder.HasQueryFilter(a => a.DeletedTime == null);
     }
 }

@@ -1,9 +1,10 @@
 using EntityFrameworkCore.Projectables;
 using NodaTime;
+using WebApp.Common.Interfaces;
 
 namespace WebApp.Domain.Entities;
 
-public sealed record class Workspace
+public sealed record class Workspace : ISoftDelete
 {
     private ICollection<WorkspaceStatus>? statuses;
     private ICollection<WorkspaceFieldDefinition>? fieldDefinitions;
@@ -15,6 +16,7 @@ public sealed record class Workspace
     public WorkspaceId Id { get; init; } = WorkspaceId.Empty;
     public string Name { get; init; } = string.Empty;
     public string Path { get; init; } = string.Empty;
+    public Instant? DeletedTime { get; init; }
 
     [Projectable(UseMemberBody = nameof(totalProjects))]
     public int TotalProjects { get; init; }
