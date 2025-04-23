@@ -6,44 +6,79 @@ namespace WebApp.Api.V1.Common.Dtos;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class DtoMapper
 {
-    public static partial BaseUserDto? UserToDtoInternal(User? user);
+    private static partial BaseUserDto? UserToDtoInternal(User? user);
 
-    public static partial ICollection<BaseUserDto>? UsersToDtoInternal(ICollection<User>? users);
+    private static partial IReadOnlyCollection<BaseUserDto>? UsersToDtoInternal(IReadOnlyCollection<User>? users);
 
-    public static partial ICollection<BaseChatMemberDto>? ChatMembersToDtoInternal(
-        ICollection<ChatMember>? chatMembers
+#pragma warning disable IDE0051 // Remove unused private members
+    private static partial IReadOnlyCollection<BaseChatMemberDto>? ChatMembersToDtoInternal(
+#pragma warning restore IDE0051 // Remove unused private members
+        IReadOnlyCollection<ChatMember>? chatMembers
     );
 
     public static BaseUserDto? UserToDto(User user) => UserToDtoInternal(user);
 
-    public static ICollection<BaseUserDto>? UsersToDto(ICollection<User> users) => UsersToDtoInternal(users);
+    public static IReadOnlyCollection<BaseUserDto>? UsersToDto(IReadOnlyCollection<User> users) =>
+        UsersToDtoInternal(users);
 
-    public static partial BaseUserProfileDto? UserProfileToDtoInternal(UserProfile? userProfile);
+    private static partial BaseUserProfileDto? UserProfileToDtoInternal(UserProfile? userProfile);
 
     public static BaseUserProfileDto? UserProfileToDto(UserProfile userProfile) =>
         UserProfileToDtoInternal(userProfile);
 
-    public static partial BaseChatDto? ChatToDtoInternal(Chat? chat);
+    private static partial BaseChatDto? ChatToDtoInternal(Chat? chat);
 
     public static BaseChatDto? ChatToDto(Chat chat) => ChatToDtoInternal(chat);
 
-    public static partial BaseChatMessageDto? ChatMessageToDtoInternal(ChatMessage? chatMessage);
+    private static partial BaseChatMessageDto? ChatMessageToDtoInternal(ChatMessage? chatMessage);
 
     public static BaseChatMessageDto? ChatMessageToDto(ChatMessage chatMessage) =>
         ChatMessageToDtoInternal(chatMessage);
 
-    public static partial BaseChatMemberDto? ChatMemberToDtoInternal(ChatMember? chatMember);
+    private static partial BaseChatMemberDto? ChatMemberToDtoInternal(ChatMember? chatMember);
 
     public static BaseChatMemberDto? ChatMemberToDto(ChatMember chatMember) => ChatMemberToDtoInternal(chatMember);
 
-    public static partial BaseWorkspaceDto? WorkspaceToDtoInternal(Workspace? Workspace);
+    private static partial BaseWorkspaceDto? WorkspaceToDtoInternal(Workspace? Workspace);
 
-    public static BaseWorkspaceDto? WorkspaceToDto(Workspace Workspace) => WorkspaceToDtoInternal(Workspace);
+    public static BaseWorkspaceDto? WorkspaceToDto(Workspace workspace) => WorkspaceToDtoInternal(workspace);
 
-    public static partial BaseWorkspaceInvitationDto? WorkspaceInvitationToDtoInternal(
-        WorkspaceInvitation? WorkspaceInvitation
+    private static partial BaseWorkspaceInvitationDto? WorkspaceInvitationToDtoInternal(
+        WorkspaceInvitation? workspaceInvitation
     );
 
-    public static BaseWorkspaceInvitationDto? WorkspaceInvitationToDto(WorkspaceInvitation WorkspaceInvitation) =>
-        WorkspaceInvitationToDtoInternal(WorkspaceInvitation);
+    public static BaseWorkspaceInvitationDto? WorkspaceInvitationToDto(WorkspaceInvitation workspaceInvitation) =>
+        WorkspaceInvitationToDtoInternal(workspaceInvitation);
+
+    private static partial BaseDocumentResourceDto? DocumentResourceToDtoInternal(DocumentResource? documentResource);
+
+    public static BaseDocumentResourceDto? DocumentResourceToDto(DocumentResource documentResource) =>
+        DocumentResourceToDtoInternal(documentResource);
+
+    private static partial BaseFileResourceDto? FileResourceToDtoInternal(FileResource? fileResource);
+
+    public static BaseFileResourceDto? FileResourceToDto(FileResource fileResource) =>
+        FileResourceToDtoInternal(fileResource);
+
+    private static BaseResourceDto? ResourceToDtoInternal(Resource? resource) =>
+        resource switch
+        {
+            DocumentResource documentResource => DocumentResourceToDto(documentResource),
+            FileResource fileResource => FileResourceToDto(fileResource),
+            null => null,
+            _ => throw new NotSupportedException($"Unsupported resource type: {resource.GetType()}"),
+        };
+
+    public static BaseResourceDto? ResourceToDto(Resource resource) => ResourceToDtoInternal(resource);
+
+    private static partial BaseWorkspaceResourceDto? WorkspaceResourceToDtoInternal(
+        WorkspaceResource? workspaceResource
+    );
+
+    public static BaseWorkspaceResourceDto? WorkspaceResourceToDto(WorkspaceResource workspaceResource) =>
+        WorkspaceResourceToDtoInternal(workspaceResource);
+
+    public static partial IReadOnlyCollection<BaseWorkspaceResourceDto> WorkspaceResourcesToDto(
+        IReadOnlyCollection<WorkspaceResource> workspaceResources
+    );
 }

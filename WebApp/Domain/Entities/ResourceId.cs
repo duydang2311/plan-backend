@@ -10,4 +10,14 @@ public readonly struct ResourceId : IEntityId<long>
     {
         return Value.ToString(CultureInfo.InvariantCulture);
     }
+
+    public static bool operator >(ResourceId a, ResourceId b)
+    {
+        return a.Value > b.Value;
+    }
+
+    public static bool operator <(ResourceId a, ResourceId b)
+    {
+        return a.Value < b.Value;
+    }
 }
