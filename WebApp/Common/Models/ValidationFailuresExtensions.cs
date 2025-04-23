@@ -1,6 +1,7 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebApp.Common.Constants;
 
 namespace WebApp.Common.Models;
 
@@ -38,11 +39,11 @@ public static class ValidationFailuresExtensions
             var tuple = transform(property);
             if (tuple.HasValue)
             {
-                failures.Add(tuple.Value.PropertyName, tuple.Value.Message, "invalid_reference");
+                failures.Add(tuple.Value.PropertyName, tuple.Value.Message, ErrorCodes.NotFound);
             }
             else
             {
-                failures.Add(property, $"Reference to \"{property}\" does not exist", "invalid_reference");
+                failures.Add(property, $"Reference to \"{property}\" does not exist", ErrorCodes.NotFound);
             }
         }
         return failures;
@@ -59,11 +60,11 @@ public static class ValidationFailuresExtensions
             var tuple = transform(property);
             if (tuple.HasValue)
             {
-                failures.Add(tuple.Value.PropertyName, tuple.Value.Message, "unique");
+                failures.Add(tuple.Value.PropertyName, tuple.Value.Message, ErrorCodes.Duplicated);
             }
             else
             {
-                failures.Add(property, $"\"{property}\" must be unique", "unique");
+                failures.Add(property, $"\"{property}\" must be unique", ErrorCodes.Duplicated);
             }
         }
         return failures;
