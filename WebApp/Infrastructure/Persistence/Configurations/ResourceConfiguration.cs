@@ -22,6 +22,8 @@ public sealed class ResourceConfiguration : IEntityTypeConfiguration<Resource>
         builder.Property(a => a.UpdatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.Type).HasConversion<EnumToNumberConverter<ResourceType, byte>>();
         builder.Property(a => a.CreatorId).HasConversion<EntityGuidConverter<UserId>>().ValueGeneratedNever();
+        builder.Property(a => a.Name).HasMaxLength(256);
+        builder.Property(a => a.Rank).UseCollation("C");
 
         builder.HasOne(a => a.Creator).WithMany().HasForeignKey(a => a.CreatorId);
     }

@@ -23,7 +23,12 @@ public sealed record CreateWorkspaceDocumentResourceHandler(AppDbContext db)
         var resource = new WorkspaceResource
         {
             WorkspaceId = command.WorkspaceId,
-            Resource = new DocumentResource { CreatorId = command.CreatorId, Content = command.Content },
+            Resource = new DocumentResource
+            {
+                CreatorId = command.CreatorId,
+                Content = command.Content,
+                Name = command.Name,
+            },
         };
 
         db.Add(resource);

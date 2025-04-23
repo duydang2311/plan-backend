@@ -12,6 +12,7 @@ public sealed record CreateWorkspaceFileResource
 {
     public required WorkspaceId WorkspaceId { get; init; }
     public required UserId CreatorId { get; init; }
+    public required string Name { get; init; }
     public required string Key { get; init; }
 
     public StoragePendingUploadId? PendingUploadId { get; init; }

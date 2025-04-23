@@ -36,7 +36,12 @@ public sealed record CreateWorkspaceFileResourceHandler(AppDbContext db)
         var resource = new WorkspaceResource
         {
             WorkspaceId = command.WorkspaceId,
-            Resource = new FileResource { CreatorId = command.CreatorId, Key = command.Key },
+            Resource = new FileResource
+            {
+                CreatorId = command.CreatorId,
+                Key = command.Key,
+                Name = command.Name,
+            },
         };
 
         db.Add(resource);

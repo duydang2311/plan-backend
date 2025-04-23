@@ -12,6 +12,7 @@ public record Request
     public WorkspaceId? WorkspaceId { get; init; }
     public string? Key { get; init; }
     public StoragePendingUploadId? PendingUploadId { get; init; }
+    public string? Name { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId CreatorId { get; init; }
@@ -23,6 +24,7 @@ public sealed class RequestValidator : Validator<Request>
     {
         RuleFor(a => a.WorkspaceId).NotNull().WithErrorCode("required");
         RuleFor(a => a.Key).NotEmpty().WithErrorCode("required");
+        RuleFor(a => a.Name).NotEmpty().WithErrorCode("required");
     }
 }
 

@@ -12,5 +12,6 @@ public sealed record CreateWorkspaceDocumentResource
 {
     public required WorkspaceId WorkspaceId { get; init; }
     public required UserId CreatorId { get; init; }
+    public required string Name { get; init; }
     public required string Content { get; init; }
 }
