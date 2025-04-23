@@ -40,13 +40,12 @@ public sealed class CreateWorkspaceResourceUploadUrlHandler(
         }
 
         var key = Path.Join("ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(command.Key));
-        db.Add(
-            new StoragePendingUpload
-            {
-                Key = key,
-                ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
-            }
-        );
+        var pendingUpload = new StoragePendingUpload
+        {
+            Key = key,
+            ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
+        };
+        db.Add(pendingUpload);
         try
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
@@ -59,6 +58,7 @@ public sealed class CreateWorkspaceResourceUploadUrlHandler(
 
         return new CreateWorkspaceResourceUploadUrlResult
         {
+            PendingUploadId = pendingUpload.Id,
             Url = storageService.GeneratePreSignedUploadUrl(key, expiration: TimeSpan.FromHours(30)),
         };
     }

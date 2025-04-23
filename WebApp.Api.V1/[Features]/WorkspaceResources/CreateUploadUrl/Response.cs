@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using WebApp.Domain.Entities;
 using WebApp.Features.WorkspaceResources.CreateUploadUrl;
 
 namespace WebApp.Api.V1.WorkspaceResources.CreateUploadUrl;
@@ -6,6 +7,7 @@ namespace WebApp.Api.V1.WorkspaceResources.CreateUploadUrl;
 public sealed record Response
 {
     public required string Url { get; init; }
+    public required StoragePendingUploadId PendingUploadId { get; init; }
 }
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
