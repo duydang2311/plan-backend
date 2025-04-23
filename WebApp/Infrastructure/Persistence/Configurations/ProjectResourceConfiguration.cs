@@ -18,6 +18,7 @@ public sealed class ProjectResourceConfiguration : IEntityTypeConfiguration<Proj
             .HasOne(a => a.Resource)
             .WithOne(a => a.ProjectResource)
             .HasForeignKey<ProjectResource>(a => a.ResourceId);
+        builder.HasOne(a => a.Project).WithMany().HasForeignKey(a => a.ProjectId);
         builder.HasQueryFilter(a => a.Project.DeletedTime == null);
     }
 }

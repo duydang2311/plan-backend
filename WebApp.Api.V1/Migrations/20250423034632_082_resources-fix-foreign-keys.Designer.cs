@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423034632_082_resources-fix-foreign-keys")]
+    partial class _082_resourcesfixforeignkeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1543,19 +1546,20 @@ namespace WebApp.Host.Migrations
 
             modelBuilder.Entity("WebApp.Domain.Entities.WorkspaceResource", b =>
                 {
-                    b.Property<long>("ResourceId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("resource_id");
-
                     b.Property<Guid>("WorkspaceId")
                         .HasColumnType("uuid")
                         .HasColumnName("workspace_id");
 
-                    b.HasKey("ResourceId")
+                    b.Property<long>("ResourceId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("resource_id");
+
+                    b.HasKey("WorkspaceId")
                         .HasName("pk_workspace_resources");
 
-                    b.HasIndex("WorkspaceId")
-                        .HasDatabaseName("ix_workspace_resources_workspace_id");
+                    b.HasIndex("ResourceId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_workspace_resources_resource_id");
 
                     b.ToTable("workspace_resources", (string)null);
                 });
