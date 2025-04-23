@@ -154,6 +154,8 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ChatId>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ResourceId, long>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StoragePendingUploadId, long>());
     x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
@@ -271,6 +273,15 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<ChatId>(EntityGuidJsonConverter<ChatId>.ValueParser, handleNull: true);
         config.Binding.ValueParserFor<ChatMessageId>(
             input => EntityIdValueParsers.ParseLong(input, static value => new ChatMessageId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ResourceId>(
+            input => EntityIdValueParsers.ParseLong(input, static value => new ResourceId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<StoragePendingUploadId>(
+            input =>
+                EntityIdValueParsers.ParseLong(input, static value => new StoragePendingUploadId { Value = value }),
             handleNull: true
         );
     }
