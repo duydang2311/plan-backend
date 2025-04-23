@@ -6,6 +6,7 @@ using NodaTime;
 using OneOf;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
+using WebApp.Features.WorkspaceResources.Common;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Storages.Abstractions;
 
