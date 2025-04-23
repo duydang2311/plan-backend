@@ -11,17 +11,17 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Api.V1.Common.Authentications;
 
-public class BasicAuthenticationSchemeHandler(
-    IOptionsMonitor<BasicAuthenticationSchemeOptions> options,
+public class SessionAuthenticationSchemeHandler(
+    IOptionsMonitor<SessionAuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder,
     AppDbContext db,
     HybridCache cache
-) : AuthenticationHandler<BasicAuthenticationSchemeOptions>(options, logger, encoder)
+) : AuthenticationHandler<SessionAuthenticationSchemeOptions>(options, logger, encoder)
 {
     private const string MissingHeader =
-        $"Missing header '{BasicAuthenticationSchemeOptions.AuthorizationHeaderName}'.";
-    private const string EmptyHeader = $"Header '{BasicAuthenticationSchemeOptions.AuthorizationHeaderName}' is empty.";
+        $"Missing header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}'.";
+    private const string EmptyHeader = $"Header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}' is empty.";
     private const string InvalidScheme = "Invalid authorization scheme";
     private const string MissingValue = "Missing session token";
     private const string BadToken = "Bad session token";
@@ -34,7 +34,7 @@ public class BasicAuthenticationSchemeHandler(
             return AuthenticateResult.NoResult();
         }
 
-        if (!Request.Headers.TryGetValue(BasicAuthenticationSchemeOptions.AuthorizationHeaderName, out var headerValue))
+        if (!Request.Headers.TryGetValue(SessionAuthenticationSchemeOptions.AuthorizationHeaderName, out var headerValue))
         {
             return AuthenticateResult.Fail(MissingHeader);
         }
@@ -87,10 +87,5 @@ public class BasicAuthenticationSchemeHandler(
         var claims = new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));
         return AuthenticateResult.Success(new AuthenticationTicket(principal, Scheme.Name));
-    }
-
-    private Task<UserId> GetUserSessionAsync(SessionToken sessionToken)
-    {
-        return db.UserSessions.Where(a => a.Token == sessionToken).Select(a => a.UserId).FirstOrDefaultAsync();
     }
 }

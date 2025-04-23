@@ -70,10 +70,11 @@ builder
 builder
     .Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = BasicAuthenticationSchemeOptions.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = SessionAuthenticationSchemeOptions.AuthenticationScheme;
+        options.DefaultChallengeScheme = SessionAuthenticationSchemeOptions.AuthenticationScheme;
     })
-    .AddScheme<BasicAuthenticationSchemeOptions, BasicAuthenticationSchemeHandler>(
-        BasicAuthenticationSchemeOptions.AuthenticationScheme,
+    .AddScheme<SessionAuthenticationSchemeOptions, SessionAuthenticationSchemeHandler>(
+        SessionAuthenticationSchemeOptions.AuthenticationScheme,
         null
     )
     .AddJwtBearer(options =>
