@@ -21,11 +21,10 @@ public sealed record CreateWorkspaceDocumentResourceHandler(AppDbContext db)
         CancellationToken ct
     )
     {
-        var resource = new DocumentResource
+        var resource = new WorkspaceResource
         {
-            WorkspaceResource = new WorkspaceResource { WorkspaceId = command.WorkspaceId },
-            CreatorId = command.CreatorId,
-            Content = command.Content,
+            WorkspaceId = command.WorkspaceId,
+            Resource = new DocumentResource { CreatorId = command.CreatorId, Content = command.Content },
         };
 
         db.Add(resource);

@@ -33,11 +33,10 @@ public sealed record CreateWorkspaceFileResourceHandler(AppDbContext db)
                 .ConfigureAwait(false);
         }
 
-        var resource = new FileResource
+        var resource = new WorkspaceResource
         {
-            WorkspaceResource = new WorkspaceResource { WorkspaceId = command.WorkspaceId },
-            CreatorId = command.CreatorId,
-            Key = command.Key,
+            WorkspaceId = command.WorkspaceId,
+            Resource = new FileResource { CreatorId = command.CreatorId, Key = command.Key },
         };
 
         db.Add(resource);

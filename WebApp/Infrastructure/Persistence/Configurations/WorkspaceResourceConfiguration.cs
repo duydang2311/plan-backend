@@ -14,10 +14,7 @@ public sealed class WorkspaceResourceConfiguration : IEntityTypeConfiguration<Wo
         builder.Property(a => a.WorkspaceId).HasConversion<EntityGuidConverter<WorkspaceId>>().ValueGeneratedNever();
 
         builder.HasKey(a => a.ResourceId);
-        builder
-            .HasOne(a => a.Resource)
-            .WithOne(a => a.WorkspaceResource)
-            .HasForeignKey<WorkspaceResource>(a => a.ResourceId);
+        builder.HasOne(a => a.Resource).WithOne().HasForeignKey<WorkspaceResource>(a => a.ResourceId);
         builder.HasOne(a => a.Workspace).WithMany().HasForeignKey(a => a.WorkspaceId);
         builder.HasQueryFilter(a => a.Workspace.DeletedTime == null);
     }
