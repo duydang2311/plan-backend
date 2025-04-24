@@ -9,24 +9,24 @@ using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Storages.Abstractions;
 
-namespace WebApp.Features.WorkspaceResources.CreateUploadUrl;
+namespace WebApp.Features.WorkspaceResources.CreateUploadUrls;
 
-public sealed class CreateWorkspaceResourceUploadUrlHandler(
+public sealed class CreateWorkspaceResourceUploadUrlsHandler(
     AppDbContext db,
     IStorageService storageService,
-    ILogger<CreateWorkspaceResourceUploadUrlHandler> logger
+    ILogger<CreateWorkspaceResourceUploadUrlsHandler> logger
 )
     : ICommandHandler<
-        CreateWorkspaceResourceUploadUrl,
-        OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlResult>
+        CreateWorkspaceResourceUploadUrls,
+        OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlsResult>
     >
 {
     static readonly BitArray isAllowedChar = BuildAllowedCharsLookup(
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
     );
 
-    public async Task<OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlResult>> ExecuteAsync(
-        CreateWorkspaceResourceUploadUrl command,
+    public async Task<OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlsResult>> ExecuteAsync(
+        CreateWorkspaceResourceUploadUrls command,
         CancellationToken ct
     )
     {
@@ -35,27 +35,43 @@ public sealed class CreateWorkspaceResourceUploadUrlHandler(
             return new NotFoundError();
         }
 
-        var key = Path.Join("ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(command.Key));
-        var pendingUpload = new StoragePendingUpload
-        {
-            Key = key,
-            ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
-        };
-        db.Add(pendingUpload);
+        var list = command
+            .Keys.Select(a =>
+            {
+                var key = Path.Join("ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(a));
+                return new
+                {
+                    PendingUpload = new StoragePendingUpload
+                    {
+                        Key = key,
+                        ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
+                    },
+                    Url = storageService.GeneratePreSignedUploadUrl(key, expiration: TimeSpan.FromHours(30)),
+                };
+            })
+            .ToList();
+        db.AddRange(list.Select(a => a.PendingUpload));
+
         try
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to save pending upload for key {Key}", key);
-            return ServerError.From("pending_upload_save_failed");
+            logger.LogError(e, "Failed to save pending uploads");
+            return ServerError.From("pending_uploads_save_failed");
         }
 
-        return new CreateWorkspaceResourceUploadUrlResult
+        return new CreateWorkspaceResourceUploadUrlsResult
         {
-            PendingUploadId = pendingUpload.Id,
-            Url = storageService.GeneratePreSignedUploadUrl(key, expiration: TimeSpan.FromHours(30)),
+            Results =
+            [
+                .. list.Select(a => new CreateWorkspaceResourceUploadUrlResult
+                {
+                    PendingUploadId = a.PendingUpload.Id,
+                    Url = a.Url,
+                }),
+            ],
         };
     }
 
