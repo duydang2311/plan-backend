@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Security.Cryptography;
 using System.Text;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
@@ -35,22 +36,18 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
             return new NotFoundError();
         }
 
-        var list = command
+        var uploads = command
             .Keys.Select(a =>
             {
                 var key = Path.Join("ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(a));
-                return new
+                return new StoragePendingUpload
                 {
-                    PendingUpload = new StoragePendingUpload
-                    {
-                        Key = key,
-                        ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
-                    },
-                    Url = storageService.GeneratePreSignedUploadUrl(key, expiration: TimeSpan.FromHours(30)),
+                    Key = key,
+                    ExpiryTime = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromHours(1)),
                 };
             })
             .ToList();
-        db.AddRange(list.Select(a => a.PendingUpload));
+        db.AddRange(uploads);
 
         try
         {
@@ -66,10 +63,13 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
         {
             Results =
             [
-                .. list.Select(a => new CreateWorkspaceResourceUploadUrlResult
+                .. uploads.Select(a =>
                 {
-                    PendingUploadId = a.PendingUpload.Id,
-                    Url = a.Url,
+                    return new CreateWorkspaceResourceUploadUrlResult
+                    {
+                        PendingUploadId = a.Id,
+                        Url = storageService.GeneratePreSignedUploadUrl(a.Key, expiration: TimeSpan.FromHours(30)),
+                    };
                 }),
             ],
         };
@@ -81,37 +81,67 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
 
         if (string.IsNullOrEmpty(key))
         {
-            return Guid.NewGuid().ToString();
+            return GenerateRandomId();
         }
 
         var sb = new StringBuilder();
-        var replacementLastAppended = false;
+        var replaced = false;
+        var extensionStart = -1;
         foreach (var c in key)
         {
             var idx = (byte)c - 45;
-            if (idx < isAllowedChar.Length && isAllowedChar[idx])
+            if (idx >= 0 && idx < isAllowedChar.Length && isAllowedChar[idx])
             {
-                sb.Append(c);
-                if (replacementLastAppended)
+                if (c == '.')
                 {
-                    replacementLastAppended = false;
+                    extensionStart = sb.Length;
+                }
+                sb.Append(c);
+                if (replaced)
+                {
+                    replaced = false;
                 }
             }
-            else if (!replacementLastAppended)
+            else if (!replaced)
             {
                 sb.Append(replacement);
-                replacementLastAppended = true;
+                replaced = true;
             }
+        }
+
+        if (extensionStart == -1)
+        {
+            if (sb[^1] != '_')
+            {
+                sb.Append('_');
+            }
+            sb.Append(GenerateRandomId());
+        }
+        else
+        {
+            if (sb[extensionStart - 1] != '_')
+            {
+                sb.Insert(extensionStart, '_');
+                ++extensionStart;
+            }
+            sb.Insert(extensionStart, GenerateRandomId());
         }
         var result = sb.ToString();
 
         result = result.Trim(' ', '.', '_', '-');
         if (string.IsNullOrEmpty(result))
         {
-            return Guid.NewGuid().ToString();
+            return GenerateRandomId();
         }
 
         return result;
+    }
+
+    static string GenerateRandomId()
+    {
+        var bytes = new byte[16];
+        RandomNumberGenerator.Fill(bytes);
+        return Convert.ToBase64String(bytes).Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 
     static BitArray BuildAllowedCharsLookup(string allowedChars)
@@ -119,10 +149,7 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
         var lookup = new BitArray(78, false);
         foreach (var c in allowedChars)
         {
-            if (c < 78)
-            {
-                lookup[(byte)c - 45] = true;
-            }
+            lookup[(byte)c - 45] = true;
         }
         return lookup;
     }
