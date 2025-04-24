@@ -50,24 +50,7 @@ public static partial class DtoMapper
     public static BaseWorkspaceInvitationDto? WorkspaceInvitationToDto(WorkspaceInvitation workspaceInvitation) =>
         WorkspaceInvitationToDtoInternal(workspaceInvitation);
 
-    private static partial BaseDocumentResourceDto? DocumentResourceToDtoInternal(DocumentResource? documentResource);
-
-    public static BaseDocumentResourceDto? DocumentResourceToDto(DocumentResource documentResource) =>
-        DocumentResourceToDtoInternal(documentResource);
-
-    private static partial BaseFileResourceDto? FileResourceToDtoInternal(FileResource? fileResource);
-
-    public static BaseFileResourceDto? FileResourceToDto(FileResource fileResource) =>
-        FileResourceToDtoInternal(fileResource);
-
-    private static BaseResourceDto? ResourceToDtoInternal(Resource? resource) =>
-        resource switch
-        {
-            DocumentResource documentResource => DocumentResourceToDto(documentResource),
-            FileResource fileResource => FileResourceToDto(fileResource),
-            null => null,
-            _ => throw new NotSupportedException($"Unsupported resource type: {resource.GetType()}"),
-        };
+    private static partial BaseResourceDto? ResourceToDtoInternal(Resource? resource);
 
     public static BaseResourceDto? ResourceToDto(Resource resource) => ResourceToDtoInternal(resource);
 
@@ -81,4 +64,16 @@ public static partial class DtoMapper
     public static partial IReadOnlyCollection<BaseWorkspaceResourceDto> WorkspaceResourcesToDto(
         IReadOnlyCollection<WorkspaceResource> workspaceResources
     );
+
+    private static partial BaseResourceDocumentDto? ResourceDocumentToDtoInternal(ResourceDocument? resourceDocument);
+
+    public static BaseResourceDocumentDto? ResourceDocumentToDto(ResourceDocument resourceDocument) =>
+        ResourceDocumentToDtoInternal(resourceDocument);
+
+    private static partial BaseResourceFileDto? ResourceFileToDtoInternal(ResourceFile? resourceFile);
+
+    public static BaseResourceFileDto? ResourceFileToDto(ResourceFile resourceFile) =>
+        ResourceFileToDtoInternal(resourceFile);
+
+    public static partial ICollection<BaseResourceFileDto> ResourceFilesToDto(ICollection<ResourceFile> resourceFiles);
 }

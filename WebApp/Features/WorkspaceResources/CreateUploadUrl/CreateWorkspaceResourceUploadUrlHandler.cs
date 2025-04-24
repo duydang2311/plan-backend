@@ -6,7 +6,6 @@ using NodaTime;
 using OneOf;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.Features.WorkspaceResources.Common;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Storages.Abstractions;
 
@@ -19,22 +18,18 @@ public sealed class CreateWorkspaceResourceUploadUrlHandler(
 )
     : ICommandHandler<
         CreateWorkspaceResourceUploadUrl,
-        OneOf<NotFoundError, InvalidResourceTypeError, ServerError, CreateWorkspaceResourceUploadUrlResult>
+        OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlResult>
     >
 {
     static readonly BitArray isAllowedChar = BuildAllowedCharsLookup(
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
     );
 
-    public async Task<
-        OneOf<NotFoundError, InvalidResourceTypeError, ServerError, CreateWorkspaceResourceUploadUrlResult>
-    > ExecuteAsync(CreateWorkspaceResourceUploadUrl command, CancellationToken ct)
+    public async Task<OneOf<NotFoundError, ServerError, CreateWorkspaceResourceUploadUrlResult>> ExecuteAsync(
+        CreateWorkspaceResourceUploadUrl command,
+        CancellationToken ct
+    )
     {
-        if (!Enum.IsDefined(command.ResourceType))
-        {
-            return new InvalidResourceTypeError();
-        }
-
         if (!await db.Workspaces.AnyAsync(x => x.Id == command.WorkspaceId, ct).ConfigureAwait(false))
         {
             return new NotFoundError();

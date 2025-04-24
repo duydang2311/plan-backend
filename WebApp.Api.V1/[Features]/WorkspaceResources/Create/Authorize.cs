@@ -2,7 +2,7 @@ using FastEndpoints;
 using WebApp.Common.Constants;
 using WebApp.Infrastructure.Caching.Common;
 
-namespace WebApp.Api.V1.WorkspaceResources.CreateDocument;
+namespace WebApp.Api.V1.WorkspaceResources.Create;
 
 public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {

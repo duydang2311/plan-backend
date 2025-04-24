@@ -20,7 +20,6 @@ public sealed class Endpoint : Endpoint<Request, Results>
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
         return oneOf.Match<Results>(
             notFoundError => Problem.Failure("workspaceId", "Workspace not found").ToProblemDetails(),
-            invalidResourceTypeError => Problem.Failure("type", "Invalid resource type").ToProblemDetails(),
             serverError => serverError.ToProblemDetails(),
             result => TypedResults.Ok(result.ToResponse())
         );

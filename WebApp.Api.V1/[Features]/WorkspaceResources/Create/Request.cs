@@ -3,9 +3,9 @@ using FastEndpoints;
 using FluentValidation;
 using Riok.Mapperly.Abstractions;
 using WebApp.Domain.Entities;
-using WebApp.Features.WorkspaceResources.CreateFile;
+using WebApp.Features.WorkspaceResources.Create;
 
-namespace WebApp.Api.V1.WorkspaceResources.CreateFile;
+namespace WebApp.Api.V1.WorkspaceResources.Create;
 
 public record Request
 {
@@ -13,9 +13,17 @@ public record Request
     public string? Key { get; init; }
     public StoragePendingUploadId? PendingUploadId { get; init; }
     public string? Name { get; init; }
+    public string? Content { get; init; }
+    public ICollection<RequestResourceFile>? Files { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId CreatorId { get; init; }
+}
+
+public sealed record RequestResourceFile
+{
+    public string? Key { get; init; }
+    public StoragePendingUploadId? PendingUploadId { get; init; }
 }
 
 public sealed class RequestValidator : Validator<Request>
@@ -31,5 +39,5 @@ public sealed class RequestValidator : Validator<Request>
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
-    public static partial CreateWorkspaceFileResource ToCommand(this Request request);
+    public static partial CreateWorkspaceResource ToCommand(this Request request);
 }

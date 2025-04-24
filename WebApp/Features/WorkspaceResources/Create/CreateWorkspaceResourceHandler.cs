@@ -5,19 +5,15 @@ using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.Features.WorkspaceResources.Common;
 using WebApp.Infrastructure.Persistence;
 
-namespace WebApp.Features.WorkspaceResources.CreateFile;
+namespace WebApp.Features.WorkspaceResources.Create;
 
-public sealed record CreateWorkspaceFileResourceHandler(AppDbContext db)
-    : ICommandHandler<
-        CreateWorkspaceFileResource,
-        OneOf<WorkspaceNotFoundError, UserNotFoundError, InvalidResourceTypeError, Success>
-    >
+public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
+    : ICommandHandler<CreateWorkspaceResource, OneOf<WorkspaceNotFoundError, UserNotFoundError, Success>>
 {
-    public async Task<OneOf<WorkspaceNotFoundError, UserNotFoundError, InvalidResourceTypeError, Success>> ExecuteAsync(
-        CreateWorkspaceFileResource command,
+    public async Task<OneOf<WorkspaceNotFoundError, UserNotFoundError, Success>> ExecuteAsync(
+        CreateWorkspaceResource command,
         CancellationToken ct
     )
     {
@@ -25,22 +21,33 @@ public sealed record CreateWorkspaceFileResourceHandler(AppDbContext db)
         await using var transaction = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
 #pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
-        if (command.PendingUploadId.HasValue)
+        if (command.Files is not null)
         {
-            await db
-                .StoragePendingUploads.Where(a => a.Id == command.PendingUploadId.Value)
-                .ExecuteDeleteAsync(ct)
-                .ConfigureAwait(false);
+            foreach (var file in command.Files)
+            {
+                var ids = command
+                    .Files.Where(a => a.PendingUploadId.HasValue)
+                    .Select(a => a.PendingUploadId)
+                    .Cast<StoragePendingUploadId>()
+                    .ToList();
+                await db
+                    .StoragePendingUploads.Where(a => ids.Contains(a.Id))
+                    .ExecuteDeleteAsync(ct)
+                    .ConfigureAwait(false);
+            }
         }
 
         var resource = new WorkspaceResource
         {
             WorkspaceId = command.WorkspaceId,
-            Resource = new FileResource
+            Resource = new Resource
             {
                 CreatorId = command.CreatorId,
-                Key = command.Key,
                 Name = command.Name,
+                Document = !string.IsNullOrEmpty(command.Content)
+                    ? new ResourceDocument { Content = command.Content }
+                    : null,
+                Files = command.Files?.Select(a => new ResourceFile { Key = a.Key }).ToList() ?? [],
             },
         };
 
@@ -57,7 +64,7 @@ public sealed record CreateWorkspaceFileResourceHandler(AppDbContext db)
             {
                 return new WorkspaceNotFoundError();
             }
-            if (e.ConstraintProperties.Any(a => a == nameof(FileResource.CreatorId)))
+            if (e.ConstraintProperties.Any(a => a == nameof(Resource.CreatorId)))
             {
                 return new UserNotFoundError();
             }

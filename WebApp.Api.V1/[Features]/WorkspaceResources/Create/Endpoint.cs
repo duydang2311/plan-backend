@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Api.V1.Common.Helpers;
 using WebApp.Common.Constants;
 
-namespace WebApp.Api.V1.WorkspaceResources.CreateDocument;
+namespace WebApp.Api.V1.WorkspaceResources.Create;
 
 using Results = Results<ForbidHttpResult, ProblemDetails, NoContent>;
 
@@ -11,7 +11,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Post("workspace-resources/documents");
+        Post("workspace-resources");
         Version(1);
         PreProcessor<Authorize>();
     }
@@ -25,8 +25,6 @@ public sealed class Endpoint : Endpoint<Request, Results>
                 Problem.Failure("workspaceId", "Workspace not found", ErrorCodes.NotFound).ToProblemDetails(),
             userNotFoundError =>
                 Problem.Failure("creator", "Creator not found", ErrorCodes.NotFound).ToProblemDetails(),
-            invalidResourceTypeError =>
-                Problem.Failure("type", "Invalid resource type", ErrorCodes.InvalidValue).ToProblemDetails(),
             success => TypedResults.NoContent()
         );
     }
