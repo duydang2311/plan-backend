@@ -1,9 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
 using NodaTime;
@@ -310,8 +313,13 @@ app.UseJobQueues(options =>
 //     Audience = "WebApp",
 //     SigningCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256),
 // };
-
 // var token = tokenHandler.CreateToken(tokenDescriptor);
 // Console.WriteLine("Token: " + tokenHandler.WriteToken(token));
+// return 0;
+
+// var rsa = RSA.Create(4096);
+// Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(rsa.ExportPkcs8PrivateKeyPem()));
+// Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(rsa.ExportSubjectPublicKeyInfoPem()));
+// return 0;
 
 return await app.RunOaktonCommands(args).ConfigureAwait(false);

@@ -75,5 +75,10 @@ public static partial class DtoMapper
     public static BaseResourceFileDto? ResourceFileToDto(ResourceFile resourceFile) =>
         ResourceFileToDtoInternal(resourceFile);
 
-    public static partial ICollection<BaseResourceFileDto> ResourceFilesToDto(ICollection<ResourceFile> resourceFiles);
+    private static partial ICollection<BaseResourceFileDto>? ResourceFilesToDtoInternal(
+        ICollection<ResourceFile>? resourceFiles
+    );
+
+    public static ICollection<BaseResourceFileDto>? ResourceFilesToDto(ICollection<ResourceFile> resourceFiles) =>
+        ResourceFilesToDtoInternal(resourceFiles);
 }
