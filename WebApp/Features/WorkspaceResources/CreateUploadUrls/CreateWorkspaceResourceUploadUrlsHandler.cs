@@ -39,7 +39,7 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
         var uploads = command
             .Keys.Select(a =>
             {
-                var key = Path.Join("ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(a));
+                var key = string.Join('/', ["ws-resources", command.WorkspaceId.ToBase64String(), SanitizeKey(a)]);
                 return new StoragePendingUpload
                 {
                     Key = key,
@@ -63,14 +63,20 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
         {
             Results =
             [
-                .. uploads.Select(a =>
-                {
-                    return new CreateWorkspaceResourceUploadUrlResult
-                    {
-                        PendingUploadId = a.Id,
-                        Url = storageService.GeneratePreSignedUploadUrl(a.Key, expiration: TimeSpan.FromHours(30)),
-                    };
-                }),
+                .. await Task.WhenAll(
+                        uploads.Select(async a =>
+                        {
+                            return new CreateWorkspaceResourceUploadUrlResult
+                            {
+                                PendingUploadId = a.Id,
+                                Key = a.Key,
+                                Url = await storageService
+                                    .GetPreSignedUploadUrlAsync(a.Key, expiration: TimeSpan.FromHours(30))
+                                    .ConfigureAwait(false),
+                            };
+                        })
+                    )
+                    .ConfigureAwait(false),
             ],
         };
     }

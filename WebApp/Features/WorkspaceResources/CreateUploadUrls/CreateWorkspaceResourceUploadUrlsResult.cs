@@ -10,5 +10,6 @@ public sealed record CreateWorkspaceResourceUploadUrlsResult
 public sealed record CreateWorkspaceResourceUploadUrlResult
 {
     public required StoragePendingUploadId PendingUploadId { get; init; }
+    public required string Key { get; init; }
     public required string Url { get; init; }
 }
