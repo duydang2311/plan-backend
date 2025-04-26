@@ -18,5 +18,6 @@ public sealed record CreateWorkspaceResource : ICommand<OneOf<WorkspaceNotFoundE
 public sealed record CreateWorkspaceResourceFile
 {
     public required string Key { get; init; }
+    public required string OriginalName { get; init; }
     public StoragePendingUploadId? PendingUploadId { get; init; }
 }

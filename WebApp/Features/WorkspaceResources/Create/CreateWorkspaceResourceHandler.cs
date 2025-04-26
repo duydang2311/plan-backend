@@ -1,5 +1,6 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
+using FractionalIndexing;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
@@ -37,6 +38,13 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
             }
         }
 
+        var lastResource = await db
+            .WorkspaceResources.Where(a => a.WorkspaceId == command.WorkspaceId)
+            .OrderByDescending(a => a.Resource.Rank)
+            .Select(a => new { a.Resource.Rank })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+
         var resource = new WorkspaceResource
         {
             WorkspaceId = command.WorkspaceId,
@@ -47,7 +55,10 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
                 Document = !string.IsNullOrEmpty(command.Content)
                     ? new ResourceDocument { Content = command.Content }
                     : null,
-                Files = command.Files?.Select(a => new ResourceFile { Key = a.Key }).ToList() ?? [],
+                Files =
+                    command.Files?.Select(a => new ResourceFile { Key = a.Key, OriginalName = a.OriginalName }).ToList()
+                    ?? [],
+                Rank = OrderKeyGenerator.GenerateKeyBetween(lastResource?.Rank, null),
             },
         };
 
