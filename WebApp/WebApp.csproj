@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.CrtIntegration" />
     <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="EFCore.NamingConventions" />
