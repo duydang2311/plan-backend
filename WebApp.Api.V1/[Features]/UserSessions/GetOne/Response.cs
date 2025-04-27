@@ -7,7 +7,7 @@ namespace WebApp.Api.V1.UserSessions.GetOne;
 public sealed record Response
 {
     public Instant? CreatedTime { get; init; }
-    public SessionToken? Token { get; init; }
+    public SessionId? Token { get; init; }
     public UserId? UserId { get; init; }
     public User? User { get; init; }
 }

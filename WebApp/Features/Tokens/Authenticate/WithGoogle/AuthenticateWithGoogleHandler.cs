@@ -37,13 +37,13 @@ public sealed class AuthenticateWithGoogleHandler(AppDbContext db)
             return ValidationFailures.Single("user", "User has not been registered", "unregistered");
         }
 
-        var session = new UserSession { Token = IdHelper.NewSessionId(), UserId = user.Id };
+        var session = new UserSession { SessionId = IdHelper.NewSessionId(), UserId = user.Id };
         db.Add(session);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
 
         return new AuthenticateResult
         {
-            SessionId = session.Token,
+            SessionId = session.SessionId,
             SessionMaxAge = (int)TimeSpan.FromDays(45).TotalSeconds,
         };
     }

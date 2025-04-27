@@ -1,12 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
 using NodaTime;
@@ -144,7 +141,7 @@ builder.Services.Configure<JsonOptions>(x =>
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
     x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<SessionToken>());
+    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<SessionId, string>());
     x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceMemberId, long>());
     x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
@@ -238,8 +235,8 @@ app.UseFastEndpoints(
             handleNull: true
         );
         config.Binding.ValueParserFor<ProjectId>(EntityGuidJsonConverter<ProjectId>.ValueParser, handleNull: true);
-        config.Binding.ValueParserFor<SessionToken>(
-            EntityGuidJsonConverter<SessionToken>.ValueParser,
+        config.Binding.ValueParserFor<SessionId>(
+            input => EntityIdValueParsers.ParseString(input, static value => new SessionId { Value = value }),
             handleNull: true
         );
         config.Binding.ValueParserFor<WorkspaceMemberId>(

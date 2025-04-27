@@ -14,7 +14,7 @@ public sealed record GetUserSessionByTokenHandler(AppDbContext db) : ICommandHan
 {
     public async Task<Result> ExecuteAsync(GetUserSessionByToken command, CancellationToken ct)
     {
-        var query = db.UserSessions.Where(a => a.Token == command.Token).AsQueryable();
+        var query = db.UserSessions.Where(a => a.SessionId == command.Token).AsQueryable();
 
         if (!string.IsNullOrEmpty(command.Select))
         {

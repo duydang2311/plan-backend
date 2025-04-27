@@ -21,7 +21,8 @@ public class SessionAuthenticationSchemeHandler(
 {
     private const string MissingHeader =
         $"Missing header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}'.";
-    private const string EmptyHeader = $"Header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}' is empty.";
+    private const string EmptyHeader =
+        $"Header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}' is empty.";
     private const string InvalidScheme = "Invalid authorization scheme";
     private const string MissingValue = "Missing session token";
     private const string BadToken = "Bad session token";
@@ -34,7 +35,12 @@ public class SessionAuthenticationSchemeHandler(
             return AuthenticateResult.NoResult();
         }
 
-        if (!Request.Headers.TryGetValue(SessionAuthenticationSchemeOptions.AuthorizationHeaderName, out var headerValue))
+        if (
+            !Request.Headers.TryGetValue(
+                SessionAuthenticationSchemeOptions.AuthorizationHeaderName,
+                out var headerValue
+            )
+        )
         {
             return AuthenticateResult.Fail(MissingHeader);
         }
@@ -57,20 +63,22 @@ public class SessionAuthenticationSchemeHandler(
             return AuthenticateResult.Fail(MissingValue);
         }
 
-        var parseResult = EntityGuidJsonConverter<SessionToken>.ValueParser(id);
+        var parseResult = EntityIdValueParsers.ParseString(id, value => new SessionId { Value = value });
         if (!parseResult.IsSuccess || parseResult.Value is null)
         {
             return AuthenticateResult.Fail(BadToken);
         }
 
+        var value = (SessionId)parseResult.Value;
+
         var userId = await cache
             .GetOrCreateAsync(
-                $"session-{parseResult.Value}",
-                (token: (SessionToken)parseResult.Value, db),
+                $"session-{value}",
+                (token: value, db),
                 static async (state, token) =>
                 {
                     return await state
-                        .db.UserSessions.Where(a => a.Token == state.token)
+                        .db.UserSessions.Where(a => a.SessionId == state.token)
                         .Select(a => a.UserId)
                         .FirstOrDefaultAsync(CancellationToken.None)
                         .ConfigureAwait(false);

@@ -26,7 +26,7 @@ public static class IdHelper
 
     public static IssueId NewIssueId() => new() { Value = NewGuid() };
 
-    public static SessionToken NewSessionId() => new() { Value = NewGuid() };
+    public static SessionId NewSessionId() => new() { Value = NewRandomId() };
 
     public static ProjectId NewProjectId() => new() { Value = NewGuid() };
 }

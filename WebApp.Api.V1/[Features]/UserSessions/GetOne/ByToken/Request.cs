@@ -6,7 +6,7 @@ namespace WebApp.Api.V1.UserSessions.GetOne.ByToken;
 
 public sealed record Request
 {
-    public SessionToken Token { get; init; }
+    public SessionId Token { get; init; }
     public string? Select { get; init; }
 }
 

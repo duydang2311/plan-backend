@@ -45,7 +45,7 @@ public sealed class AuthenticateWithCredentialsHandler(IHasher hasher, AppDbCont
         }
 
         var userRefreshToken = new UserRefreshToken { UserId = user.Id };
-        var session = new UserSession { Token = IdHelper.NewSessionId(), UserId = user.Id };
+        var session = new UserSession { SessionId = IdHelper.NewSessionId(), UserId = user.Id };
 
         dbContext.Add(session);
         dbContext.Add(userRefreshToken);
@@ -53,7 +53,7 @@ public sealed class AuthenticateWithCredentialsHandler(IHasher hasher, AppDbCont
 
         return new AuthenticateResult
         {
-            SessionId = session.Token,
+            SessionId = session.SessionId,
             SessionMaxAge = (int)TimeSpan.FromDays(45).TotalSeconds,
         };
     }

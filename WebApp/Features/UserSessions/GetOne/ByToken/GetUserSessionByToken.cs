@@ -7,6 +7,6 @@ namespace WebApp.Features.UserSessions.GetOne.ByToken;
 
 public sealed record GetUserSessionByToken : ICommand<OneOf<NotFoundError, UserSession>>
 {
-    public required SessionToken Token { get; init; }
+    public required SessionId Token { get; init; }
     public string? Select { get; init; }
 }
