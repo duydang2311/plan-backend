@@ -2,11 +2,11 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.IdentityModel.Tokens;
-using WebApp.Common.Models;
 using WebApp.Hubs.Common;
 using WebApp.Hubs.Features.Chats;
 using WebApp.Hubs.Features.Hubs;
 using WebApp.Hubs.Features.Notifications;
+using WebApp.Infrastructure.Jwts.Common;
 using WebApp.Infrastructure.Nats.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);

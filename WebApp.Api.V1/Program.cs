@@ -17,6 +17,7 @@ using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
+using WebApp.Infrastructure.Jwts.Common;
 using WebApp.Infrastructure.Mails.Abstractions;
 using WebApp.Infrastructure.Messaging;
 using WebApp.Infrastructure.Nats.Abstractions;
@@ -42,11 +43,6 @@ builder
 builder
     .Services.AddOptions<FastEndpointsOptions>()
     .BindConfiguration(FastEndpointsOptions.Section)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-builder
-    .Services.AddOptions<JwtOptions>()
-    .BindConfiguration(JwtOptions.Section)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder
@@ -131,7 +127,8 @@ builder
     .AddAuthorization()
     .AddNATS()
     .AddStorage()
-    .AddCaching();
+    .AddCaching()
+    .AddJwts();
 builder.Services.Configure<JsonOptions>(x =>
 {
     x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

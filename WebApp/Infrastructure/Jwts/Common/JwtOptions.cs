@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WebApp.Common.Models;
+namespace WebApp.Infrastructure.Jwts.Common;
 
 public sealed record class JwtOptions
 {
