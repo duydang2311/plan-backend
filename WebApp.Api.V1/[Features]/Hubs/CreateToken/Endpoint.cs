@@ -8,14 +8,15 @@ using Microsoft.IdentityModel.Tokens;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Api.V1.Hubs.GetToken;
+namespace WebApp.Api.V1.Hubs.CreateToken;
 
 public sealed class Endpoint(IOptions<JwtOptions> jwtOptions) : Endpoint<Request, Ok<Response>>
 {
     public override void Configure()
     {
-        Get("hubs/token");
+        Post("hubs/token");
         Version(1);
+        Description(a => a.ClearDefaultAccepts().Accepts<Request>(true, "*/*"));
     }
 
     public override Task<Ok<Response>> ExecuteAsync(Request req, CancellationToken ct)

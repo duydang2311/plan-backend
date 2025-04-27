@@ -2,7 +2,7 @@ using System.Security.Claims;
 using FastEndpoints;
 using WebApp.Domain.Entities;
 
-namespace WebApp.Api.V1.Hubs.GetToken;
+namespace WebApp.Api.V1.Hubs.CreateToken;
 
 public sealed record Request
 {

@@ -1,4 +1,4 @@
-namespace WebApp.Api.V1.Hubs.GetToken;
+namespace WebApp.Api.V1.Hubs.CreateToken;
 
 public sealed record Response
 {
