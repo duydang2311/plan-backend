@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.IdentityModel.JsonWebTokens;
+using WebApp.Common.Helpers;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Jwts.Common;
 
@@ -24,6 +26,7 @@ public sealed class Endpoint(IJwtService jwtService) : Endpoint<Request, Ok<Resp
                         audience: "coop-cf-worker",
                         claims:
                         [
+                            new Claim(JwtRegisteredClaimNames.Jti, IdHelper.NewRandomId()),
                             new Claim(ClaimTypes.NameIdentifier, req.UserId.ToBase64String()),
                             new Claim("workspaceId", req.WorkspaceId!.Value.ToBase64String()),
                         ],
