@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Common.Helpers;
@@ -7,9 +8,14 @@ public static class IdHelper
 {
     public static Guid NewGuid()
     {
-        Span<byte> guidBytes = stackalloc byte[16];
-        RandomNumberGenerator.Fill(guidBytes);
-        return new Guid(guidBytes);
+        return Guid.NewGuid();
+    }
+
+    public static string NewRandomId()
+    {
+        var bytes = new byte[16];
+        RandomNumberGenerator.Fill(bytes);
+        return Base64UrlTextEncoder.Encode(bytes);
     }
 
     public static UserId NewUserId() => new() { Value = NewGuid() };

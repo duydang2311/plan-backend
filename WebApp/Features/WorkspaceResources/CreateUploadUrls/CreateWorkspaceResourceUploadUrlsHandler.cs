@@ -5,6 +5,7 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using OneOf;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -87,7 +88,7 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
 
         if (string.IsNullOrEmpty(key))
         {
-            return GenerateRandomId();
+            return IdHelper.NewRandomId();
         }
 
         var sb = new StringBuilder();
@@ -121,7 +122,7 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
             {
                 sb.Append('_');
             }
-            sb.Append(GenerateRandomId());
+            sb.Append(IdHelper.NewRandomId());
         }
         else
         {
@@ -130,24 +131,17 @@ public sealed class CreateWorkspaceResourceUploadUrlsHandler(
                 sb.Insert(extensionStart, '_');
                 ++extensionStart;
             }
-            sb.Insert(extensionStart, GenerateRandomId());
+            sb.Insert(extensionStart, IdHelper.NewRandomId());
         }
         var result = sb.ToString();
 
         result = result.Trim(' ', '.', '_', '-');
         if (string.IsNullOrEmpty(result))
         {
-            return GenerateRandomId();
+            return IdHelper.NewRandomId();
         }
 
         return result;
-    }
-
-    static string GenerateRandomId()
-    {
-        var bytes = new byte[16];
-        RandomNumberGenerator.Fill(bytes);
-        return Convert.ToBase64String(bytes).Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 
     static BitArray BuildAllowedCharsLookup(string allowedChars)
