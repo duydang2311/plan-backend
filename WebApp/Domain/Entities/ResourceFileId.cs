@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace WebApp.Domain.Entities;
 
-public readonly struct ResourceFileId : IEntityId<long>
+public readonly record struct ResourceFileId : IEntityId<long>
 {
     public long Value { get; init; }
 
