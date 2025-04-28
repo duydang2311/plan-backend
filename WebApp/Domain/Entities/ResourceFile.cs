@@ -11,4 +11,6 @@ public sealed record ResourceFile
     public Resource Resource { get; init; } = null!;
     public string Key { get; init; } = null!;
     public string OriginalName { get; init; } = null!;
+    public long Size { get; init; }
+    public string MimeType { get; init; } = null!;
 }

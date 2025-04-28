@@ -15,6 +15,8 @@ public sealed class ResourceFileConfiguration : IEntityTypeConfiguration<Resourc
         builder.Property(a => a.ResourceId).HasConversion<EntityIdConverter<ResourceId, long>>().ValueGeneratedNever();
         builder.Property(a => a.Key).HasMaxLength(1024);
         builder.Property(a => a.OriginalName).HasMaxLength(255);
+        builder.Property(a => a.MimeType).HasMaxLength(255);
+        builder.Property(a => a.Size);
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Resource).WithMany(a => a.Files).HasForeignKey(a => a.ResourceId);
