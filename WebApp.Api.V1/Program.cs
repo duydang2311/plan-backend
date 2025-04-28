@@ -10,6 +10,8 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Oakton;
 using Oakton.Resources;
+using Sqids;
+using WebApp.Api.V1.Common;
 using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Common.Models;
@@ -31,6 +33,12 @@ var builder = WebApplication.CreateBuilder(args);
 var persistenceOptions =
     builder.Configuration.GetRequiredSection(PersistenceOptions.Section).Get<PersistenceOptions>()
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
+
+var idEncodingOptions =
+    builder.Configuration.GetRequiredSection(IdEncodingOptions.Section).Get<IdEncodingOptions>()
+    ?? throw new InvalidOperationException("IdEncodingOptions must be configured");
+
+var longEncoder = new SqidsEncoder<long>(new SqidsOptions { MinLength = 6, Alphabet = idEncodingOptions.Alphabet });
 
 builder
     .Services.AddOptions<NatsOptions>()
@@ -126,36 +134,40 @@ builder
     .AddStorage()
     .AddCaching()
     .AddJwts();
-builder.Services.Configure<JsonOptions>(x =>
-{
-    x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-    x.SerializerOptions.Converters.Add(new OrderableArrayJsonConverter());
-    x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<UserId>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<WorkspaceId>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamId>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueId>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueCommentId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamRoleId, int>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamInvitationId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<SessionId, string>());
-    x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceMemberId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<NotificationId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
-    x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ChatId>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ResourceId, long>());
-    x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StoragePendingUploadId, long>());
-    x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
+
+builder.Services.AddSingleton(longEncoder);
+builder.Services.Configure<JsonOptions>(
+    (x) =>
+    {
+        x.SerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        x.SerializerOptions.Converters.Add(new OrderableArrayJsonConverter());
+        x.SerializerOptions.Converters.Add(GuidToBase64JsonConverter.Instance);
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<UserId>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<WorkspaceId>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamId>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueId>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<IssueCommentId>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<TeamRoleId, int>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<TeamInvitationId>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StatusId, long>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<RefreshToken>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ProjectId>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<SessionId, string>());
+        x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceMemberId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<NotificationId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
+        x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ChatId>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
+        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StoragePendingUploadId, long>());
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceId>(longEncoder));
+        x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    }
+);
 builder.Services.AddJobQueues<JobRecord, JobStorageProvider>();
 builder.Services.AddFastEndpoints(
     (options) =>
@@ -274,7 +286,12 @@ app.UseFastEndpoints(
             handleNull: true
         );
         config.Binding.ValueParserFor<ResourceId>(
-            input => EntityIdValueParsers.ParseLong(input, static value => new ResourceId { Value = value }),
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    app.Services.GetRequiredService<SqidsEncoder<long>>(),
+                    input,
+                    static value => new ResourceId { Value = value }
+                ),
             handleNull: true
         );
         config.Binding.ValueParserFor<StoragePendingUploadId>(
