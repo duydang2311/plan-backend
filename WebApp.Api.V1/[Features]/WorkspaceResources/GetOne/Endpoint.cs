@@ -12,6 +12,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
     {
         Get("workspace-resources/{Id}");
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Results> ExecuteAsync(Request request, CancellationToken ct)

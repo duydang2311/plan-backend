@@ -2,22 +2,22 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebApp.Api.V1.WorkspaceResources.GetMany;
+namespace WebApp.Api.V1.WorkspaceResources.Delete;
 
-using Results = Results<ForbidHttpResult, Ok<Response>>;
+using Results = Results<ForbidHttpResult, NotFound, NoContent>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Get("workspaces/{WorkspaceId}/resources");
+        Delete("workspace-resources/{Id}");
         Version(1);
         PreProcessor<Authorize>();
     }
 
     public override async Task<Results> ExecuteAsync(Request request, CancellationToken ct)
     {
-        var list = await request.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
-        return TypedResults.Ok(list.ToResponse());
+        var oneOf = await request.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
+        return oneOf.Match<Results>(notFoundError => TypedResults.NotFound(), success => TypedResults.NoContent());
     }
 }
