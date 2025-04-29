@@ -21,9 +21,11 @@ public record Request
 
 public sealed record RequestResourceFile
 {
+    public StoragePendingUploadId? PendingUploadId { get; init; }
     public string? Key { get; init; }
     public string? OriginalName { get; init; }
-    public StoragePendingUploadId? PendingUploadId { get; init; }
+    public long? Size { get; init; }
+    public string? MimeType { get; init; }
 }
 
 public sealed class RequestValidator : Validator<Request>
@@ -41,6 +43,8 @@ public sealed class RequestValidator : Validator<Request>
                     {
                         file.RuleFor(a => a.Key).NotEmpty().WithErrorCode("required");
                         file.RuleFor(a => a.OriginalName).NotEmpty().WithErrorCode("required");
+                        file.RuleFor(a => a.Size).NotNull().WithErrorCode("required");
+                        file.RuleFor(a => a.MimeType).NotEmpty().WithErrorCode("required");
                     });
             }
         );

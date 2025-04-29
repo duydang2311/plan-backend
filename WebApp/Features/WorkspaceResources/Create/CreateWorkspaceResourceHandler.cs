@@ -56,8 +56,15 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
                     ? new ResourceDocument { Content = command.Content }
                     : null,
                 Files =
-                    command.Files?.Select(a => new ResourceFile { Key = a.Key, OriginalName = a.OriginalName }).ToList()
-                    ?? [],
+                    command
+                        .Files?.Select(a => new ResourceFile
+                        {
+                            Key = a.Key,
+                            OriginalName = a.OriginalName,
+                            Size = a.Size,
+                            MimeType = a.MimeType,
+                        })
+                        .ToList() ?? [],
                 Rank = OrderKeyGenerator.GenerateKeyBetween(lastResource?.Rank, null),
             },
         };
