@@ -20,4 +20,9 @@ public sealed class R2StorageService(IAmazonS3 s3, IOptions<R2Options> r2Options
             }
         );
     }
+
+    public Task DeleteAsync(string key, CancellationToken ct = default)
+    {
+        return s3.DeleteObjectAsync(new DeleteObjectRequest { BucketName = r2Options.Value.BucketName, Key = key }, ct);
+    }
 }

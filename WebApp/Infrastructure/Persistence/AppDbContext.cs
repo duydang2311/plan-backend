@@ -40,6 +40,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<WorkspaceResource> WorkspaceResources => Set<WorkspaceResource>();
     public DbSet<ProjectResource> ProjectResources => Set<ProjectResource>();
     public DbSet<StoragePendingUpload> StoragePendingUploads => Set<StoragePendingUpload>();
+    public DbSet<ResourceFile> ResourceFiles => Set<ResourceFile>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
