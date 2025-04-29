@@ -81,4 +81,8 @@ public static partial class DtoMapper
 
     public static ICollection<BaseResourceFileDto>? ResourceFilesToDto(ICollection<ResourceFile> resourceFiles) =>
         ResourceFilesToDtoInternal(resourceFiles);
+
+    public static partial IReadOnlyCollection<BaseResourceFileDto> ResourceFilesToDto(
+        IReadOnlyCollection<ResourceFile> resourceFiles
+    );
 }
