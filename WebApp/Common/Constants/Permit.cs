@@ -48,7 +48,8 @@ public static class Permit
     public const string DeleteProjectMemberInvitation = "project-member-invitation:delete";
     public const string CreateProjectMemberInvitation = "project-member-invitation:create";
 
-    public const string ReadWorkspaceResource = "workspace-resource:read";
     public const string CreateWorkspaceResource = "workspace-resource:create";
+    public const string ReadWorkspaceResource = "workspace-resource:read";
+    public const string UpdateWorkspaceResource = "workspace-resource:update";
     public const string DeleteWorkspaceResource = "workspace-resource:delete";
 }
