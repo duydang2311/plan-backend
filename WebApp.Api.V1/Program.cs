@@ -165,6 +165,7 @@ builder.Services.Configure<JsonOptions>(
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StoragePendingUploadId, long>());
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceId>(longEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceFileId>(longEncoder));
         x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     }
 );
@@ -291,6 +292,15 @@ app.UseFastEndpoints(
                     app.Services.GetRequiredService<SqidsEncoder<long>>(),
                     input,
                     static value => new ResourceId { Value = value }
+                ),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ResourceFileId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    app.Services.GetRequiredService<SqidsEncoder<long>>(),
+                    input,
+                    static value => new ResourceFileId { Value = value }
                 ),
             handleNull: true
         );
