@@ -13,4 +13,6 @@ public sealed record Resource
     public string Rank { get; init; } = null!;
     public ResourceDocument? Document { get; init; }
     public ICollection<ResourceFile> Files { get; init; } = null!;
+    public WorkspaceResource? WorkspaceResource { get; init; }
+    public ProjectResource? ProjectResource { get; init; }
 }
