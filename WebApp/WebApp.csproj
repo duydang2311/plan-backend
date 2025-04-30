@@ -17,6 +17,7 @@
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="FractionalIndexing" />
     <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" />

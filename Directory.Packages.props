@@ -10,6 +10,7 @@
     <PackageVersion Include="CloudinaryDotNet" Version="1.27.5" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="4.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables.Abstractions" Version="4.0.0" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.12.1" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.4.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.4.0" />

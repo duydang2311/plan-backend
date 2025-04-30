@@ -13,6 +13,7 @@ public sealed class ResourceDocumentConfiguration : IEntityTypeConfiguration<Res
         builder.Property(a => a.UpdatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.ResourceId).HasConversion<EntityIdConverter<ResourceId, long>>().ValueGeneratedNever();
         builder.Property(a => a.Content);
+        builder.Property(a => a.PreviewContent).HasMaxLength(256);
 
         builder.HasKey(a => a.ResourceId);
         builder.HasOne(a => a.Resource).WithOne(a => a.Document).HasForeignKey<ResourceDocument>(a => a.ResourceId);

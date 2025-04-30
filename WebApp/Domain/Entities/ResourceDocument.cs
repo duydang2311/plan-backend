@@ -9,4 +9,5 @@ public sealed record ResourceDocument
     public ResourceId ResourceId { get; init; }
     public Resource Resource { get; init; } = null!;
     public string Content { get; init; } = null!;
+    public string? PreviewContent { get; init; }
 }

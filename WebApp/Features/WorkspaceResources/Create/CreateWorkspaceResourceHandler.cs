@@ -4,6 +4,7 @@ using FractionalIndexing;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
+using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -45,6 +46,13 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
 
+        var previewContent = !string.IsNullOrEmpty(command.Content)
+            ? HtmlHelper.ConvertToPlainText(command.Content, 256)
+            : null;
+        if (previewContent != null && previewContent.Length >= 256)
+        {
+            previewContent = previewContent[..256];
+        }
         var resource = new WorkspaceResource
         {
             WorkspaceId = command.WorkspaceId,
@@ -53,7 +61,7 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
                 CreatorId = command.CreatorId,
                 Name = command.Name,
                 Document = !string.IsNullOrEmpty(command.Content)
-                    ? new ResourceDocument { Content = command.Content }
+                    ? new ResourceDocument { Content = command.Content, PreviewContent = previewContent }
                     : null,
                 Files =
                     command
