@@ -1,8 +1,10 @@
+using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -20,6 +22,7 @@ public sealed record AcceptProjectMemberInvitationHandler(AppDbContext db)
             .ProjectMemberInvitations.Where(a => a.Id == command.ProjectMemberInvitationId)
             .Select(a => new
             {
+                a.Project.WorkspaceId,
                 a.ProjectId,
                 a.UserId,
                 a.RoleId,
@@ -46,6 +49,21 @@ public sealed record AcceptProjectMemberInvitationHandler(AppDbContext db)
             }
         );
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
+
+        db.Add(
+            new WorkspaceMember
+            {
+                WorkspaceId = invitation.WorkspaceId,
+                UserId = invitation.UserId,
+                RoleId = WorkspaceRoleDefaults.Guest.Id,
+            }
+        );
+        try
+        {
+            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        }
+        catch (UniqueConstraintException) { }
+
         return new Success();
     }
 }
