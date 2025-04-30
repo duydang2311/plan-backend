@@ -18,20 +18,23 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
         var db = context.HttpContext.Resolve<AppDbContext>();
         var workspaceResource = await db
             .WorkspaceResources.Where(a => a.ResourceId == context.Request.Id)
-            .Select(a => new { a.WorkspaceId })
+            .Select(a => new { a.WorkspaceId, a.Resource.CreatorId })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
 
         var canRead =
             workspaceResource is not null
-            && await permissionCache
-                .HasWorkspacePermissionAsync(
-                    workspaceResource.WorkspaceId,
-                    context.Request.UserId,
-                    Permit.DeleteWorkspaceResource,
-                    ct
-                )
-                .ConfigureAwait(false);
+            && (
+                workspaceResource.CreatorId == context.Request.RequestingUserId
+                || await permissionCache
+                    .HasWorkspacePermissionAsync(
+                        workspaceResource.WorkspaceId,
+                        context.Request.RequestingUserId,
+                        Permit.DeleteWorkspaceResource,
+                        ct
+                    )
+                    .ConfigureAwait(false)
+            );
         if (!canRead)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);

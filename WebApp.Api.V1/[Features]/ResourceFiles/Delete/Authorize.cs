@@ -27,13 +27,15 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
                 ProjectId = a.Resource.ProjectResource == null
                     ? null
                     : (ProjectId?)a.Resource.ProjectResource.ProjectId,
+                CreatorId = a.Resource.CreatorId,
             })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
         var canDelete =
             resourceFile is not null
             && (
-                (
+                resourceFile.CreatorId == context.Request.RequestingUserId
+                || (
                     resourceFile.WorkspaceId.HasValue
                     && await permissionCache
                         .HasWorkspacePermissionAsync(
