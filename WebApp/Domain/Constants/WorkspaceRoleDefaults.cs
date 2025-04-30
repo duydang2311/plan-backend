@@ -47,6 +47,7 @@ public sealed record WorkspaceRoleDefaults
             Permit.DeleteProjectMemberInvitation,
             Permit.UpdateWorkspaceStatus,
             Permit.DeleteWorkspaceStatus,
+            Permit.UpdateWorkspaceResource,
             Permit.DeleteWorkspaceResource,
         ]
     );
