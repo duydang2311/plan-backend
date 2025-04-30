@@ -3,7 +3,7 @@ using FastEndpoints;
 using Riok.Mapperly.Abstractions;
 using WebApp.Api.V1.Common.Dtos;
 using WebApp.Domain.Entities;
-using WebApp.Features.WorkspaceResources.Delete;
+using WebApp.Features.Resources.Delete;
 
 namespace WebApp.Api.V1.WorkspaceResources.Delete;
 
@@ -19,5 +19,5 @@ public sealed record Request
 [UseStaticMapper(typeof(DtoMapper))]
 public static partial class RequestMapper
 {
-    public static partial DeleteWorkspaceResource ToCommand(this Request request);
+    public static partial DeleteResource ToCommand(this Request request);
 }
