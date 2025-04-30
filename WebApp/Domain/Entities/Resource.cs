@@ -1,3 +1,4 @@
+using EntityFrameworkCore.Projectables;
 using NodaTime;
 
 namespace WebApp.Domain.Entities;
@@ -15,4 +16,14 @@ public sealed record Resource
     public ICollection<ResourceFile> Files { get; init; } = null!;
     public WorkspaceResource? WorkspaceResource { get; init; }
     public ProjectResource? ProjectResource { get; init; }
+
+    [Projectable(UseMemberBody = nameof(previewFileCount))]
+    public int PreviewFileCount { get; init; }
+
+    [Projectable(UseMemberBody = nameof(previewFileMimeTypes))]
+    public IReadOnlyCollection<string> PreviewFileMimeTypes { get; init; } = null!;
+
+    private int previewFileCount => Files.Count;
+    private IReadOnlyCollection<string> previewFileMimeTypes =>
+        Files.OrderByDescending(a => a.Id).Select(a => a.MimeType).Distinct().Take(5).ToList();
 }

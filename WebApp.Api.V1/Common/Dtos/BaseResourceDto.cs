@@ -14,4 +14,7 @@ public record BaseResourceDto
     public string? Rank { get; init; }
     public BaseResourceDocumentDto? Document { get; init; }
     public ICollection<BaseResourceFileDto>? Files { get; init; }
+
+    public int? PreviewFileCount { get; init; }
+    public IReadOnlyCollection<string>? PreviewFileMimeTypes { get; init; }
 }

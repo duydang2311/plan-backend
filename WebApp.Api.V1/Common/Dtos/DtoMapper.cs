@@ -85,4 +85,12 @@ public static partial class DtoMapper
     public static partial IReadOnlyCollection<BaseResourceFileDto> ResourceFilesToDto(
         IReadOnlyCollection<ResourceFile> resourceFiles
     );
+
+    private static partial IReadOnlyCollection<string>? ResourceFileMimeTypesToDtoInternal(
+        IReadOnlyCollection<string>? resourceFileMimeTypes
+    );
+
+    public static IReadOnlyCollection<string>? ResourceFileMimeTypesToDto(
+        IReadOnlyCollection<string> resourceFileMimeTypes
+    ) => ResourceFileMimeTypesToDtoInternal(resourceFileMimeTypes);
 }
