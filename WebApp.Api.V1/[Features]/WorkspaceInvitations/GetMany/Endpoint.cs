@@ -9,6 +9,7 @@ public sealed class Endpoint : Endpoint<Request, Ok<Response>>
     {
         Get("workspace-invitations");
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Ok<Response>> ExecuteAsync(Request req, CancellationToken ct)

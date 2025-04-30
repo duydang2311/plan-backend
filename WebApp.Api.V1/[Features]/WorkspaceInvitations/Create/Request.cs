@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
 using Riok.Mapperly.Abstractions;
@@ -10,6 +11,9 @@ public sealed record Request
 {
     public WorkspaceId WorkspaceId { get; init; }
     public UserId? UserId { get; init; }
+
+    [FromClaim(ClaimTypes.NameIdentifier)]
+    public UserId RequestingUserId { get; init; }
 }
 
 public sealed class RequestValidator : Validator<Request>
@@ -20,7 +24,7 @@ public sealed class RequestValidator : Validator<Request>
     }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
     public static partial CreateWorkspaceInvitation ToCommand(this Request request);

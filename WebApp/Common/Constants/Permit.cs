@@ -62,4 +62,9 @@ public static class Permit
     public const string ReadProjectResourceFile = "project-resource-file:read";
     public const string UpdateProjectResourceFile = "project-resource-file:update";
     public const string DeleteProjectResourceFile = "project-resource-file:delete";
+
+    public const string CreateWorkspaceInvitation = "workspace-invitation:create";
+    public const string ReadWorkspaceInvitation = "workspace-invitation:read";
+    public const string UpdateWorkspaceInvitation = "workspace-invitation:update";
+    public const string DeleteWorkspaceInvitation = "workspace-invitation:delete";
 }

@@ -4,7 +4,7 @@ using WebApp.Common.Constants;
 using WebApp.Infrastructure.Caching.Common;
 using WebApp.Infrastructure.Persistence;
 
-namespace WebApp.Api.V1.WorkspaceInvitations.GetOne;
+namespace WebApp.Api.V1.WorkspaceInvitations.Delete;
 
 public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<Request>
 {
@@ -18,24 +18,20 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
         var db = context.HttpContext.Resolve<AppDbContext>();
         var workspaceInvitation = await db
             .WorkspaceInvitations.Where(a => a.Id == context.Request.Id)
-            .Select(a => new { a.WorkspaceId, a.UserId })
+            .Select(a => new { a.WorkspaceId })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
-        var canRead =
+        var canDelete =
             workspaceInvitation is not null
-            && (
-                workspaceInvitation.UserId == context.Request.RequestingUserId
-                || await permissionCache
-                    .HasWorkspacePermissionAsync(
-                        workspaceInvitation.WorkspaceId,
-                        context.Request.RequestingUserId,
-                        Permit.ReadWorkspaceInvitation,
-                        ct
-                    )
-                    .ConfigureAwait(false)
-            );
-
-        if (!canRead)
+            && await permissionCache
+                .HasWorkspacePermissionAsync(
+                    workspaceInvitation.WorkspaceId,
+                    context.Request.RequestingUserId,
+                    Permit.CreateWorkspaceInvitation,
+                    ct
+                )
+                .ConfigureAwait(false);
+        if (!canDelete)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
         }
