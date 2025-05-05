@@ -30,6 +30,7 @@ public sealed record WorkspaceRoleDefaults
             Permit.ReadProjectMemberInvitation,
             Permit.ReadWorkspaceResource,
             Permit.CreateWorkspaceResource,
+            Permit.ReadWorkspaceInvitation,
         ]
     );
     public static readonly WorkspaceRoleDefaults Manager = new(
@@ -49,6 +50,9 @@ public sealed record WorkspaceRoleDefaults
             Permit.DeleteWorkspaceStatus,
             Permit.UpdateWorkspaceResource,
             Permit.DeleteWorkspaceResource,
+            Permit.CreateWorkspaceInvitation,
+            Permit.UpdateWorkspaceInvitation,
+            Permit.DeleteWorkspaceInvitation,
         ]
     );
     public static readonly WorkspaceRoleDefaults Admin = new(

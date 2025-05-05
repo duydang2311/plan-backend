@@ -26,7 +26,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" />
-    <PackageReference Include="Sqids" />
   </ItemGroup>
 
   <ItemGroup>

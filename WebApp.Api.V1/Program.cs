@@ -4,16 +4,16 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using JasperFx.Core;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Oakton;
 using Oakton.Resources;
-using Sqids;
-using WebApp.Api.V1.Common;
 using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
+using WebApp.Common.IdEncoding;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Jwts.Common;
@@ -35,10 +35,10 @@ var persistenceOptions =
     ?? throw new InvalidOperationException("PersistenceOptions must be configured");
 
 var idEncodingOptions =
-    builder.Configuration.GetRequiredSection(IdEncodingOptions.Section).Get<IdEncodingOptions>()
-    ?? throw new InvalidOperationException("IdEncodingOptions must be configured");
+    builder.Configuration.GetRequiredSection(IdEncoderOptions.Section).Get<IdEncoderOptions>()
+    ?? throw new InvalidOperationException("IdEncoderOptions must be configured");
 
-var longEncoder = new SqidsEncoder<long>(new SqidsOptions { MinLength = 6, Alphabet = idEncodingOptions.Alphabet });
+var idEncoder = new SqidsEncoder(Options.Create(idEncodingOptions));
 
 builder
     .Services.AddOptions<NatsOptions>()
@@ -126,7 +126,8 @@ builder
 // });
 
 builder
-    .Services.AddPersistence()
+    .Services.AddCommon()
+    .AddPersistence()
     .AddHashers()
     .AddMails()
     .AddAuthorization()
@@ -135,7 +136,6 @@ builder
     .AddCaching()
     .AddJwts();
 
-builder.Services.AddSingleton(longEncoder);
 builder.Services.Configure<JsonOptions>(
     (x) =>
     {
@@ -155,17 +155,17 @@ builder.Services.Configure<JsonOptions>(
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<SessionId, string>());
         x.SerializerOptions.Converters.Add(new PatchableJsonConverter());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceMemberId, long>());
-        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<WorkspaceInvitationId, long>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<RoleId, int>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberId, long>());
-        x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ProjectMemberInvitationId, long>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<NotificationId, long>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<UserNotificationId, long>());
         x.SerializerOptions.Converters.Add(new EntityGuidJsonConverter<ChatId>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<ChatMessageId, long>());
         x.SerializerOptions.Converters.Add(new EntityIdJsonConverter<StoragePendingUploadId, long>());
-        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceId>(longEncoder));
-        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceFileId>(longEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceFileId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<WorkspaceInvitationId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ProjectMemberInvitationId>(idEncoder));
         x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     }
 );
@@ -209,6 +209,7 @@ app.UseAuthorization();
 app.UseFastEndpoints(
     (config) =>
     {
+        var idEncoder = app.Services.GetRequiredService<IIdEncoder>();
         config.Endpoints.RoutePrefix = "api";
         config.Versioning.Prefix = "v";
         config.Versioning.PrependToRoute = false;
@@ -256,21 +257,12 @@ app.UseFastEndpoints(
             input => EntityIdValueParsers.ParseLong(input, static value => new WorkspaceMemberId { Value = value }),
             handleNull: true
         );
-        config.Binding.ValueParserFor<WorkspaceInvitationId>(
-            input => EntityIdValueParsers.ParseLong(input, static value => new WorkspaceInvitationId { Value = value }),
-            handleNull: true
-        );
         config.Binding.ValueParserFor<RoleId>(
             input => EntityIdValueParsers.ParseInt(input, static value => new RoleId { Value = value }),
             handleNull: true
         );
         config.Binding.ValueParserFor<ProjectMemberId>(
             input => EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberId { Value = value }),
-            handleNull: true
-        );
-        config.Binding.ValueParserFor<ProjectMemberInvitationId>(
-            input =>
-                EntityIdValueParsers.ParseLong(input, static value => new ProjectMemberInvitationId { Value = value }),
             handleNull: true
         );
         config.Binding.ValueParserFor<NotificationId>(
@@ -289,7 +281,7 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<ResourceId>(
             input =>
                 EncodedEntityIdValueParsers.ParseLong(
-                    app.Services.GetRequiredService<SqidsEncoder<long>>(),
+                    idEncoder,
                     input,
                     static value => new ResourceId { Value = value }
                 ),
@@ -298,7 +290,7 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<ResourceFileId>(
             input =>
                 EncodedEntityIdValueParsers.ParseLong(
-                    app.Services.GetRequiredService<SqidsEncoder<long>>(),
+                    idEncoder,
                     input,
                     static value => new ResourceFileId { Value = value }
                 ),
@@ -307,6 +299,24 @@ app.UseFastEndpoints(
         config.Binding.ValueParserFor<StoragePendingUploadId>(
             input =>
                 EntityIdValueParsers.ParseLong(input, static value => new StoragePendingUploadId { Value = value }),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<WorkspaceInvitationId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    idEncoder,
+                    input,
+                    static value => new WorkspaceInvitationId { Value = value }
+                ),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ProjectMemberInvitationId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    idEncoder,
+                    input,
+                    static value => new ProjectMemberInvitationId { Value = value }
+                ),
             handleNull: true
         );
     }
