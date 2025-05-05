@@ -1,5 +1,6 @@
 using System.Text.Json;
 using NATS.Client.Core;
+using WebApp.Common.IdEncoding;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Messaging.Common;
@@ -12,6 +13,7 @@ public static class WorkspaceMemberInvitedHandler
         WorkspaceMemberInvitedUserNotified notified,
         INatsClient natsClient,
         ILogger logger,
+        IIdEncoder idEncoder,
         CancellationToken ct
     )
     {
@@ -26,7 +28,7 @@ public static class WorkspaceMemberInvitedHandler
                             notified.UserId.ToBase64String(),
                             notified.UserNotificationId.Value,
                             notified.Type,
-                            notified.WorkspaceInvitationId.Value,
+                            idEncoder.Encode(notified.WorkspaceInvitationId.Value),
                             notified.WorkspacePath,
                             notified.WorkspaceName
                         ),

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using NATS.Client.Core;
+using WebApp.Common.IdEncoding;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Messaging.Common;
@@ -11,6 +12,7 @@ public static class ProjectMemberInvitedHandler
     public static async Task HandleAsync(
         ProjectMemberInvitedUserNotified notified,
         INatsClient natsClient,
+        IIdEncoder idEncoder,
         ILogger logger,
         CancellationToken ct
     )
@@ -26,7 +28,7 @@ public static class ProjectMemberInvitedHandler
                             notified.UserId.ToBase64String(),
                             notified.UserNotificationId.Value,
                             notified.Type,
-                            notified.ProjectMemberInvitationId.Value,
+                            idEncoder.Encode(notified.ProjectMemberInvitationId.Value),
                             notified.ProjectIdentifier,
                             notified.ProjectName
                         ),

@@ -6,7 +6,7 @@ public sealed record ProjectMemberInvitedEvent(
     string UserId,
     long UserNotificationId,
     NotificationType Type,
-    long ProjectMemberInvitationId,
+    string ProjectMemberInvitationId,
     string ProjectIdentifier,
     string ProjectName
 ) { }

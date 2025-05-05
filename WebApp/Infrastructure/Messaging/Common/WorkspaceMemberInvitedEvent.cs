@@ -6,7 +6,7 @@ public sealed record WorkspaceMemberInvitedEvent(
     string UserId,
     long UserNotificationId,
     NotificationType Type,
-    long WorkspaceInvitationId,
+    string WorkspaceInvitationId,
     string WorkspacePath,
     string WorkspaceName
 ) { }
