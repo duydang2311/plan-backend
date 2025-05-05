@@ -21,6 +21,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
         Post("project-member-invitations");
         Version(1);
         PreProcessor<Authorize>();
+        Description(a => a.ClearDefaultAccepts().Accepts<Request>(isOptional: true, "*/*"));
     }
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)
