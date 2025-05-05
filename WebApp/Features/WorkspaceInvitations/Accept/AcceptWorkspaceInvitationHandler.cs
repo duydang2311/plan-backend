@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -38,7 +39,12 @@ public sealed record AcceptWorkspaceInvitationHandler(AppDbContext db, ILogger<A
             return new NotFoundError();
         }
 
-        var workspaceMember = new WorkspaceMember { UserId = invitation.UserId, WorkspaceId = invitation.WorkspaceId };
+        var workspaceMember = new WorkspaceMember
+        {
+            UserId = invitation.UserId,
+            WorkspaceId = invitation.WorkspaceId,
+            RoleId = WorkspaceRoleDefaults.Member.Id,
+        };
         db.Add(workspaceMember);
         try
         {
