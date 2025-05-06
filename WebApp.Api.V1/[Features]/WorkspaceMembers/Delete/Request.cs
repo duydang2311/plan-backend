@@ -11,12 +11,11 @@ public sealed record Request
     public WorkspaceMemberId Id { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
-    public UserId UserId { get; init; }
+    public UserId RequestingUserId { get; init; }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
-    [MapperIgnoreSource(nameof(Request.UserId))]
     public static partial DeleteWorkspaceMember ToCommand(this Request request);
 }

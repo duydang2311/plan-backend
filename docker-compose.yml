@@ -32,7 +32,7 @@ services:
       context: ../plan-go-mailer
       dockerfile: Dockerfile
     env_file:
-      - .env.docker-compose
+      - ../plan-go-mailer/.env
     depends_on:
       - nats
     networks:

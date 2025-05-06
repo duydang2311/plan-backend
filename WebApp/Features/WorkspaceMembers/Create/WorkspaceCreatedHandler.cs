@@ -14,7 +14,7 @@ public sealed class WorkspaceCreatedHandler : IEventHandler<WorkspaceCreated>
         db.Add(
             new WorkspaceMember
             {
-                RoleId = WorkspaceRoleDefaults.Admin.Id,
+                RoleId = WorkspaceRoleDefaults.Owner.Id,
                 UserId = eventModel.UserId,
                 WorkspaceId = eventModel.Workspace.Id
             }

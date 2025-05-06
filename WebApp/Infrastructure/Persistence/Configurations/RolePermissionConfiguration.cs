@@ -9,11 +9,11 @@ public sealed class RolePermissionConfiguration : IEntityTypeConfiguration<RoleP
     public void Configure(EntityTypeBuilder<RolePermission> builder)
     {
         builder.ToTable("role_permissions");
-        builder.Property(x => x.RoleId).HasConversion<EntityIdConverter<RoleId, int>>().ValueGeneratedNever();
+        builder.Property(a => a.RoleId).HasConversion<EntityIdConverter<RoleId, int>>().ValueGeneratedNever();
 
-        builder.HasKey(x => new { x.RoleId, x.Permission });
-        builder.HasIndex(x => x.RoleId);
+        builder.HasKey(a => new { a.RoleId, a.Permission });
+        builder.HasIndex(a => a.RoleId);
 
-        builder.HasOne<Role>().WithMany(x => x.Permissions).HasForeignKey(x => x.RoleId);
+        builder.HasOne<Role>().WithMany(a => a.Permissions).HasForeignKey(a => a.RoleId);
     }
 }

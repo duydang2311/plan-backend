@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using WebApp.Common.Constants;
 using WebApp.Domain.Entities;
+using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Domain.Constants;
 
@@ -7,28 +9,33 @@ public sealed record ProjectRoleDefaults
 {
     public RoleId Id { get; }
     public string Name { get; }
+    public int Rank { get; }
     public string[] Permissions { get; }
 
-    private ProjectRoleDefaults(RoleId id, string name, string[] permissions)
+    private ProjectRoleDefaults(RoleId id, string name, int rank, string[] permissions)
     {
         Id = id;
         Name = name;
+        Rank = rank;
         Permissions = permissions;
     }
 
     public static readonly ProjectRoleDefaults Guest = new(
-        new RoleId { Value = 2100 },
+        RoleId.From(15),
         "Guest",
+        400,
         [Permit.ReadIssue, Permit.ReadIssueAudit, Permit.ReadProjectMember]
     );
     public static readonly ProjectRoleDefaults Member = new(
-        new RoleId { Value = 2200 },
+        RoleId.From(14),
         "Member",
+        300,
         [.. Guest.Permissions, Permit.CreateIssue, Permit.ReadProjectMemberInvitation]
     );
     public static readonly ProjectRoleDefaults Manager = new(
-        new RoleId { Value = 2300 },
+        RoleId.From(13),
         "Manager",
+        200,
         [
             .. Member.Permissions,
             Permit.DeleteProjectMember,
@@ -38,10 +45,79 @@ public sealed record ProjectRoleDefaults
         ]
     );
     public static readonly ProjectRoleDefaults Admin = new(
-        new RoleId { Value = 2400 },
+        RoleId.From(12),
         "Administrator",
+        100,
         [.. Manager.Permissions]
     );
+    public static readonly ProjectRoleDefaults Owner = new(RoleId.From(11), "Owner", 0, [.. Manager.Permissions]);
 
-    public static readonly ProjectRoleDefaults[] Roles = [Guest, Member, Manager, Admin];
+    public static readonly ProjectRoleDefaults[] Roles = [Guest, Member, Manager, Admin, Owner];
+
+    public static async Task SeedAsync(AppDbContext db, CancellationToken ct)
+    {
+        var roleIds = Roles.Select(a => a.Id).ToArray();
+        var existingRoles = await db
+            .Roles.Where(a => roleIds.Contains(a.Id))
+            .Select(a => a.Id)
+            .ToArrayAsync(ct)
+            .ConfigureAwait(false);
+        var newRoles = Roles.Where(a => !existingRoles.Contains(a.Id)).ToArray();
+        var shouldSave = false;
+
+        if (newRoles.Length > 0)
+        {
+            await db
+                .Roles.AddRangeAsync(
+                    newRoles.Select(a => new Role
+                    {
+                        Id = a.Id,
+                        Name = a.Name,
+                        Rank = a.Rank,
+                        Permissions = [.. a.Permissions.Select(b => new RolePermission { Permission = b })],
+                    }),
+                    ct
+                )
+                .ConfigureAwait(false);
+            shouldSave = true;
+        }
+
+        // for roles that are already in database, check which permissions are missing and add them
+        var existingRolePermissions = await db
+            .Roles.Where(a => roleIds.Contains(a.Id))
+            .Select(a => new { a.Id, Permissions = a.Permissions.Select(b => b.Permission) })
+            .ToArrayAsync(ct)
+            .ConfigureAwait(false);
+        if (existingRolePermissions.Length > 0)
+        {
+            // add which permission in permissions array is missing in the database
+            var missingPermissions = Roles
+                .Select(a => new
+                {
+                    a.Id,
+                    MissingPermissions = a.Permissions.Except(
+                        existingRolePermissions.First(b => b.Id == a.Id).Permissions
+                    ),
+                })
+                .Where(a => a.MissingPermissions.Any())
+                .ToArray();
+            foreach (var role in missingPermissions)
+            {
+                var dbRole = await db
+                    .Roles.Include(a => a.Permissions)
+                    .FirstAsync(a => a.Id == role.Id, ct)
+                    .ConfigureAwait(false);
+                foreach (var permission in role.MissingPermissions)
+                {
+                    dbRole.Permissions.Add(new RolePermission { Permission = permission });
+                }
+                shouldSave = true;
+            }
+        }
+
+        if (shouldSave)
+        {
+            await db.SaveChangesAsync(ct).ConfigureAwait(false);
+        }
+    }
 }

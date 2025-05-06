@@ -81,23 +81,6 @@ namespace WebApp.Host.Migrations
                 principalColumn: "id",
                 onDelete: ReferentialAction.Cascade
             );
-
-            foreach (var role in ProjectRoleDefaults.Roles)
-            {
-                migrationBuilder.InsertData(
-                    table: "roles",
-                    columns: ["id", "name"],
-                    values: [role.Id.Value, role.Name]
-                );
-                foreach (var permission in role.Permissions)
-                {
-                    migrationBuilder.InsertData(
-                        table: "role_permissions",
-                        columns: ["role_id", "permission"],
-                        values: [role.Id, permission]
-                    );
-                }
-            }
         }
 
         /// <inheritdoc />

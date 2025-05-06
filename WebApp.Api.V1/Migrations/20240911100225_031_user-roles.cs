@@ -103,40 +103,6 @@ namespace WebApp.Host.Migrations
                 table: "user_roles",
                 column: "workspace_id"
             );
-
-            foreach (var role in TeamRoleDefaults.Roles)
-            {
-                migrationBuilder.InsertData(
-                    table: "roles",
-                    columns: ["id", "name"],
-                    values: [role.Id.Value, role.Name]
-                );
-                foreach (var permission in role.Permissions)
-                {
-                    migrationBuilder.InsertData(
-                        table: "role_permissions",
-                        columns: ["role_id", "permission"],
-                        values: [role.Id, permission]
-                    );
-                }
-            }
-
-            foreach (var role in WorkspaceRoleDefaults.Roles)
-            {
-                migrationBuilder.InsertData(
-                    table: "roles",
-                    columns: ["id", "name"],
-                    values: [role.Id.Value, role.Name]
-                );
-                foreach (var permission in role.Permissions)
-                {
-                    migrationBuilder.InsertData(
-                        table: "role_permissions",
-                        columns: ["role_id", "permission"],
-                        values: [role.Id, permission]
-                    );
-                }
-            }
         }
 
         /// <inheritdoc />

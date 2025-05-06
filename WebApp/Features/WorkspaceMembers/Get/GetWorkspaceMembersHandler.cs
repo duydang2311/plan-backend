@@ -23,8 +23,10 @@ public sealed class GetWorkspaceMembersHandler(AppDbContext db) : ICommandHandle
         var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
 
         query = command
-            .Order.Where(static x => x.Name.EqualsEither(["User.Email"], StringComparison.OrdinalIgnoreCase))
-            .SortOrDefault(query);
+            .Order.Where(static x =>
+                x.Name.EqualsEither(["CreatedTime", "UpdatedTime"], StringComparison.OrdinalIgnoreCase)
+            )
+            .SortOrDefault(query.OrderByDescending(a => a.CreatedTime));
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         return new PaginatedList<WorkspaceMember>() { Items = items, TotalCount = totalCount };
     }

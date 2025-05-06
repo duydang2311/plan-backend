@@ -13,11 +13,9 @@ public readonly record struct RoleId : IEntityId<int>
         return Value.ToString(CultureInfo.InvariantCulture);
     }
 
-    public static bool TryParse(string? input, out RoleId output)
+    public static RoleId From(int value)
     {
-        var ok = int.TryParse(input, CultureInfo.InvariantCulture, out var value);
-        output = ok ? new RoleId { Value = value } : Empty;
-        return ok;
+        return new RoleId { Value = value };
     }
 
     public static bool operator >(RoleId a, RoleId b)

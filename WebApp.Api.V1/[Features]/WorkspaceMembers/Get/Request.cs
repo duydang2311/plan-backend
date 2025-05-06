@@ -17,7 +17,7 @@ public sealed record Request : Collective
     public UserId UserId { get; init; }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
     public static partial GetWorkspaceMembers ToCommand(this Request request);

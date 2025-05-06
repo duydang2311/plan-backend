@@ -13,6 +13,7 @@ public sealed class WorkspaceMemberConfiguration : IEntityTypeConfiguration<Work
         builder.Property(x => x.UpdatedTime).HasDefaultValueSql("now()");
         builder.Property(a => a.Id).HasConversion<EntityIdConverter<WorkspaceMemberId, long>>().ValueGeneratedOnAdd();
         builder.HasKey(a => a.Id);
+        builder.HasIndex(a => a.CreatedTime);
         builder.HasIndex(a => a.UserId);
         builder.HasIndex(a => a.WorkspaceId);
         builder.HasOne(a => a.Workspace).WithMany(a => a.Members).HasForeignKey(a => a.WorkspaceId);

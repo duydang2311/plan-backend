@@ -17,9 +17,11 @@ public sealed class CreateWorkspaceHandler(AppDbContext dbContext, IServiceProvi
 {
     public override async Task<Result> ExecuteAsync(CreateWorkspaceCommand command, CancellationToken ct)
     {
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
         await using var transaction = await dbContext
             .Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, ct)
             .ConfigureAwait(false);
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
 
         if (await dbContext.Workspaces.AnyAsync(x => x.Path.Equals(command.Path), ct).ConfigureAwait(false))
         {

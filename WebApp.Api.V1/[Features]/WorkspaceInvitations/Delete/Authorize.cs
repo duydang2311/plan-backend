@@ -27,7 +27,7 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
                 .HasWorkspacePermissionAsync(
                     workspaceInvitation.WorkspaceId,
                     context.Request.RequestingUserId,
-                    Permit.CreateWorkspaceInvitation,
+                    Permit.DeleteWorkspaceInvitation,
                     ct
                 )
                 .ConfigureAwait(false);

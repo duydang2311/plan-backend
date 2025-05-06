@@ -15,6 +15,7 @@ using WebApp.Api.V1.Common.Authentications;
 using WebApp.Api.V1.Common.Converters;
 using WebApp.Common.IdEncoding;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Jwts.Common;
 using WebApp.Infrastructure.Mails.Abstractions;
@@ -328,10 +329,6 @@ app.UseJobQueues(options =>
     options.ExecutionTimeLimit = TimeSpan.FromSeconds(10);
 });
 
-// var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
-// using var scope = scopeFactory.CreateScope();
-// var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
 // var tokenHandler = new JwtSecurityTokenHandler();
 // var rsa = RSA.Create();
 // rsa.ImportFromPem(app.Services.GetRequiredService<IOptions<JwtOptions>>().Value.PrivateKey);
@@ -352,5 +349,13 @@ app.UseJobQueues(options =>
 // Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(rsa.ExportPkcs8PrivateKeyPem()));
 // Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(rsa.ExportSubjectPublicKeyInfoPem()));
 // return 0;
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateAsyncScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await WorkspaceRoleDefaults.SeedAsync(db, CancellationToken.None).ConfigureAwait(false);
+    await ProjectRoleDefaults.SeedAsync(db, CancellationToken.None).ConfigureAwait(false);
+}
 
 return await app.RunOaktonCommands(args).ConfigureAwait(false);

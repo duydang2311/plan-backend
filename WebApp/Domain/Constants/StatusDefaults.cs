@@ -10,9 +10,9 @@ public static class StatusDefaults
             {
                 Value = "Backlog",
                 Icon = "backlog",
-                IsDefault = true
+                IsDefault = true,
             },
-            new WorkspaceStatus { Value = "Todo", Icon = "todo", },
+            new WorkspaceStatus { Value = "Todo", Icon = "todo" },
             new WorkspaceStatus { Value = "In Progress", Icon = "in-progress" },
             new WorkspaceStatus { Value = "Done", Icon = "done" },
             new WorkspaceStatus { Value = "Canceled", Icon = "canceled" },

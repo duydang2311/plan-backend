@@ -14,13 +14,15 @@ public sealed class GetRolesHandler(AppDbContext db) : ICommandHandler<GetRoles,
     {
         var query = db.Roles.AsQueryable();
 
-        if (string.Equals(command.Type, "project", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(command.Type, "workspace", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(a => ProjectRoleDefaults.Roles.Select(a => a.Id).Contains(a.Id));
+            var roleIds = WorkspaceRoleDefaults.Roles.Select(a => a.Id);
+            query = query.Where(a => roleIds.Contains(a.Id));
         }
-        else if (string.Equals(command.Type, "workspace", StringComparison.OrdinalIgnoreCase))
+        else if (string.Equals(command.Type, "project", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(a => WorkspaceRoleDefaults.Roles.Select(a => a.Id).Contains(a.Id));
+            var roleIds = ProjectRoleDefaults.Roles.Select(a => a.Id);
+            query = query.Where(a => roleIds.Contains(a.Id));
         }
 
         var countAsync = query.CountAsync(ct).ConfigureAwait(false);
