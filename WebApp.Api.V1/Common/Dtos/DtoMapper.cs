@@ -93,4 +93,9 @@ public static partial class DtoMapper
     public static IReadOnlyCollection<string>? ResourceFileMimeTypesToDto(
         IReadOnlyCollection<string> resourceFileMimeTypes
     ) => ResourceFileMimeTypesToDtoInternal(resourceFileMimeTypes);
+
+    private static partial BaseWorkspaceStatusDto? WorkspaceStatusToDtoInternal(WorkspaceStatus? workspaceStatus);
+
+    public static BaseWorkspaceStatusDto? WorkspaceStatusToDto(WorkspaceStatus workspaceStatus) =>
+        WorkspaceStatusToDtoInternal(workspaceStatus);
 }
