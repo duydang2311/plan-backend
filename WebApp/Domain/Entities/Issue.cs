@@ -16,6 +16,7 @@ public sealed record Issue : ISoftDelete
     public long OrderNumber { get; init; }
     public string Title { get; init; } = null!;
     public string? Description { get; init; }
+    public string? PreviewDescription { get; init; }
     public Instant? DeletedTime { get; init; }
     public StatusId? StatusId { get; init; }
     public WorkspaceStatus? Status { get; init; }

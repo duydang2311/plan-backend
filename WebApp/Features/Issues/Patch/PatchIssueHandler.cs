@@ -26,7 +26,19 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
         }
         if (command.Patch.TryGetValue(a => a.Description, out var description))
         {
-            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Description, description));
+            var previewDescription = !string.IsNullOrEmpty(description)
+                ? HtmlHelper.ConvertToPlainText(description, 256)
+                : null;
+            if (previewDescription != null && previewDescription.Length >= 256)
+            {
+                previewDescription = previewDescription[..256];
+            }
+            updateEx = ExpressionHelper.Append(
+                updateEx,
+                a =>
+                    a.SetProperty(a => a.Description, description)
+                        .SetProperty(a => a.PreviewDescription, previewDescription)
+            );
         }
         if (command.Patch.TryGetValue(a => a.Priority, out var priority))
         {

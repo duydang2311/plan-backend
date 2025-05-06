@@ -6,5 +6,5 @@ public enum IssuePriority : byte
     Low,
     Medium,
     High,
-    Urgent
+    Urgent,
 }

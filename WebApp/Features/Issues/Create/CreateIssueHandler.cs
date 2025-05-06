@@ -3,6 +3,7 @@ using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using FractionalIndexing;
 using Microsoft.EntityFrameworkCore;
+using MimeKit.Text;
 using OneOf;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
@@ -26,6 +27,13 @@ public sealed class CreateIssueHandler(AppDbContext db, IDbContextOutbox outbox)
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
 
+        var previewDescription = !string.IsNullOrEmpty(command.Description)
+            ? HtmlHelper.ConvertToPlainText(command.Description, 256)
+            : null;
+        if (previewDescription != null && previewDescription.Length >= 256)
+        {
+            previewDescription = previewDescription[..256];
+        }
         var issue = new Issue
         {
             Id = IdHelper.NewIssueId(),
@@ -33,6 +41,7 @@ public sealed class CreateIssueHandler(AppDbContext db, IDbContextOutbox outbox)
             ProjectId = command.ProjectId,
             Title = command.Title,
             Description = command.Description,
+            PreviewDescription = previewDescription,
             StatusId = command.StatusId,
             StatusRank = OrderKeyGenerator.GenerateKeyBetween(lastIssueWithSameStatus?.StatusRank, null),
         };

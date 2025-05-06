@@ -98,4 +98,22 @@ public static partial class DtoMapper
 
     public static BaseWorkspaceStatusDto? WorkspaceStatusToDto(WorkspaceStatus workspaceStatus) =>
         WorkspaceStatusToDtoInternal(workspaceStatus);
+
+    private static partial BaseIssueDto? IssueToDtoInternal(Issue? issue);
+
+    public static BaseIssueDto? IssueToDto(Issue issue) => IssueToDtoInternal(issue);
+
+    private static partial BaseTeamDto? TeamToDtoInternal(Team? team);
+
+    public static BaseTeamDto? TeamToDto(Team team) => TeamToDtoInternal(team);
+
+    private static partial ICollection<BaseTeamDto>? TeamsToDtoInternal(ICollection<Team>? teams);
+
+    public static ICollection<BaseTeamDto>? TeamsToDto(ICollection<Team> teams) => TeamsToDtoInternal(teams);
+
+    private static partial ICollection<BaseUserDto>? UsersToDtoInternal(ICollection<User>? users);
+
+    public static ICollection<BaseUserDto>? UsersToDto(ICollection<User> users) => UsersToDtoInternal(users);
+
+    public static partial IReadOnlyCollection<BaseIssueDto> IssuesToDto(IReadOnlyCollection<Issue> issues);
 }

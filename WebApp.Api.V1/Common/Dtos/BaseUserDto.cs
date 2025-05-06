@@ -3,7 +3,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Common.Dtos;
 
-public sealed record BaseUserDto
+public record BaseUserDto
 {
     public Instant? CreatedTime { get; init; }
     public Instant? UpdatedTime { get; init; }
