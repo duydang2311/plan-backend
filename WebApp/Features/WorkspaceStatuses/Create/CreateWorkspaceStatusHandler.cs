@@ -18,8 +18,9 @@ public sealed class CreateWorkspaceStatusHandler(AppDbContext db)
         var status = new WorkspaceStatus
         {
             WorkspaceId = command.WorkspaceId,
+            Category = command.Category,
             Value = command.Value,
-            Description = command.Description
+            Description = command.Description,
         };
         db.Add(status);
 
