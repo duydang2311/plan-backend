@@ -20,17 +20,24 @@ public sealed record ProjectRoleDefaults
         Permissions = permissions;
     }
 
-    public static readonly ProjectRoleDefaults Guest = new(
+    public static readonly ProjectRoleDefaults Guest = new(RoleId.From(16), "Guest", 500, [Permit.ReadIssue]);
+    public static readonly ProjectRoleDefaults Viewer = new(
         RoleId.From(15),
-        "Guest",
+        "Viewer",
         400,
-        [Permit.ReadIssue, Permit.ReadIssueAudit, Permit.ReadProjectMember]
+        [
+            .. Guest.Permissions,
+            Permit.ReadProjectMember,
+            Permit.ReadProjectMemberInvitation,
+            Permit.ReadIssueAudit,
+            Permit.ReadProjectResourceFile,
+        ]
     );
     public static readonly ProjectRoleDefaults Member = new(
         RoleId.From(14),
         "Member",
         300,
-        [.. Guest.Permissions, Permit.CreateIssue, Permit.ReadProjectMemberInvitation]
+        [.. Viewer.Permissions, Permit.CreateIssue, Permit.CreateProjectResource, Permit.CreateProjectResourceFile]
     );
     public static readonly ProjectRoleDefaults Manager = new(
         RoleId.From(13),
@@ -38,17 +45,22 @@ public sealed record ProjectRoleDefaults
         200,
         [
             .. Member.Permissions,
-            Permit.DeleteProjectMember,
             Permit.CreateProjectMember,
             Permit.CreateProjectMemberInvitation,
-            Permit.DeleteProjectMemberInvitation,
-            Permit.UpdateIssue,
-            Permit.DeleteIssue,
             Permit.CreateIssueAssignee,
             Permit.CreateTeamIssue,
+            Permit.CreateIssueAuditComment,
+            Permit.UpdateIssue,
+            Permit.UpdateProjectResource,
+            Permit.UpdateProjectResourceFile,
+            Permit.DeleteProjectMember,
+            Permit.DeleteProjectResource,
+            Permit.DeleteProjectResourceFile,
+            Permit.DeleteProjectMemberInvitation,
+            Permit.UpdateProjectMember,
+            Permit.DeleteIssue,
             Permit.DeleteIssueAssignee,
             Permit.DeleteTeamIssue,
-            Permit.CreateIssueAuditComment,
         ]
     );
     public static readonly ProjectRoleDefaults Admin = new(

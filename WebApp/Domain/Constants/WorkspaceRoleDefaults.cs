@@ -23,13 +23,13 @@ public sealed record WorkspaceRoleDefaults
     public static readonly WorkspaceRoleDefaults Guest = new(
         RoleId.From(6),
         "Guest",
-        400,
+        500,
         [Permit.ReadProject, Permit.ReadTeam, Permit.ReadWorkspaceMember, Permit.ReadWorkspaceStatus]
     );
 
-    public static readonly WorkspaceRoleDefaults Client = new(
+    public static readonly WorkspaceRoleDefaults Viewer = new(
         RoleId.From(5),
-        "Client",
+        "Viewer",
         400,
         [
             .. Guest.Permissions,
@@ -46,7 +46,7 @@ public sealed record WorkspaceRoleDefaults
         RoleId.From(4),
         "Member",
         300,
-        [.. Client.Permissions, Permit.CreateIssue, Permit.CreateWorkspaceResource, Permit.CreateWorkspaceResourceFile]
+        [.. Viewer.Permissions, Permit.CreateIssue, Permit.CreateWorkspaceResource, Permit.CreateWorkspaceResourceFile]
     );
 
     public static readonly WorkspaceRoleDefaults Manager = new(

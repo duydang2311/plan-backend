@@ -60,6 +60,11 @@ public static class Permit
     public const string UpdateWorkspaceResourceFile = "workspace-resource-file:update";
     public const string DeleteWorkspaceResourceFile = "workspace-resource-file:delete";
 
+    public const string CreateProjectResource = "project-resource:create";
+    public const string ReadProjectResource = "project-resource:read";
+    public const string UpdateProjectResource = "project-resource:update";
+    public const string DeleteProjectResource = "project-resource:delete";
+
     public const string CreateProjectResourceFile = "project-resource-file:create";
     public const string ReadProjectResourceFile = "project-resource-file:read";
     public const string UpdateProjectResourceFile = "project-resource-file:update";
