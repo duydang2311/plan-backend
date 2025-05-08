@@ -21,25 +21,34 @@ public sealed record WorkspaceRoleDefaults
     }
 
     public static readonly WorkspaceRoleDefaults Guest = new(
-        RoleId.From(5),
+        RoleId.From(6),
         "Guest",
         400,
         [Permit.ReadProject, Permit.ReadTeam, Permit.ReadWorkspaceMember, Permit.ReadWorkspaceStatus]
+    );
+
+    public static readonly WorkspaceRoleDefaults Client = new(
+        RoleId.From(5),
+        "Client",
+        400,
+        [
+            .. Guest.Permissions,
+            Permit.ReadIssue,
+            Permit.ReadIssueAudit,
+            Permit.ReadProjectMember,
+            Permit.ReadWorkspaceResource,
+            Permit.ReadWorkspaceInvitation,
+            Permit.ReadProjectMemberInvitation,
+        ]
     );
 
     public static readonly WorkspaceRoleDefaults Member = new(
         RoleId.From(4),
         "Member",
         300,
-        [
-            .. Guest.Permissions,
-            Permit.CreateIssue,
-            Permit.ReadProjectMemberInvitation,
-            Permit.ReadWorkspaceResource,
-            Permit.CreateWorkspaceResource,
-            Permit.ReadWorkspaceInvitation,
-        ]
+        [.. Client.Permissions, Permit.CreateIssue, Permit.CreateWorkspaceResource, Permit.CreateWorkspaceResourceFile]
     );
+
     public static readonly WorkspaceRoleDefaults Manager = new(
         RoleId.From(3),
         "Manager",
@@ -61,6 +70,13 @@ public sealed record WorkspaceRoleDefaults
             Permit.CreateWorkspaceInvitation,
             Permit.UpdateWorkspaceInvitation,
             Permit.DeleteWorkspaceInvitation,
+            Permit.CreateIssueAssignee,
+            Permit.CreateTeamIssue,
+            Permit.DeleteIssueAssignee,
+            Permit.DeleteTeamIssue,
+            Permit.DeleteWorkspaceResourceFile,
+            Permit.UpdateWorkspaceMember,
+            Permit.DeleteWorkspaceMember,
         ]
     );
 
@@ -68,15 +84,10 @@ public sealed record WorkspaceRoleDefaults
         RoleId.From(2),
         "Administrator",
         100,
-        [.. Manager.Permissions, Permit.DeleteWorkspaceMember]
+        [.. Manager.Permissions]
     );
 
-    public static readonly WorkspaceRoleDefaults Owner = new(
-        RoleId.From(1),
-        "Owner",
-        0,
-        [.. Manager.Permissions, Permit.DeleteWorkspaceMember]
-    );
+    public static readonly WorkspaceRoleDefaults Owner = new(RoleId.From(1), "Owner", 0, [.. Admin.Permissions]);
 
     public static readonly WorkspaceRoleDefaults[] Roles = [Guest, Member, Manager, Admin, Owner];
 
@@ -126,19 +137,10 @@ public sealed record WorkspaceRoleDefaults
                     ),
                 })
                 .Where(a => a.MissingPermissions.Any())
+                .SelectMany(a => a.MissingPermissions.Select(b => new RolePermission { RoleId = a.Id, Permission = b }))
                 .ToArray();
-            foreach (var role in missingPermissions)
-            {
-                var dbRole = await db
-                    .Roles.Include(a => a.Permissions)
-                    .FirstAsync(a => a.Id == role.Id, ct)
-                    .ConfigureAwait(false);
-                foreach (var permission in role.MissingPermissions)
-                {
-                    dbRole.Permissions.Add(new RolePermission { Permission = permission });
-                }
-                shouldSave = true;
-            }
+            db.AddRange(missingPermissions);
+            shouldSave = true;
         }
 
         if (shouldSave)

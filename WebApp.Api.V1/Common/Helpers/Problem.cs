@@ -8,6 +8,7 @@ public sealed class Problem
     public List<ValidationFailure> Failures { get; init; } = [];
     string? instance;
     string? traceId;
+    string? detail;
     int? statusCode;
 
     private Problem() { }
@@ -25,6 +26,11 @@ public sealed class Problem
     public static Problem Failure(string name, string message, string code)
     {
         return new Problem { Failures = [new ValidationFailure(name, message) { ErrorCode = code }] };
+    }
+
+    public static Problem Detail(string detail)
+    {
+        return new Problem { detail = detail };
     }
 
     public Problem Instance(string? instance)
@@ -47,11 +53,16 @@ public sealed class Problem
 
     public ProblemDetails ToProblemDetails(string? instance = null, string? traceId = null, int? statusCode = null)
     {
-        return new ProblemDetails(
+        var problemDetails = new ProblemDetails(
             Failures,
             instance ?? this.instance!,
             traceId ?? this.traceId!,
             statusCode ?? this.statusCode ?? 400
         );
+        if (!string.IsNullOrEmpty(detail))
+        {
+            problemDetails.Detail = detail;
+        }
+        return problemDetails;
     }
 }

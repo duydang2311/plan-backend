@@ -32,7 +32,9 @@ public static class Permit
     public const string DeleteWorkspaceStatus = "workspace-status:delete";
     public const string UpdateWorkspaceStatus = "workspace-status:update";
 
+    public const string CreateWorkspaceMember = "workspace-member:create";
     public const string ReadWorkspaceMember = "workspace-member:read";
+    public const string UpdateWorkspaceMember = "workspace-member:update";
     public const string DeleteWorkspaceMember = "workspace-member:delete";
 
     public const string ReadIssueAudit = "issue-audit:read";
@@ -67,4 +69,14 @@ public static class Permit
     public const string ReadWorkspaceInvitation = "workspace-invitation:read";
     public const string UpdateWorkspaceInvitation = "workspace-invitation:update";
     public const string DeleteWorkspaceInvitation = "workspace-invitation:delete";
+
+    public const string CreateIssueAssignee = "issue-assignee:create";
+    public const string ReadIssueAssignee = "issue-assignee:read";
+    public const string UpdateIssueAssignee = "issue-assignee:update";
+    public const string DeleteIssueAssignee = "issue-assignee:delete";
+
+    public const string CreateTeamIssue = "team-issue:create";
+    public const string ReadTeamIssue = "team-issue:read";
+    public const string UpdateTeamIssue = "team-issue:update";
+    public const string DeleteTeamIssue = "team-issue:delete";
 }

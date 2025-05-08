@@ -26,4 +26,10 @@ public interface IPermissionCache
         string permission,
         CancellationToken ct = default
     );
+    ValueTask InvalidateWorkspacePermissionAsync(
+        WorkspaceId workspaceId,
+        UserId userId,
+        CancellationToken ct = default
+    );
+    ValueTask InvalidateProjectPermissionAsync(ProjectId projectId, UserId userId, CancellationToken ct = default);
 }

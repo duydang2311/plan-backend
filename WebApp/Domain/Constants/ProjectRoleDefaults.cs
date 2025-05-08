@@ -42,6 +42,13 @@ public sealed record ProjectRoleDefaults
             Permit.CreateProjectMember,
             Permit.CreateProjectMemberInvitation,
             Permit.DeleteProjectMemberInvitation,
+            Permit.UpdateIssue,
+            Permit.DeleteIssue,
+            Permit.CreateIssueAssignee,
+            Permit.CreateTeamIssue,
+            Permit.DeleteIssueAssignee,
+            Permit.DeleteTeamIssue,
+            Permit.CreateIssueAuditComment,
         ]
     );
     public static readonly ProjectRoleDefaults Admin = new(

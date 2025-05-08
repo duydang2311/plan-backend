@@ -5,7 +5,7 @@ using WebApp.Common.Models;
 
 namespace WebApp.Api.V1.IssueAssignees.Create;
 
-using Results = Results<ProblemDetails, NoContent>;
+using Results = Results<ForbidHttpResult, ProblemDetails, NoContent>;
 
 public sealed class Endpoint : Endpoint<Request, Results>
 {
@@ -13,6 +13,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
     {
         Post("issue-assignees");
         Version(1);
+        PreProcessor<Authorize>();
     }
 
     public override async Task<Results> ExecuteAsync(Request req, CancellationToken ct)

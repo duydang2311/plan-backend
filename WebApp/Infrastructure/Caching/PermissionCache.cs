@@ -98,6 +98,24 @@ public sealed class PermissionCache(HybridCache cache, IDbContextFactory<AppDbCo
         return permissions.Contains(permission);
     }
 
+    public async ValueTask InvalidateWorkspacePermissionAsync(
+        WorkspaceId workspaceId,
+        UserId userId,
+        CancellationToken ct = default
+    )
+    {
+        await cache.RemoveAsync(CacheKeys.WorkspacePermissions(workspaceId, userId), ct).ConfigureAwait(false);
+    }
+
+    public async ValueTask InvalidateProjectPermissionAsync(
+        ProjectId projectId,
+        UserId userId,
+        CancellationToken ct = default
+    )
+    {
+        await cache.RemoveAsync(CacheKeys.ProjectPermissions(projectId, userId), ct).ConfigureAwait(false);
+    }
+
     sealed class GetProjectPermissionsState(
         IDbContextFactory<AppDbContext> dbFactory,
         ProjectId projectId,

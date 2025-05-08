@@ -217,6 +217,13 @@ app.UseFastEndpoints(
         config.Errors.UseProblemDetails(config =>
         {
             config.IndicateErrorCode = true;
+            config.ResponseBuilder = static (failures, context, statusCode) =>
+            {
+                Console.WriteLine(
+                    "ResponseBuilder, " + failures + ", " + context.Request.Path + ", " + context.TraceIdentifier
+                );
+                return new ProblemDetails(failures, context.Request.Path, context.TraceIdentifier, statusCode);
+            };
         });
         config.Binding.JsonExceptionTransformer = ex =>
         {

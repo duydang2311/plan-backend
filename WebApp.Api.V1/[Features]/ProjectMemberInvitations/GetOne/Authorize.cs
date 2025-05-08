@@ -18,19 +18,22 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
         var db = context.HttpContext.Resolve<AppDbContext>();
         var invitation = await db
             .ProjectMemberInvitations.Where(a => a.Id == context.Request.ProjectMemberInvitationId)
-            .Select(a => new { a.ProjectId })
+            .Select(a => new { a.UserId, a.ProjectId })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
         var canRead =
             invitation is not null
-            && await permissionCache
-                .HasProjectPermissionAsync(
-                    invitation.ProjectId,
-                    context.Request.RequestingUserId,
-                    Permit.ReadProjectMemberInvitation,
-                    ct
-                )
-                .ConfigureAwait(false);
+            && (
+                invitation.UserId == context.Request.RequestingUserId
+                || await permissionCache
+                    .HasProjectPermissionAsync(
+                        invitation.ProjectId,
+                        context.Request.RequestingUserId,
+                        Permit.ReadProjectMemberInvitation,
+                        ct
+                    )
+                    .ConfigureAwait(false)
+            );
         if (!canRead)
         {
             await context.HttpContext.Response.SendForbiddenAsync(ct).ConfigureAwait(false);
