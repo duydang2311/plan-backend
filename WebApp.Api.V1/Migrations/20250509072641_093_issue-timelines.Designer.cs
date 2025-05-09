@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509072641_093_issue-timelines")]
+    partial class _093_issuetimelines
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -376,38 +379,6 @@ namespace WebApp.Host.Migrations
                     b.HasDiscriminator<byte>("discriminator");
 
                     b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.IssueLink", b =>
-                {
-                    b.Property<Guid>("IssueId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("issue_id");
-
-                    b.Property<Instant>("CreatedTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_time")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<Guid>("SubIssueId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sub_issue_id");
-
-                    b.HasKey("IssueId")
-                        .HasName("pk_issue_links");
-
-                    b.HasIndex("SubIssueId")
-                        .HasDatabaseName("ix_issue_links_sub_issue_id");
-
-                    b.ToTable("issue_links", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.IssueTimeline", b =>
@@ -1963,27 +1934,6 @@ namespace WebApp.Host.Migrations
                     b.Navigation("Issue");
                 });
 
-            modelBuilder.Entity("WebApp.Domain.Entities.IssueLink", b =>
-                {
-                    b.HasOne("WebApp.Domain.Entities.Issue", "Issue")
-                        .WithMany("SubIssues")
-                        .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_issue_links_issues_issue_id");
-
-                    b.HasOne("WebApp.Domain.Entities.Issue", "SubIssue")
-                        .WithMany("ParentIssues")
-                        .HasForeignKey("SubIssueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_issue_links_issues_sub_issue_id");
-
-                    b.Navigation("Issue");
-
-                    b.Navigation("SubIssue");
-                });
-
             modelBuilder.Entity("WebApp.Domain.Entities.IssueTimeline", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.Issue", "Issue")
@@ -2514,10 +2464,6 @@ namespace WebApp.Host.Migrations
                     b.Navigation("Fields");
 
                     b.Navigation("IssueAssignees");
-
-                    b.Navigation("ParentIssues");
-
-                    b.Navigation("SubIssues");
 
                     b.Navigation("TeamIssues");
 
