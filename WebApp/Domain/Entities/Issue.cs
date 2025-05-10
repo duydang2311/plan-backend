@@ -22,13 +22,14 @@ public sealed record Issue : ISoftDelete
     public WorkspaceStatus? Status { get; init; }
     public string StatusRank { get; init; } = null!;
     public IssuePriority Priority { get; init; }
+    public Instant? StartTime { get; init; }
+    public Instant? EndTime { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
     public ICollection<TeamIssue> TeamIssues { get; init; } = null!;
     public ICollection<Team> Teams { get; init; } = null!;
     public ICollection<IssueAssignee> IssueAssignees { get; init; } = null!;
     public ICollection<User> Assignees { get; init; } = null!;
-    public IssueTimeline? Timeline { get; init; }
-    public ICollection<IssueLink> ParentIssues { get; init; } = null!;
-    public ICollection<IssueLink> SubIssues { get; init; } = null!;
+    public ICollection<ChecklistItem> ParentChecklistItems { get; init; } = null!;
+    public ICollection<ChecklistItem> SubChecklistItems { get; init; } = null!;
 }

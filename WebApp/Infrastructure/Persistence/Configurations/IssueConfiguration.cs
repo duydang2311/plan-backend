@@ -22,6 +22,8 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasDefaultValue(IssuePriority.None);
         builder.Property(a => a.DeletedTime);
         builder.Property(a => a.PreviewDescription).HasMaxLength(256);
+        builder.Property(a => a.StartTime);
+        builder.Property(a => a.EndTime);
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);

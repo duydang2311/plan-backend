@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace WebApp.Domain.Entities;
 
-public readonly struct IssueLinkId : IEntityId<long>
+public readonly struct ChecklistItemId : IEntityId<long>
 {
     public long Value { get; init; }
 

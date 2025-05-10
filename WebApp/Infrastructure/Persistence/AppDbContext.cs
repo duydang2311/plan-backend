@@ -41,6 +41,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<ProjectResource> ProjectResources => Set<ProjectResource>();
     public DbSet<StoragePendingUpload> StoragePendingUploads => Set<StoragePendingUpload>();
     public DbSet<ResourceFile> ResourceFiles => Set<ResourceFile>();
+    public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

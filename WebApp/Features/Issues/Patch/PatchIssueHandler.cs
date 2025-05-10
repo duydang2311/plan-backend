@@ -11,7 +11,7 @@ using WebApp.Infrastructure.Persistence;
 
 namespace WebApp.Features.Issues.Patch;
 
-public sealed class PatchIssueHandler(AppDbContext dbContext)
+public sealed class PatchIssueHandler(AppDbContext db)
     : ICommandHandler<PatchIssue, OneOf<ValidationFailures, NotFoundError, Success>>
 {
     public async Task<OneOf<ValidationFailures, NotFoundError, Success>> ExecuteAsync(
@@ -24,7 +24,7 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Title, title));
         }
-        if (command.Patch.TryGetValue(a => a.Description, out var description))
+        if (command.Patch.TryGetValue(a => a.Description, out var description) && description is not null)
         {
             var previewDescription = !string.IsNullOrEmpty(description)
                 ? HtmlHelper.ConvertToPlainText(description, 256)
@@ -40,20 +40,28 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
                         .SetProperty(a => a.PreviewDescription, previewDescription)
             );
         }
-        if (command.Patch.TryGetValue(a => a.Priority, out var priority))
+        if (command.Patch.TryGetValue(a => a.Priority, out var priority) && priority.HasValue)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Priority, priority));
         }
-        if (command.Patch.TryGetValue(a => a.StatusId, out var statusId))
+        if (command.Patch.TryGetValue(a => a.StatusId, out var statusId) && statusId.HasValue)
         {
             updateEx = ExpressionHelper.Append(
                 updateEx,
-                a => a.SetProperty(a => a.StatusId, statusId.Value == -1 ? null : statusId)
+                a => a.SetProperty(a => a.StatusId, statusId.Value.Value == -1 ? null : statusId)
             );
         }
         if (command.Patch.TryGetValue(a => a.StatusRank, out var statusRank) && statusRank is not null)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.StatusRank, statusRank));
+        }
+        if (command.Patch.TryGetValue(a => a.StartTime, out var startTime) && startTime.HasValue)
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.StartTime, startTime.Value));
+        }
+        if (command.Patch.TryGetValue(a => a.EndTime, out var endTime) && endTime.HasValue)
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.EndTime, endTime.Value));
         }
 
         if (updateEx is null)
@@ -61,7 +69,7 @@ public sealed class PatchIssueHandler(AppDbContext dbContext)
             return ValidationFailures.Single("patch", "Invalid patch", "invalid");
         }
 
-        var count = await dbContext
+        var count = await db
             .Issues.Where(a => a.Id == command.IssueId)
             .ExecuteUpdateAsync(updateEx, ct)
             .ConfigureAwait(false);
