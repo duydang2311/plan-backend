@@ -31,6 +31,8 @@ public sealed record ProjectRoleDefaults
             Permit.ReadProjectMemberInvitation,
             Permit.ReadIssueAudit,
             Permit.ReadProjectResourceFile,
+            Permit.ReadIssueAssignee,
+            Permit.ReadTeamIssue,
         ]
     );
     public static readonly ProjectRoleDefaults Member = new(
@@ -119,19 +121,10 @@ public sealed record ProjectRoleDefaults
                     ),
                 })
                 .Where(a => a.MissingPermissions.Any())
+                .SelectMany(a => a.MissingPermissions.Select(b => new RolePermission { RoleId = a.Id, Permission = b }))
                 .ToArray();
-            foreach (var role in missingPermissions)
-            {
-                var dbRole = await db
-                    .Roles.Include(a => a.Permissions)
-                    .FirstAsync(a => a.Id == role.Id, ct)
-                    .ConfigureAwait(false);
-                foreach (var permission in role.MissingPermissions)
-                {
-                    dbRole.Permissions.Add(new RolePermission { Permission = permission });
-                }
-                shouldSave = true;
-            }
+            db.AddRange(missingPermissions);
+            shouldSave = true;
         }
 
         if (shouldSave)

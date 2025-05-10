@@ -39,6 +39,8 @@ public sealed record WorkspaceRoleDefaults
             Permit.ReadWorkspaceResource,
             Permit.ReadWorkspaceInvitation,
             Permit.ReadProjectMemberInvitation,
+            Permit.ReadIssueAssignee,
+            Permit.ReadTeamIssue,
         ]
     );
 

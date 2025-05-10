@@ -116,4 +116,24 @@ public static partial class DtoMapper
     public static ICollection<BaseUserDto>? UsersToDto(ICollection<User> users) => UsersToDtoInternal(users);
 
     public static partial IReadOnlyCollection<BaseIssueDto> IssuesToDto(IReadOnlyCollection<Issue> issues);
+
+    private static partial ICollection<BaseIssueAssigneeDto>? IssueAssigneesToDtoInternal(
+        ICollection<IssueAssignee>? issueAssignees
+    );
+
+    public static ICollection<BaseIssueAssigneeDto>? IssueAssigneesToDto(ICollection<IssueAssignee> issueAssignees) =>
+        IssueAssigneesToDtoInternal(issueAssignees);
+
+    public static partial IReadOnlyCollection<BaseIssueAssigneeDto> IssueAssigneesToDto(
+        IReadOnlyCollection<IssueAssignee> issueAssignees
+    );
+
+    private static partial ICollection<BaseTeamIssueDto>? TeamIssuesToDtoInternal(ICollection<TeamIssue>? teamIssues);
+
+    public static ICollection<BaseTeamIssueDto>? TeamIssuesToDto(ICollection<TeamIssue> teamIssues) =>
+        TeamIssuesToDtoInternal(teamIssues);
+
+    public static partial IReadOnlyCollection<BaseTeamIssueDto> TeamIssuesToDto(
+        IReadOnlyCollection<TeamIssue> teamIssues
+    );
 }
