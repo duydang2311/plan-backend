@@ -24,6 +24,7 @@ public sealed record Issue : ISoftDelete
     public IssuePriority Priority { get; init; }
     public Instant? StartTime { get; init; }
     public Instant? EndTime { get; init; }
+    public string? TimelineZone { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
     public ICollection<IssueField> Fields { get; init; } = null!;
     public ICollection<TeamIssue> TeamIssues { get; init; } = null!;

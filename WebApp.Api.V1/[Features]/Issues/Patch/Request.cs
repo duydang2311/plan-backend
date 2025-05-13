@@ -24,6 +24,7 @@ public sealed record Request
         public string? StatusRank { get; init; }
         public Instant? StartTime { get; init; }
         public Instant? EndTime { get; init; }
+        public string? TimelineZone { get; init; }
     }
 
     [FromClaim(ClaimTypes.NameIdentifier)]

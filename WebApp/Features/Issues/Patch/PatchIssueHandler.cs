@@ -63,6 +63,10 @@ public sealed class PatchIssueHandler(AppDbContext db)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.EndTime, endTime.Value));
         }
+        if (command.Patch.TryGetValue(a => a.TimelineZone, out var timelineZone) && !string.IsNullOrEmpty(timelineZone))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.TimelineZone, timelineZone));
+        }
 
         if (updateEx is null)
         {

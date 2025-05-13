@@ -20,6 +20,9 @@ public record BaseIssueDto
     public StatusId? StatusId { get; init; }
     public Status? Status { get; init; }
     public string? StatusRank { get; init; }
+    public Instant? StartTime { get; init; }
+    public Instant? EndTime { get; init; }
+    public string? TimelineZone { get; init; }
     public IssuePriority? Priority { get; init; }
     public ICollection<BaseTeamDto>? Teams { get; init; }
     public ICollection<BaseUserDto>? Assignees { get; init; }
