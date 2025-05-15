@@ -1,4 +1,5 @@
 using NodaTime;
+using WebApp.Domain.Constants;
 
 namespace WebApp.Domain.Entities;
 
@@ -10,12 +11,7 @@ public record ChecklistItem
     public Issue ParentIssue { get; init; } = null!;
     public ChecklistItemKind Kind { get; init; }
     public string? Content { get; init; }
+    public bool? Completed { get; init; }
     public IssueId? SubIssueId { get; init; }
     public Issue? SubIssue { get; init; }
-}
-
-public enum ChecklistItemKind
-{
-    Simple,
-    SubIssue,
 }
