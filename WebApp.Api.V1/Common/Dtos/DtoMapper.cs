@@ -136,4 +136,9 @@ public static partial class DtoMapper
     public static partial IReadOnlyCollection<BaseTeamIssueDto> TeamIssuesToDto(
         IReadOnlyCollection<TeamIssue> teamIssues
     );
+
+    private static partial BaseChecklistItemDto? ChecklistItemToDtoInternal(ChecklistItem? checklistItem);
+
+    public static BaseChecklistItemDto? ChecklistItemToDto(ChecklistItem checklistItem) =>
+        ChecklistItemToDtoInternal(checklistItem);
 }

@@ -41,6 +41,7 @@ public sealed record WorkspaceRoleDefaults
             Permit.ReadProjectMemberInvitation,
             Permit.ReadIssueAssignee,
             Permit.ReadTeamIssue,
+            Permit.ReadChecklistItem,
         ]
     );
 
@@ -79,6 +80,9 @@ public sealed record WorkspaceRoleDefaults
             Permit.DeleteWorkspaceResourceFile,
             Permit.UpdateWorkspaceMember,
             Permit.DeleteWorkspaceMember,
+            Permit.CreateChecklistItem,
+            Permit.DeleteChecklistItem,
+            Permit.UpdateChecklistItem,
         ]
     );
 

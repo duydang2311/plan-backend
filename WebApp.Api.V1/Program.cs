@@ -167,6 +167,7 @@ builder.Services.Configure<JsonOptions>(
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ResourceFileId>(idEncoder));
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<WorkspaceInvitationId>(idEncoder));
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ProjectMemberInvitationId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ChecklistItemId>(idEncoder));
         x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     }
 );
@@ -217,13 +218,6 @@ app.UseFastEndpoints(
         config.Errors.UseProblemDetails(config =>
         {
             config.IndicateErrorCode = true;
-            config.ResponseBuilder = static (failures, context, statusCode) =>
-            {
-                Console.WriteLine(
-                    "ResponseBuilder, " + failures + ", " + context.Request.Path + ", " + context.TraceIdentifier
-                );
-                return new ProblemDetails(failures, context.Request.Path, context.TraceIdentifier, statusCode);
-            };
         });
         config.Binding.JsonExceptionTransformer = ex =>
         {
@@ -324,6 +318,15 @@ app.UseFastEndpoints(
                     idEncoder,
                     input,
                     static value => new ProjectMemberInvitationId { Value = value }
+                ),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<ChecklistItemId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    idEncoder,
+                    input,
+                    static value => new ChecklistItemId { Value = value }
                 ),
             handleNull: true
         );

@@ -84,4 +84,9 @@ public static class Permit
     public const string ReadTeamIssue = "team-issue:read";
     public const string UpdateTeamIssue = "team-issue:update";
     public const string DeleteTeamIssue = "team-issue:delete";
+
+    public const string CreateChecklistItem = "checklist-items:create";
+    public const string ReadChecklistItem = "checklist-items:read";
+    public const string UpdateChecklistItem = "checklist-items:update";
+    public const string DeleteChecklistItem = "checklist-items:delete";
 }
