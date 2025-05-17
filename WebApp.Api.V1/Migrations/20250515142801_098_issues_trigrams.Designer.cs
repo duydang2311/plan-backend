@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515142801_098_issues_trigrams")]
+    partial class _098_issues_trigrams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,12 +195,11 @@ namespace WebApp.Host.Migrations
                     b.HasKey("Id")
                         .HasName("pk_checklist_items");
 
+                    b.HasIndex("ParentIssueId")
+                        .HasDatabaseName("ix_checklist_items_parent_issue_id");
+
                     b.HasIndex("SubIssueId")
                         .HasDatabaseName("ix_checklist_items_sub_issue_id");
-
-                    b.HasIndex("ParentIssueId", "SubIssueId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_checklist_items_parent_issue_id_sub_issue_id");
 
                     b.ToTable("checklist_items", null, t =>
                         {
@@ -284,7 +286,7 @@ namespace WebApp.Host.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("text")
                         .HasColumnName("trigrams")
-                        .HasComputedColumnSql("repeat(\"order_number\"::text || ' ', 4) || \"title\" || ' '", true);
+                        .HasComputedColumnSql("\"order_number\"::text || ' ' || \"title\" || ' ' || \"description\"", true);
 
                     b.Property<Instant>("UpdatedTime")
                         .ValueGeneratedOnAdd()

@@ -12,4 +12,6 @@ public sealed record GetIssues : Collective, ICommand<PaginatedList<Issue>>
     public string? Select { get; init; }
     public StatusId? StatusId { get; init; }
     public bool? NullStatusId { get; init; }
+    public IReadOnlyCollection<IssueId>? ExcludeIssueIds { get; init; }
+    public IssueId? ExcludeChecklistItemParentIssueId { get; init; }
 }

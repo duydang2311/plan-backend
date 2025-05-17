@@ -49,6 +49,18 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
             query = query.Where(a => a.StatusId == null);
         }
 
+        if (command.ExcludeIssueIds is not null)
+        {
+            query = query.Where(a => !command.ExcludeIssueIds.Contains(a.Id));
+        }
+
+        if (command.ExcludeChecklistItemParentIssueId.HasValue)
+        {
+            query = query.Where(a =>
+                a.ParentChecklistItems.All(b => b.ParentIssueId != command.ExcludeChecklistItemParentIssueId)
+            );
+        }
+
         if (!string.IsNullOrEmpty(command.Select))
         {
             query = query.Select(ExpressionHelper.Select<Issue, Issue>(command.Select));
@@ -65,6 +77,6 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
             .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
         var issues = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
 
-        return new() { Items = issues, TotalCount = totalCount, };
+        return new() { Items = issues, TotalCount = totalCount };
     }
 }

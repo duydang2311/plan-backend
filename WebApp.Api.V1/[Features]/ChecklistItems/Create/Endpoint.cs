@@ -44,6 +44,20 @@ public sealed class Endpoint : Endpoint<Request, Results>
                         Problem
                             .Failure("subIssueId", "Sub issue not found", ErrorCodes.NotFound)
                             .ToProblemDetails(statusCode: StatusCodes.Status404NotFound),
+                    duplicatedError =>
+                        Problem
+                            .Multiple(2)
+                            .Failure(
+                                "parentIssueId",
+                                "'parentIssueId' and 'subIssueId' must be unique",
+                                ErrorCodes.Duplicated
+                            )
+                            .Failure(
+                                "subIssueId",
+                                "'parentIssueId' and 'subIssueId' must be unique",
+                                ErrorCodes.Duplicated
+                            )
+                            .ToProblemDetails(statusCode: StatusCodes.Status409Conflict),
                     checklistItem => TypedResults.Ok(checklistItem.ToResponse())
                 );
             }

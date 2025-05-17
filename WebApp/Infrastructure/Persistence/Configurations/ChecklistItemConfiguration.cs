@@ -36,6 +36,7 @@ public sealed class ChecklistItemConfiguration : IEntityTypeConfiguration<Checkl
         builder.HasOne(a => a.ParentIssue).WithMany(a => a.SubChecklistItems).HasForeignKey(a => a.ParentIssueId);
         builder.HasOne(a => a.SubIssue).WithMany(a => a.ParentChecklistItems).HasForeignKey(a => a.SubIssueId);
         builder.HasIndex(a => a.SubIssueId);
+        builder.HasIndex(a => new { a.ParentIssueId, a.SubIssueId }).IsUnique();
         builder.HasQueryFilter(a =>
             a.ParentIssue.DeletedTime == null && (a.SubIssue == null || a.SubIssue.DeletedTime == null)
         );

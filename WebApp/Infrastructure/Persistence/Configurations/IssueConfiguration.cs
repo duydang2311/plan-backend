@@ -21,9 +21,13 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasConversion<EnumToNumberConverter<IssuePriority, byte>>()
             .HasDefaultValue(IssuePriority.None);
         builder.Property(a => a.DeletedTime);
+        builder.Property(a => a.Description);
         builder.Property(a => a.PreviewDescription).HasMaxLength(256);
         builder.Property(a => a.StartTime);
         builder.Property(a => a.EndTime);
+        builder
+            .Property(a => a.Trigrams)
+            .HasComputedColumnSql("repeat(\"order_number\"::text || ' ', 4) || \"title\" || ' '", stored: true);
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);
@@ -34,6 +38,7 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.HasIndex(a => a.StatusId);
         builder.HasIndex(a => a.StatusRank);
         builder.HasIndex(a => a.DeletedTime);
+        builder.HasIndex(a => a.Trigrams).HasMethod("gin").HasOperators("gin_trgm_ops");
         builder.HasQueryFilter(a => a.DeletedTime == null);
     }
 }
