@@ -193,4 +193,4 @@ public sealed class NotificationHubService(
 [JsonSerializable(typeof(ProjectCreatedEvent))]
 [JsonSerializable(typeof(ProjectMemberInvitedEvent))]
 [JsonSerializable(typeof(WorkspaceMemberInvitedEvent))]
-internal partial class MessagingJsonContext : JsonSerializerContext;
+internal sealed partial class MessagingJsonContext : JsonSerializerContext;
