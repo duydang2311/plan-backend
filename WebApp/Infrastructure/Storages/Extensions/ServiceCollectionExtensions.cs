@@ -28,7 +28,6 @@ public static partial class ServiceCollectionExtensions
             (provider) =>
             {
                 var options = provider.GetRequiredService<IOptions<R2Options>>().Value;
-                AWSConfigsS3.UseSignatureVersion4 = true;
                 return new AmazonS3Client(
                     options.S3AccessKeyId,
                     options.S3SecretAccessKey,
