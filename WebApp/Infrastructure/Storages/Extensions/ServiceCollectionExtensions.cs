@@ -1,4 +1,3 @@
-using Amazon;
 using Amazon.S3;
 using CloudinaryDotNet;
 using Microsoft.Extensions.Options;

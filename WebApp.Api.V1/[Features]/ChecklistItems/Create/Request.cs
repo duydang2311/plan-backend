@@ -53,7 +53,10 @@ public sealed class RequestValidator : Validator<Request>
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
+    [MapProperty(nameof(Request.Content), nameof(CreateChecklistItemTodo.Contents))]
     public static partial CreateChecklistItemTodo ToTodoCommand(this Request request);
 
     public static partial CreateChecklistItemSubIssue ToSubIssueCommand(this Request request);
+
+    public static string[] ToContents(string? content) => [content!];
 }

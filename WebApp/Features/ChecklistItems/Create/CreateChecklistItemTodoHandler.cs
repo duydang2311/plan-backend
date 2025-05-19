@@ -8,22 +8,24 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Features.ChecklistItems.Create;
 
 public sealed record CreateChecklistItemTodoHandler(AppDbContext db)
-    : ICommandHandler<CreateChecklistItemTodo, OneOf<ParentIssueNotFoundError, ChecklistItem>>
+    : ICommandHandler<CreateChecklistItemTodo, OneOf<ParentIssueNotFoundError, IReadOnlyCollection<ChecklistItem>>>
 {
-    public async Task<OneOf<ParentIssueNotFoundError, ChecklistItem>> ExecuteAsync(
+    public async Task<OneOf<ParentIssueNotFoundError, IReadOnlyCollection<ChecklistItem>>> ExecuteAsync(
         CreateChecklistItemTodo command,
         CancellationToken ct
     )
     {
-        var checklistItem = new ChecklistItem
-        {
-            ParentIssueId = command.ParentIssueId,
-            Kind = ChecklistItemKind.Todo,
-            Content = command.Content,
-            Completed = false,
-        };
+        var checklistItems = command
+            .Contents.Select(a => new ChecklistItem
+            {
+                ParentIssueId = command.ParentIssueId,
+                Kind = ChecklistItemKind.Todo,
+                Content = a,
+                Completed = false,
+            })
+            .ToList();
 
-        db.Add(checklistItem);
+        db.AddRange(checklistItems);
         try
         {
             await db.SaveChangesAsync(ct).ConfigureAwait(false);
@@ -41,6 +43,6 @@ public sealed record CreateChecklistItemTodoHandler(AppDbContext db)
             throw;
         }
 
-        return checklistItem;
+        return checklistItems;
     }
 }

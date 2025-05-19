@@ -29,7 +29,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
                         Problem
                             .Failure("parentIssueId", "Parent issue not found", ErrorCodes.NotFound)
                             .ToProblemDetails(statusCode: StatusCodes.Status404NotFound),
-                    checklistItem => TypedResults.Ok(checklistItem.ToResponse())
+                    checklistItem => TypedResults.Ok(checklistItem.First().ToResponse())
                 );
             }
             case ChecklistItemKind.SubIssue:
