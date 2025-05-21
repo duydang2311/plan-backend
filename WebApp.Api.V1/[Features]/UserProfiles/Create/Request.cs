@@ -49,7 +49,7 @@ public sealed class RequestValidator : Validator<Request>
     }
 }
 
-[Mapper]
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
     public static partial CreateUserProfile ToCommand(this Request request);
