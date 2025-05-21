@@ -21,10 +21,7 @@ public static partial class DtoMapper
     public static IReadOnlyCollection<BaseUserDto>? UsersToDto(IReadOnlyCollection<User> users) =>
         UsersToDtoInternal(users);
 
-    private static partial BaseUserProfileDto? UserProfileToDtoInternal(UserProfile? userProfile);
-
-    public static BaseUserProfileDto? UserProfileToDto(UserProfile userProfile) =>
-        UserProfileToDtoInternal(userProfile);
+    public static partial BaseUserProfileDto? UserProfileToDto(UserProfile? userProfile);
 
     private static partial BaseChatDto? ChatToDtoInternal(Chat? chat);
 
@@ -141,4 +138,12 @@ public static partial class DtoMapper
 
     public static BaseChecklistItemDto? ChecklistItemToDto(ChecklistItem checklistItem) =>
         ChecklistItemToDtoInternal(checklistItem);
+
+    private static partial ICollection<BaseUserSocialLinkDto>? UserSocialLinksToDtoInternal(
+        ICollection<UserSocialLink>? userSocialLinks
+    );
+
+    public static ICollection<BaseUserSocialLinkDto>? UserSocialLinksToDto(
+        ICollection<UserSocialLink> userSocialLinks
+    ) => UserSocialLinksToDtoInternal(userSocialLinks);
 }
