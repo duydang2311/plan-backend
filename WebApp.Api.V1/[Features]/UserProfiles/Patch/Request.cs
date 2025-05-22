@@ -18,6 +18,10 @@ public sealed record Request
     {
         public string? DisplayName { get; init; }
         public string? Bio { get; init; }
+        public string? ImageResourceType { get; init; }
+        public string? ImagePublicId { get; init; }
+        public string? ImageFormat { get; init; }
+        public int? ImageVersion { get; init; }
     }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
@@ -30,7 +34,17 @@ public sealed class RequestValidator : Validator<Request>
     {
         RuleFor(a => a.Patch).NotNull().WithErrorCode(ErrorCodes.Required);
         RuleFor(a => a.Patch)
-            .Must(a => a is not null && (a.DisplayName is not null || a.Bio is not null))
+            .Must(a =>
+                a is not null
+                && (
+                    a.DisplayName is not null
+                    || a.Bio is not null
+                    || a.ImageResourceType is not null
+                    || a.ImagePublicId is not null
+                    || a.ImageFormat is not null
+                    || a.ImageVersion is not null
+                )
+            )
             .WithErrorCode(ErrorCodes.InvalidValue);
     }
 }

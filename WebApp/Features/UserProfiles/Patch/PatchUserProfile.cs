@@ -15,5 +15,9 @@ public sealed record PatchUserProfile : ICommand<OneOf<NotFoundError, InvalidPat
     {
         public string? DisplayName { get; init; }
         public string? Bio { get; init; }
+        public string? ImageResourceType { get; init; }
+        public string? ImagePublicId { get; init; }
+        public string? ImageFormat { get; init; }
+        public int? ImageVersion { get; init; }
     }
 }

@@ -7,8 +7,9 @@ public sealed class Endpoint : Endpoint<Request, Ok<Response>>
 {
     public override void Configure()
     {
-        Get("users/profiles/signed-upload");
+        Post("users/profiles/signed-upload");
         Version(1);
+        Description(a => a.ClearDefaultAccepts().Accepts<Request>(isOptional: true, "*/*"));
     }
 
     public override async Task<Ok<Response>> ExecuteAsync(Request req, CancellationToken ct)

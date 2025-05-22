@@ -28,6 +28,25 @@ public sealed class PatchUserProfileHandler(AppDbContext db)
         {
             updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Bio, bio));
         }
+        if (command.Patch.TryGetValue(a => a.ImageResourceType, out var imageResourceType))
+        {
+            updateEx = ExpressionHelper.Append(
+                updateEx,
+                a => a.SetProperty(a => a.Image.ResourceType, imageResourceType)
+            );
+        }
+        if (command.Patch.TryGetValue(a => a.ImagePublicId, out var imagePublicId))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Image.PublicId, imagePublicId));
+        }
+        if (command.Patch.TryGetValue(a => a.ImageFormat, out var imageFormat))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Image.Format, imageFormat));
+        }
+        if (command.Patch.TryGetValue(a => a.ImageVersion, out var imageVersion))
+        {
+            updateEx = ExpressionHelper.Append(updateEx, a => a.SetProperty(a => a.Image.Version, imageVersion));
+        }
 
         if (updateEx is null)
         {
