@@ -146,4 +146,6 @@ public static partial class DtoMapper
     public static ICollection<BaseUserSocialLinkDto>? UserSocialLinksToDto(
         ICollection<UserSocialLink> userSocialLinks
     ) => UserSocialLinksToDtoInternal(userSocialLinks);
+
+    public static partial BaseMilestoneDto MilestoneToDto(Milestone milestone);
 }

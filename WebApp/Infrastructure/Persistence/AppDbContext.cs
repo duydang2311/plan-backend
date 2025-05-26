@@ -43,6 +43,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<ResourceFile> ResourceFiles => Set<ResourceFile>();
     public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
     public DbSet<UserSocialLink> UserSocialLinks => Set<UserSocialLink>();
+    public DbSet<Milestone> Milestones => Set<Milestone>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

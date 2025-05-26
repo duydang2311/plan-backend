@@ -16,6 +16,16 @@ public static class HtmlHelper
 
         var sw = new StringWriter();
         ConvertTo(doc.DocumentNode, sw, maxLength);
+
+        var sb = sw.GetStringBuilder();
+        if (maxLength != -1 && sb.Length > maxLength)
+        {
+            sb.Remove(maxLength, sb.Length - maxLength);
+        }
+        while (sb[^1] == ' ')
+        {
+            sb.Remove(sb.Length - 1, 1);
+        }
         sw.Flush();
         return sw.ToString();
     }
@@ -90,22 +100,16 @@ public static class HtmlHelper
                 // check the text is meaningful and not a bunch of whitespaces
                 if (html.Trim().Length > 0)
                 {
-                    sw.Write(HtmlEntity.DeEntitize(html));
+                    var text = HtmlEntity.DeEntitize(html)?.Trim();
+                    if (!string.IsNullOrEmpty(text) && !text.EndsWith('.'))
+                    {
+                        text += ". ";
+                    }
+                    sw.Write(text);
                 }
                 break;
 
             case HtmlNodeType.Element:
-                switch (node.Name)
-                {
-                    case "p":
-                        // treat paragraphs as crlf
-                        sw.Write("\r\n");
-                        break;
-                    case "br":
-                        sw.Write("\r\n");
-                        break;
-                }
-
                 if (node.HasChildNodes)
                 {
                     ConvertContentTo(node, sw, maxLength);

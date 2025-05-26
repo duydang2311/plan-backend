@@ -18,6 +18,8 @@ public sealed class MilestoneConfiguration : IEntityTypeConfiguration<Milestone>
         builder.Property(a => a.Title).HasMaxLength(128);
         builder.Property(a => a.Description);
         builder.Property(a => a.PreviewDescription).HasMaxLength(256);
+        builder.Property(a => a.Emoji).HasMaxLength(26);
+        builder.Property(a => a.Color).HasMaxLength(40);
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Milestones).HasForeignKey(a => a.ProjectId);

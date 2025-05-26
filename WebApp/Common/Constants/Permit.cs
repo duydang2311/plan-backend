@@ -89,4 +89,9 @@ public static class Permit
     public const string ReadChecklistItem = "checklist-items:read";
     public const string UpdateChecklistItem = "checklist-items:update";
     public const string DeleteChecklistItem = "checklist-items:delete";
+
+    public const string CreateMilestone = "milestone:create";
+    public const string ReadMilestone = "milestone:read";
+    public const string UpdateMilestone = "milestone:update";
+    public const string DeleteMilestone = "milestone:delete";
 }

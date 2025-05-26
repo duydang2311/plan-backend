@@ -13,6 +13,8 @@ public sealed record Milestone
     public Project Project { get; init; } = null!;
     public Instant EndTime { get; init; }
     public string Title { get; init; } = null!;
+    public string Emoji { get; init; } = null!;
+    public string Color { get; init; } = null!;
     public string? Description { get; init; }
     public string? PreviewDescription { get; init; }
     public ICollection<Issue> Issues { get; init; } = null!;
