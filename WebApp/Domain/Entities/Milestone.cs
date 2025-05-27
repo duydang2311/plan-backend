@@ -1,6 +1,4 @@
 using NodaTime;
-using WebApp.Common.Interfaces;
-using WebApp.Domain.Constants;
 
 namespace WebApp.Domain.Entities;
 
@@ -17,5 +15,7 @@ public sealed record Milestone
     public string Color { get; init; } = null!;
     public string? Description { get; init; }
     public string? PreviewDescription { get; init; }
+    public MilestoneStatusId? StatusId { get; init; }
+    public MilestoneStatus? Status { get; init; }
     public ICollection<Issue> Issues { get; init; } = null!;
 }

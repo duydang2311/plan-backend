@@ -35,6 +35,9 @@ public sealed class CreateProjectHandler(AppDbContext db, IDbContextOutbox outbo
         {
             outbox.Enroll(db);
             await outbox
+                .InvokeAsync(new ProjectCreatedInline { Db = db, ProjectId = project.Id }, ct)
+                .ConfigureAwait(false);
+            await outbox
                 .PublishAsync(new ProjectCreated { ProjectId = project.Id, WorkspaceId = project.WorkspaceId })
                 .ConfigureAwait(false);
             await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);

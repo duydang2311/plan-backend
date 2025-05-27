@@ -20,4 +20,5 @@ public sealed record class Project : ISoftDelete
     public ICollection<Team> Teams { get; init; } = null!;
     public ICollection<ProjectMember> Members { get; init; } = null!;
     public ICollection<Milestone> Milestones { get; init; } = null!;
+    public ICollection<MilestoneStatus> MilestoneStatuses { get; init; } = null!;
 }

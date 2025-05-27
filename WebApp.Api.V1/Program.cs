@@ -168,6 +168,8 @@ builder.Services.Configure<JsonOptions>(
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<WorkspaceInvitationId>(idEncoder));
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ProjectMemberInvitationId>(idEncoder));
         x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<ChecklistItemId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<MilestoneId>(idEncoder));
+        x.SerializerOptions.Converters.Add(new EncodedEntityIdLongJsonConverter<MilestoneStatusId>(idEncoder));
         x.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     }
 );
@@ -327,6 +329,24 @@ app.UseFastEndpoints(
                     idEncoder,
                     input,
                     static value => new ChecklistItemId { Value = value }
+                ),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<MilestoneId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    idEncoder,
+                    input,
+                    static value => new MilestoneId { Value = value }
+                ),
+            handleNull: true
+        );
+        config.Binding.ValueParserFor<MilestoneStatusId>(
+            input =>
+                EncodedEntityIdValueParsers.ParseLong(
+                    idEncoder,
+                    input,
+                    static value => new MilestoneStatusId { Value = value }
                 ),
             handleNull: true
         );

@@ -44,6 +44,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
     public DbSet<UserSocialLink> UserSocialLinks => Set<UserSocialLink>();
     public DbSet<Milestone> Milestones => Set<Milestone>();
+    public DbSet<MilestoneStatus> MilestoneStatuses => Set<MilestoneStatus>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

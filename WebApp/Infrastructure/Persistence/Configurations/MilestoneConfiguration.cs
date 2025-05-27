@@ -20,10 +20,15 @@ public sealed class MilestoneConfiguration : IEntityTypeConfiguration<Milestone>
         builder.Property(a => a.PreviewDescription).HasMaxLength(256);
         builder.Property(a => a.Emoji).HasMaxLength(26);
         builder.Property(a => a.Color).HasMaxLength(40);
+        builder
+            .Property(a => a.StatusId)
+            .HasConversion<EntityIdConverter<MilestoneStatusId, long>>()
+            .ValueGeneratedNever();
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Milestones).HasForeignKey(a => a.ProjectId);
         builder.HasMany(a => a.Issues).WithOne(a => a.Milestone).HasForeignKey(a => a.MilestoneId);
+        builder.HasOne(a => a.Status).WithMany(a => a.Milestones).HasForeignKey(a => a.StatusId);
         builder.HasQueryFilter(a => a.Project.DeletedTime == null);
     }
 }
