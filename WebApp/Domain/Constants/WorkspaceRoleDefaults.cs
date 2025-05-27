@@ -42,6 +42,8 @@ public sealed record WorkspaceRoleDefaults
             Permit.ReadIssueAssignee,
             Permit.ReadTeamIssue,
             Permit.ReadChecklistItem,
+            Permit.ReadMilestone,
+            Permit.ReadMilestoneStatus,
         ]
     );
 
@@ -83,6 +85,12 @@ public sealed record WorkspaceRoleDefaults
             Permit.CreateChecklistItem,
             Permit.DeleteChecklistItem,
             Permit.UpdateChecklistItem,
+            Permit.CreateMilestone,
+            Permit.UpdateMilestone,
+            Permit.DeleteMilestone,
+            Permit.CreateMilestoneStatus,
+            Permit.UpdateMilestoneStatus,
+            Permit.DeleteMilestoneStatus,
         ]
     );
 

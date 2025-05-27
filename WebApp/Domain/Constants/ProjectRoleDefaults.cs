@@ -33,6 +33,8 @@ public sealed record ProjectRoleDefaults
             Permit.ReadProjectResourceFile,
             Permit.ReadIssueAssignee,
             Permit.ReadTeamIssue,
+            Permit.ReadMilestone,
+            Permit.ReadMilestoneStatus,
         ]
     );
     public static readonly ProjectRoleDefaults Member = new(
@@ -63,6 +65,12 @@ public sealed record ProjectRoleDefaults
             Permit.DeleteIssue,
             Permit.DeleteIssueAssignee,
             Permit.DeleteTeamIssue,
+            Permit.CreateMilestone,
+            Permit.UpdateMilestone,
+            Permit.DeleteMilestone,
+            Permit.CreateMilestoneStatus,
+            Permit.UpdateMilestoneStatus,
+            Permit.DeleteMilestoneStatus,
         ]
     );
     public static readonly ProjectRoleDefaults Admin = new(

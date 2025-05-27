@@ -5,7 +5,7 @@ namespace WebApp.Features.MilestoneStatuses.Create;
 
 public static class ProjectCreatedInlineHandler
 {
-    public static void Handle(ProjectCreatedInline projectCreated, CancellationToken cancellationToken)
+    public static void Handle(ProjectCreatedInline projectCreated)
     {
         projectCreated.Db.AddRange(
             MilestoneStatusDefaults.MilestoneStatuses.Select(a => a with { ProjectId = projectCreated.ProjectId })

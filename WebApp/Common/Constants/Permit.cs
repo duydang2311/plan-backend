@@ -94,4 +94,9 @@ public static class Permit
     public const string ReadMilestone = "milestone:read";
     public const string UpdateMilestone = "milestone:update";
     public const string DeleteMilestone = "milestone:delete";
+
+    public const string CreateMilestoneStatus = "milestone-status:create";
+    public const string ReadMilestoneStatus = "milestone-status:read";
+    public const string UpdateMilestoneStatus = "milestone-status:update";
+    public const string DeleteMilestoneStatus = "milestone-status:delete";
 }
