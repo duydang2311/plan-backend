@@ -149,7 +149,8 @@ public static partial class DtoMapper
 
     private static partial BaseMilestoneDto? MilestoneToDtoInternal(Milestone? milestone);
 
-    public static BaseMilestoneDto? MilestoneToDto(Milestone milestone) => MilestoneToDtoInternal(milestone);
+    [UserMapping(Default = true)]
+    public static BaseMilestoneDto MilestoneToDto(Milestone milestone) => MilestoneToDtoInternal(milestone);
 
     private static partial BaseMilestoneStatusDto? MilestoneStatusToDtoInternal(MilestoneStatus? milestoneStatus);
 
