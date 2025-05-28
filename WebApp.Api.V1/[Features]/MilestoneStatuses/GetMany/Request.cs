@@ -5,9 +5,9 @@ using Riok.Mapperly.Abstractions;
 using WebApp.Common.Constants;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
-using WebApp.Features.Milestones.GetMany;
+using WebApp.Features.MilestoneStatuses.GetMany;
 
-namespace WebApp.Api.V1.Milestones.GetMany;
+namespace WebApp.Api.V1.MilestoneStatuses.GetMany;
 
 public sealed record Request : Collective
 {
@@ -29,5 +29,5 @@ public sealed class RequestValidator : Validator<Request>
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class RequestMapper
 {
-    public static partial GetMilestones ToCommand(this Request request);
+    public static partial GetMilestoneStatuses ToCommand(this Request request);
 }

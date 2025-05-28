@@ -147,5 +147,22 @@ public static partial class DtoMapper
         ICollection<UserSocialLink> userSocialLinks
     ) => UserSocialLinksToDtoInternal(userSocialLinks);
 
-    public static partial BaseMilestoneDto MilestoneToDto(Milestone milestone);
+    private static partial BaseMilestoneDto? MilestoneToDtoInternal(Milestone? milestone);
+
+    public static BaseMilestoneDto? MilestoneToDto(Milestone milestone) => MilestoneToDtoInternal(milestone);
+
+    private static partial BaseMilestoneStatusDto? MilestoneStatusToDtoInternal(MilestoneStatus? milestoneStatus);
+
+    [UserMapping(Default = true)]
+    public static BaseMilestoneStatusDto MilestoneStatusToDto(MilestoneStatus milestoneStatus) =>
+        MilestoneStatusToDtoInternal(milestoneStatus);
+
+    private static partial BaseProjectDto? ProjectToDtoInternal(Project? project);
+
+    [UserMapping(Default = true)]
+    public static BaseProjectDto ProjectToDto(Project project) => ProjectToDtoInternal(project);
+
+    public static partial IReadOnlyCollection<BaseMilestoneStatusDto> MilestoneStatusesToDto(
+        IReadOnlyCollection<MilestoneStatus> milestoneStatuses
+    );
 }

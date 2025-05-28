@@ -9,9 +9,12 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Features.Milestones.Create;
 
 public sealed record CreateMilestoneHandler(AppDbContext db)
-    : ICommandHandler<CreateMilestone, OneOf<NotFoundError, Milestone>>
+    : ICommandHandler<CreateMilestone, OneOf<ProjectNotFoundError, MilestoneStatusNotFoundError, Milestone>>
 {
-    public async Task<OneOf<NotFoundError, Milestone>> ExecuteAsync(CreateMilestone command, CancellationToken ct)
+    public async Task<OneOf<ProjectNotFoundError, MilestoneStatusNotFoundError, Milestone>> ExecuteAsync(
+        CreateMilestone command,
+        CancellationToken ct
+    )
     {
         var previewDescription = string.IsNullOrEmpty(command.Description)
             ? null
@@ -24,6 +27,7 @@ public sealed record CreateMilestoneHandler(AppDbContext db)
             PreviewDescription = previewDescription,
             Emoji = command.Emoji,
             Color = command.Color,
+            StatusId = command.StatusId,
         };
 
         db.Add(milestone);
@@ -33,13 +37,16 @@ public sealed record CreateMilestoneHandler(AppDbContext db)
         }
         catch (ReferenceConstraintException e)
         {
-            if (
-                e.ConstraintProperties.Any(b =>
-                    b.Equals(nameof(Milestone.ProjectId), StringComparison.OrdinalIgnoreCase)
-                )
-            )
+            foreach (var property in e.ConstraintProperties)
             {
-                return new NotFoundError();
+                if (property.Equals(nameof(Milestone.ProjectId), StringComparison.OrdinalIgnoreCase))
+                {
+                    return new ProjectNotFoundError();
+                }
+                if (property.Equals(nameof(Milestone.StatusId), StringComparison.OrdinalIgnoreCase))
+                {
+                    return new MilestoneStatusNotFoundError();
+                }
             }
             throw;
         }

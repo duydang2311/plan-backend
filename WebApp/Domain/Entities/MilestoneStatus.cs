@@ -6,7 +6,7 @@ public sealed record MilestoneStatus
 {
     public MilestoneStatusId Id { get; init; }
     public MilestoneStatusCategory Category { get; init; }
-    public int Rank { get; init; }
+    public string Rank { get; init; } = null!;
     public string Value { get; init; } = string.Empty;
     public string Color { get; init; } = string.Empty;
     public string? Icon { get; init; }

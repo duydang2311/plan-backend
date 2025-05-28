@@ -3,7 +3,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Api.V1.Common.Dtos;
 
-public record BaseMilestoneDto
+public sealed record BaseMilestoneDto
 {
     public Instant? CreatedTime { get; init; }
     public Instant? UpdatedTime { get; init; }

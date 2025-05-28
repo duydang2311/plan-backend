@@ -6,6 +6,7 @@ using OneOf;
 using OneOf.Types;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 
@@ -73,7 +74,11 @@ public sealed record CreateWorkspaceResourceHandler(AppDbContext db)
                             MimeType = a.MimeType,
                         })
                         .ToList() ?? [],
-                Rank = OrderKeyGenerator.GenerateKeyBetween(lastResource?.Rank, null),
+                Rank = OrderKeyGenerator.GenerateKeyBetween(
+                    lastResource?.Rank,
+                    null,
+                    FractionalIndexingDefaults.BASE_95_DIGITS
+                ),
             },
         };
 

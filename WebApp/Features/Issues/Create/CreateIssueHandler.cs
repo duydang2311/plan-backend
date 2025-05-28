@@ -7,6 +7,7 @@ using MimeKit.Text;
 using OneOf;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
+using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
@@ -43,7 +44,11 @@ public sealed class CreateIssueHandler(AppDbContext db, IDbContextOutbox outbox)
             Description = command.Description,
             PreviewDescription = previewDescription,
             StatusId = command.StatusId,
-            StatusRank = OrderKeyGenerator.GenerateKeyBetween(lastIssueWithSameStatus?.StatusRank, null),
+            StatusRank = OrderKeyGenerator.GenerateKeyBetween(
+                lastIssueWithSameStatus?.StatusRank,
+                null,
+                FractionalIndexingDefaults.BASE_95_DIGITS
+            ),
         };
 
         db.Add(issue);

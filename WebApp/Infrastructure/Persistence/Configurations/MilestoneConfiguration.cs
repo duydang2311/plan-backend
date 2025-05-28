@@ -28,7 +28,11 @@ public sealed class MilestoneConfiguration : IEntityTypeConfiguration<Milestone>
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Milestones).HasForeignKey(a => a.ProjectId);
         builder.HasMany(a => a.Issues).WithOne(a => a.Milestone).HasForeignKey(a => a.MilestoneId);
-        builder.HasOne(a => a.Status).WithMany(a => a.Milestones).HasForeignKey(a => a.StatusId);
+        builder
+            .HasOne(a => a.Status)
+            .WithMany(a => a.Milestones)
+            .HasForeignKey(a => a.StatusId)
+            .OnDelete(DeleteBehavior.SetNull);
         builder.HasQueryFilter(a => a.Project.DeletedTime == null);
     }
 }

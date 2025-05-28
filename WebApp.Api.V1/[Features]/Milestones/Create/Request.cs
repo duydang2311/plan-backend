@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
+using Riok.Mapperly.Abstractions;
 using WebApp.Common.Constants;
 using WebApp.Domain.Entities;
 using WebApp.Features.Milestones.Create;
@@ -14,6 +15,7 @@ public sealed record Request
     public string? Description { get; init; }
     public string? Emoji { get; init; }
     public string? Color { get; init; }
+    public MilestoneStatusId? StatusId { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }
@@ -30,17 +32,8 @@ public sealed class RequestValidator : Validator<Request>
     }
 }
 
-public static class RequestMapper
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public static partial class RequestMapper
 {
-    public static CreateMilestone ToCommand(this Request request)
-    {
-        return new CreateMilestone
-        {
-            ProjectId = request.ProjectId ?? ProjectId.Empty,
-            Title = request.Title ?? string.Empty,
-            Description = request.Description,
-            Emoji = request.Emoji ?? string.Empty,
-            Color = request.Color ?? string.Empty,
-        };
-    }
+    public static partial CreateMilestone ToCommand(this Request request);
 }

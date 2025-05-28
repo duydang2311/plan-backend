@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace WebApp.Api.V1.Milestones.GetMany;
+namespace WebApp.Api.V1.MilestoneStatuses.GetMany;
 
 using Results = Results<ForbidHttpResult, Ok<Response>>;
 
@@ -9,7 +9,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
 {
     public override void Configure()
     {
-        Get("milestones");
+        Get("milestone-statuses");
         Version(1);
         PreProcessor<Authorize>();
     }

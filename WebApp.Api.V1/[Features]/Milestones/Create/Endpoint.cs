@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApp.Api.V1.Common.Helpers;
+using WebApp.Common.Constants;
 
 namespace WebApp.Api.V1.Milestones.Create;
 
@@ -19,8 +20,14 @@ public sealed class Endpoint : Endpoint<Request, Results>
     {
         var oneOf = await req.ToCommand().ExecuteAsync(ct).ConfigureAwait(false);
         return oneOf.Match<Results>(
-            notFoundError =>
-                Problem.Detail("Project not found").ToProblemDetails(statusCode: StatusCodes.Status404NotFound),
+            projectNotFoundError =>
+                Problem
+                    .Failure("projectId", "Project not found", ErrorCodes.NotFound)
+                    .ToProblemDetails(statusCode: StatusCodes.Status404NotFound),
+            milestoneStatusNotFoundError =>
+                Problem
+                    .Failure("statusId", "Status not found", ErrorCodes.NotFound)
+                    .ToProblemDetails(statusCode: StatusCodes.Status404NotFound),
             milestone => TypedResults.Ok(milestone.ToResponse())
         );
     }
