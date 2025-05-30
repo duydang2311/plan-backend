@@ -15,7 +15,6 @@ public sealed record BaseMilestoneDto
     public string? Emoji { get; init; }
     public string? Color { get; init; }
     public string? Description { get; init; }
-    public string? PreviewDescription { get; init; }
     public MilestoneStatusId? StatusId { get; init; }
     public BaseMilestoneStatusDto? Status { get; init; }
 }

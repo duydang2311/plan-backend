@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529120834_106_milestone-statuses_color-max-length")]
+    partial class _106_milestonestatuses_colormaxlength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -539,10 +542,10 @@ namespace WebApp.Host.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_time");
 
-                    b.Property<string>("EndTimeZone")
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("end_time_zone");
+                    b.Property<string>("PreviewDescription")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("preview_description");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid")
@@ -567,9 +570,6 @@ namespace WebApp.Host.Migrations
                     b.HasKey("Id")
                         .HasName("pk_milestones");
 
-                    b.HasIndex("EndTime")
-                        .HasDatabaseName("ix_milestones_end_time");
-
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_milestones_project_id");
 
@@ -593,6 +593,7 @@ namespace WebApp.Host.Migrations
                         .HasColumnName("category");
 
                     b.Property<string>("Color")
+                        .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)")
                         .HasColumnName("color");
@@ -2050,7 +2051,6 @@ namespace WebApp.Host.Migrations
                     b.HasOne("WebApp.Domain.Entities.Milestone", "Milestone")
                         .WithMany("Issues")
                         .HasForeignKey("MilestoneId")
-                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_issues_milestones_milestone_id");
 
                     b.HasOne("WebApp.Domain.Entities.Project", "Project")

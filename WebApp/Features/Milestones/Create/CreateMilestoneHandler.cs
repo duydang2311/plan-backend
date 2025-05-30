@@ -1,7 +1,6 @@
 using EntityFramework.Exceptions.Common;
 using FastEndpoints;
 using OneOf;
-using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
@@ -16,15 +15,11 @@ public sealed record CreateMilestoneHandler(AppDbContext db)
         CancellationToken ct
     )
     {
-        var previewDescription = string.IsNullOrEmpty(command.Description)
-            ? null
-            : HtmlHelper.ConvertToPlainText(command.Description, 256);
         var milestone = new Milestone
         {
             ProjectId = command.ProjectId,
             Title = command.Title,
             Description = command.Description,
-            PreviewDescription = previewDescription,
             Emoji = command.Emoji,
             Color = command.Color,
             StatusId = command.StatusId,

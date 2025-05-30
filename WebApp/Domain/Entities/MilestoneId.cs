@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace WebApp.Domain.Entities;
 
-public readonly struct MilestoneId : IEntityId<long>
+public readonly record struct MilestoneId : IEntityId<long>
 {
     public long Value { get; init; }
 

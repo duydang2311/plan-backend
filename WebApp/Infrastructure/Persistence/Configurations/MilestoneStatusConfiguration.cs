@@ -16,7 +16,7 @@ public sealed class MilestoneStatusConfiguration : IEntityTypeConfiguration<Mile
         builder.Property(a => a.Rank).HasMaxLength(128).UseCollation("C");
         builder.Property(a => a.Value).HasMaxLength(64);
         builder.Property(a => a.Icon).HasMaxLength(64);
-        builder.Property(a => a.Color).HasMaxLength(16);
+        builder.Property(a => a.Color).HasMaxLength(64);
         builder.Property(a => a.Description).HasMaxLength(256);
         builder.Property(a => a.ProjectId).HasConversion<EntityGuidConverter<ProjectId>>();
         builder.Property(a => a.IsDefault);

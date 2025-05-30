@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250530052035_107_milestones_end-time-idx_preview-description-rm")]
+    partial class _107_milestones_endtimeidx_previewdescriptionrm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -538,11 +541,6 @@ namespace WebApp.Host.Migrations
                     b.Property<Instant>("EndTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_time");
-
-                    b.Property<string>("EndTimeZone")
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("end_time_zone");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid")
