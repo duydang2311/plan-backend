@@ -22,7 +22,7 @@ public static class HtmlHelper
         {
             sb.Remove(maxLength, sb.Length - maxLength);
         }
-        while (sb[^1] == ' ')
+        while (sb.Length > 0 && sb[^1] == ' ')
         {
             sb.Remove(sb.Length - 1, 1);
         }
