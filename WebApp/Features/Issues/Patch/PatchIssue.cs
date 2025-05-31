@@ -23,5 +23,6 @@ public sealed record PatchIssue : ICommand<OneOf<ValidationFailures, NotFoundErr
         public Instant? StartTime { get; init; }
         public Instant? EndTime { get; init; }
         public string? TimelineZone { get; init; }
+        public MilestoneId? MilestoneId { get; init; }
     }
 }

@@ -26,4 +26,6 @@ public record BaseIssueDto
     public IssuePriority? Priority { get; init; }
     public ICollection<BaseTeamDto>? Teams { get; init; }
     public ICollection<BaseUserDto>? Assignees { get; init; }
+    public MilestoneId? MilestoneId { get; init; }
+    public BaseMilestoneDto? Milestone { get; init; }
 }

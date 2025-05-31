@@ -3,6 +3,7 @@ using FastEndpoints;
 using FluentValidation;
 using NodaTime;
 using Riok.Mapperly.Abstractions;
+using WebApp.Common.Constants;
 using WebApp.Common.Models;
 using WebApp.Domain.Constants;
 using WebApp.Domain.Entities;
@@ -25,6 +26,7 @@ public sealed record Request
         public Instant? StartTime { get; init; }
         public Instant? EndTime { get; init; }
         public string? TimelineZone { get; init; }
+        public MilestoneId? MilestoneId { get; init; }
     }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
@@ -35,7 +37,27 @@ public sealed class RequestValidator : Validator<Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.Patch).NotNull();
+        RuleFor(x => x.Patch).NotNull().WithErrorCode(ErrorCodes.Required);
+        When(
+            a => a.Patch is not null,
+            () =>
+            {
+                RuleFor(a => a.Patch)
+                    .Must(
+                        (a) =>
+                            a!.Has(b => b.Title)
+                            || a.Has(b => b.Description)
+                            || a.Has(b => b.Priority)
+                            || a.Has(b => b.StatusId)
+                            || a.Has(b => b.StatusRank)
+                            || a.Has(b => b.StartTime)
+                            || a.Has(b => b.EndTime)
+                            || a.Has(b => b.TimelineZone)
+                            || a.Has(b => b.MilestoneId)
+                    )
+                    .WithErrorCode(ErrorCodes.InvalidValue);
+            }
+        );
     }
 }
 
