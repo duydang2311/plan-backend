@@ -101,9 +101,9 @@ public static class HtmlHelper
                 if (html.Trim().Length > 0)
                 {
                     var text = HtmlEntity.DeEntitize(html)?.Trim();
-                    if (!string.IsNullOrEmpty(text) && !text.EndsWith('.'))
+                    if (!string.IsNullOrEmpty(text) && !text.EndsWith('.') && char.IsLetter(text[^1]))
                     {
-                        text += ". ";
+                        text += ".";
                     }
                     sw.Write(text);
                 }
@@ -113,6 +113,26 @@ public static class HtmlHelper
                 if (node.HasChildNodes)
                 {
                     ConvertContentTo(node, sw, maxLength);
+                }
+
+                switch (node.Name)
+                {
+                    case "p":
+                    case "div":
+                    case "h1":
+                    case "h2":
+                    case "h3":
+                    case "h4":
+                    case "h5":
+                    case "h6":
+                    case "li":
+                    case "br":
+                    case "hr":
+                        sw.WriteLine();
+                        break;
+                    case "span":
+                        sw.Write(" ");
+                        break;
                 }
                 break;
         }
