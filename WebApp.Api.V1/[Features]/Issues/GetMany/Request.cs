@@ -16,6 +16,7 @@ public sealed record Request : Collective
     public bool? NullStatusId { get; init; }
     public IReadOnlyCollection<IssueId>? ExcludeIssueIds { get; init; }
     public IssueId? ExcludeChecklistItemParentIssueId { get; init; }
+    public string? StatusRankCursor { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId UserId { get; init; }

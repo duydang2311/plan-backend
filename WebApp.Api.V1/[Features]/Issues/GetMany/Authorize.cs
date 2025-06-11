@@ -18,7 +18,7 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
         }
 
         var db = context.HttpContext.Resolve<AppDbContext>();
-        var canRead = true;
+        var canRead = false;
 
         if (context.Request.TeamId.HasValue)
         {
@@ -31,13 +31,19 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
                     ct
                 )
                 .ConfigureAwait(false);
+            Console.WriteLine("Can read " + canRead);
         }
         else if (context.Request.ProjectId.HasValue)
         {
-            var projectPermissions = await permissionCache
-                .GetProjectPermissionsAsync(context.Request.ProjectId.Value, context.Request.UserId, ct)
+            canRead = await permissionCache
+                .HasProjectPermissionAsync(
+                    context.Request.ProjectId.Value,
+                    context.Request.UserId,
+                    Permit.ReadIssue,
+                    ct
+                )
                 .ConfigureAwait(false);
-            canRead = projectPermissions.Contains(Permit.ReadIssue);
+            Console.WriteLine("Can read " + canRead);
         }
 
         if (!canRead)

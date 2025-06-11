@@ -14,4 +14,5 @@ public sealed record GetIssues : Collective, ICommand<PaginatedList<Issue>>
     public bool? NullStatusId { get; init; }
     public IReadOnlyCollection<IssueId>? ExcludeIssueIds { get; init; }
     public IssueId? ExcludeChecklistItemParentIssueId { get; init; }
+    public string? StatusRankCursor { get; init; }
 }

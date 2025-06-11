@@ -61,21 +61,34 @@ public sealed class GetIssuesHandler(AppDbContext dbContext) : ICommandHandler<G
             );
         }
 
+        var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
+
+        var isKeysetPaginated = false;
+        if (!string.IsNullOrEmpty(command.StatusRankCursor))
+        {
+            query = query.Where(a => a.StatusRank.CompareTo(command.StatusRankCursor) > 0).OrderBy(a => a.StatusRank);
+            isKeysetPaginated = true;
+        }
+        else
+        {
+            query = command
+                .Order.Where(static x =>
+                    x.Name.EqualsEither(
+                        ["CreatedTime", "UpdatedTime", "Title", "OrderNumber", "Priority", "StatusRank", "Status.Rank"],
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
+        }
+
         if (!string.IsNullOrEmpty(command.Select))
         {
             query = query.Select(ExpressionHelper.Select<Issue, Issue>(command.Select));
         }
 
-        var totalCount = await query.CountAsync(ct).ConfigureAwait(false);
-        query = command
-            .Order.Where(static x =>
-                x.Name.EqualsEither(
-                    ["CreatedTime", "UpdatedTime", "Title", "OrderNumber", "Priority", "StatusRank", "Status.Rank"],
-                    StringComparison.OrdinalIgnoreCase
-                )
-            )
-            .SortOrDefault(query, x => x.OrderByDescending(x => x.CreatedTime));
-        var issues = await query.Skip(command.Offset).Take(command.Size).ToArrayAsync(ct).ConfigureAwait(false);
+        var issues = isKeysetPaginated
+            ? await query.Take(command.Size).ToListAsync(ct).ConfigureAwait(false)
+            : await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
 
         return new() { Items = issues, TotalCount = totalCount };
     }
