@@ -19,11 +19,6 @@ public class SessionAuthenticationSchemeHandler(
     HybridCache cache
 ) : AuthenticationHandler<SessionAuthenticationSchemeOptions>(options, logger, encoder)
 {
-    private const string MissingHeader =
-        $"Missing header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}'.";
-    private const string EmptyHeader =
-        $"Header '{SessionAuthenticationSchemeOptions.AuthorizationHeaderName}' is empty.";
-    private const string InvalidScheme = "Invalid authorization scheme";
     private const string MissingValue = "Missing session token";
     private const string BadToken = "Bad session token";
     private const string InvalidSession = "Invalid session";
@@ -42,19 +37,19 @@ public class SessionAuthenticationSchemeHandler(
             )
         )
         {
-            return AuthenticateResult.Fail(MissingHeader);
+            return AuthenticateResult.NoResult();
         }
 
         var header = headerValue.ToString();
         if (string.IsNullOrEmpty(header))
         {
-            return AuthenticateResult.Fail(EmptyHeader);
+            return AuthenticateResult.NoResult();
         }
 
         var type = header[..Scheme.Name.Length];
         if (string.IsNullOrEmpty(type) || !type.Equals(Scheme.Name))
         {
-            return AuthenticateResult.Fail(InvalidScheme);
+            return AuthenticateResult.NoResult();
         }
 
         var id = header[(Scheme.Name.Length + 1)..];
