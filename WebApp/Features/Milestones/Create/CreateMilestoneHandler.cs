@@ -19,6 +19,8 @@ public sealed record CreateMilestoneHandler(AppDbContext db)
         {
             ProjectId = command.ProjectId,
             Title = command.Title,
+            EndTime = command.EndTime,
+            EndTimeZone = command.EndTimeZone,
             Description = command.Description,
             Emoji = command.Emoji,
             Color = command.Color,

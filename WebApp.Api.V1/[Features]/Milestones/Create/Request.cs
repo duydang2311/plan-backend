@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FastEndpoints;
 using FluentValidation;
+using NodaTime;
 using Riok.Mapperly.Abstractions;
 using WebApp.Common.Constants;
 using WebApp.Domain.Entities;
@@ -12,6 +13,8 @@ public sealed record Request
 {
     public ProjectId? ProjectId { get; init; }
     public string? Title { get; init; }
+    public Instant? EndTime { get; init; }
+    public string? EndTimeZone { get; init; }
     public string? Description { get; init; }
     public string? Emoji { get; init; }
     public string? Color { get; init; }
@@ -27,6 +30,8 @@ public sealed class RequestValidator : Validator<Request>
     {
         RuleFor(a => a.ProjectId).NotNull().WithErrorCode(ErrorCodes.Required);
         RuleFor(a => a.Title).NotEmpty().WithErrorCode(ErrorCodes.Required);
+        RuleFor(a => a.EndTime).NotNull().WithErrorCode(ErrorCodes.Required);
+        RuleFor(a => a.EndTimeZone).NotEmpty().WithErrorCode(ErrorCodes.Required);
         RuleFor(a => a.Emoji).NotEmpty().WithErrorCode(ErrorCodes.Required);
         RuleFor(a => a.Color).NotEmpty().WithErrorCode(ErrorCodes.Required);
     }

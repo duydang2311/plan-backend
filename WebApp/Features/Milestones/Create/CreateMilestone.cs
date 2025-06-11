@@ -1,4 +1,5 @@
 using FastEndpoints;
+using NodaTime;
 using OneOf;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
@@ -9,6 +10,8 @@ public sealed record CreateMilestone : ICommand<OneOf<ProjectNotFoundError, Mile
 {
     public required ProjectId ProjectId { get; init; }
     public required string Title { get; init; }
+    public required Instant EndTime { get; init; }
+    public required string EndTimeZone { get; init; }
     public string? Description { get; init; }
     public required string Emoji { get; init; }
     public required string Color { get; init; }
