@@ -28,6 +28,7 @@ public sealed class Endpoint : Endpoint<Request, Results>
                         .StatusCode(StatusCodes.Status404NotFound)
                         .ToProblemDetails()
                 ),
+            forbiddenError => TypedResults.Forbid(),
             invalidPatch => Problem.Failure("patch", "Invalid patch", ErrorCodes.InvalidValue).ToProblemDetails(),
             success => TypedResults.NoContent()
         );

@@ -6,11 +6,12 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Features.WorkspaceMembers.Patch;
 
-public sealed record PatchWorkspaceMember
-    : ICommand<OneOf<NotFoundError, InvalidPatchError, Success>>
+public sealed record PatchWorkspaceMember : ICommand<OneOf<NotFoundError, ForbiddenError, InvalidPatchError, Success>>
 {
     public required WorkspaceMemberId Id { get; init; }
     public required Patchable Patch { get; init; }
+
+    public required UserId RequestingUserId { get; init; }
 
     public sealed record Patchable : Patchable<Patchable>
     {

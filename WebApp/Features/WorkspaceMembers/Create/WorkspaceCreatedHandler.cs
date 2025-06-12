@@ -16,7 +16,7 @@ public sealed class WorkspaceCreatedHandler : IEventHandler<WorkspaceCreated>
             {
                 RoleId = WorkspaceRoleDefaults.Owner.Id,
                 UserId = eventModel.UserId,
-                WorkspaceId = eventModel.Workspace.Id
+                WorkspaceId = eventModel.Workspace.Id,
             }
         );
         return Task.CompletedTask;
