@@ -14,5 +14,6 @@ public sealed record PatchResource : ICommand<OneOf<NotFoundError, Success>>
     public sealed record Patchable : Patchable<Patchable>
     {
         public string? Name { get; init; }
+        public string? DocumentContent { get; init; }
     }
 }

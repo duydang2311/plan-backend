@@ -4,6 +4,7 @@ using FluentValidation;
 using OneOf;
 using OneOf.Types;
 using Riok.Mapperly.Abstractions;
+using WebApp.Common.Constants;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
 using WebApp.Features.Resources.Patch;
@@ -21,6 +22,7 @@ public sealed record Request : ICommand<OneOf<NotFoundError, Success>>
     public sealed record Patchable : Patchable<Patchable>
     {
         public string? Name { get; init; }
+        public string? DocumentContent { get; init; }
     }
 }
 
@@ -33,11 +35,9 @@ public sealed class RequestValidator : Validator<Request>
             a => a.Patch is not null,
             () =>
             {
-                RuleFor(a => a.Patch!.Name)
-                    .NotEmpty()
-                    .WithErrorCode("required")
-                    .MaximumLength(255)
-                    .WithErrorCode("max_length");
+                RuleFor(a => a.Patch)
+                    .Must(a => a!.Has(b => b.Name) || a.Has(b => b.DocumentContent))
+                    .WithErrorCode(ErrorCodes.InvalidValue);
             }
         );
     }
