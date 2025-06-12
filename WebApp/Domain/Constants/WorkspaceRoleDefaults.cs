@@ -51,7 +51,13 @@ public sealed record WorkspaceRoleDefaults
         RoleId.From(4),
         "Member",
         300,
-        [.. Viewer.Permissions, Permit.CreateIssue, Permit.CreateWorkspaceResource, Permit.CreateWorkspaceResourceFile]
+        [
+            .. Viewer.Permissions,
+            Permit.ReadWorkspaceResourceFile,
+            Permit.CreateIssue,
+            Permit.CreateWorkspaceResource,
+            Permit.CreateWorkspaceResourceFile,
+        ]
     );
 
     public static readonly WorkspaceRoleDefaults Manager = new(
