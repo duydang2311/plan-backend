@@ -25,7 +25,7 @@ public sealed class CreateProjectHandler(AppDbContext db, IDbContextOutbox outbo
             Name = command.Name,
             Description = command.Description,
             Identifier = command.Identifier,
-            Members = [new ProjectMember { UserId = command.UserId, RoleId = ProjectRoleDefaults.Admin.Id }],
+            Members = [new ProjectMember { UserId = command.UserId, RoleId = ProjectRoleDefaults.Owner.Id }],
         };
 
         db.Add(new SharedCounter { Id = project.Id.Value });
