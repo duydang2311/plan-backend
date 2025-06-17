@@ -17,6 +17,7 @@ public sealed record Request : Collective, IKeysetPagination<UserNotificationId?
     public string? SelectComment { get; init; }
     public string? SelectProjectMemberInvitation { get; init; }
     public string? SelectWorkspaceInvitation { get; init; }
+    public string? SelectStatus { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }
