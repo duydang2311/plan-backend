@@ -7,11 +7,13 @@ using OneOf.Types;
 using WebApp.Common.Helpers;
 using WebApp.Common.Models;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Events;
 using WebApp.Infrastructure.Persistence;
+using Wolverine.EntityFrameworkCore;
 
 namespace WebApp.Features.Issues.Patch;
 
-public sealed class PatchIssueHandler(AppDbContext db)
+public sealed class PatchIssueHandler(AppDbContext db, IDbContextOutbox outbox)
     : ICommandHandler<PatchIssue, OneOf<ValidationFailures, NotFoundError, Success>>
 {
     public async Task<OneOf<ValidationFailures, NotFoundError, Success>> ExecuteAsync(
@@ -19,6 +21,7 @@ public sealed class PatchIssueHandler(AppDbContext db)
         CancellationToken ct
     )
     {
+        var usingOutbox = false;
         Expression<Func<SetPropertyCalls<Issue>, SetPropertyCalls<Issue>>>? updateEx = default;
         if (command.Patch.TryGetValue(a => a.Title, out var title) && !string.IsNullOrEmpty(title))
         {
@@ -50,6 +53,14 @@ public sealed class PatchIssueHandler(AppDbContext db)
                 updateEx,
                 a => a.SetProperty(a => a.StatusId, statusId.Value.Value == -1 ? null : statusId)
             );
+            usingOutbox = true;
+            outbox.Enroll(db);
+            await outbox
+                .PublishAsync(
+                    await CreateIssueStatusUpdatedEventAsync(db, command.IssueId, statusId.Value, ct)
+                        .ConfigureAwait(false)
+                )
+                .ConfigureAwait(false);
         }
         if (command.Patch.TryGetValue(a => a.StatusRank, out var statusRank) && statusRank is not null)
         {
@@ -82,11 +93,46 @@ public sealed class PatchIssueHandler(AppDbContext db)
             .ExecuteUpdateAsync(updateEx, ct)
             .ConfigureAwait(false);
 
+        if (usingOutbox)
+        {
+            await outbox.SaveChangesAndFlushMessagesAsync(ct).ConfigureAwait(false);
+        }
+
         if (count == 0)
         {
             return new NotFoundError();
         }
 
         return new Success();
+    }
+
+    static async Task<IssueStatusUpdated?> CreateIssueStatusUpdatedEventAsync(
+        AppDbContext db,
+        IssueId issueId,
+        StatusId statusId,
+        CancellationToken ct
+    )
+    {
+        var issue = await db
+            .Issues.Where(a => a.Id == issueId)
+            .Select(a => new
+            {
+                a.Project.WorkspaceId,
+                ProjectId = a.Project.Id,
+                a.StatusId,
+            })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
+        if (issue is null)
+        {
+            return default;
+        }
+        return new IssueStatusUpdated
+        {
+            ProjectId = issue.ProjectId,
+            IssueId = issueId,
+            OldStatusId = issue.StatusId,
+            NewStatusId = statusId,
+        };
     }
 }

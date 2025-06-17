@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
             ? string.IsNullOrEmpty(command.SelectProject)
             && string.IsNullOrEmpty(command.SelectIssue)
             && string.IsNullOrEmpty(command.SelectComment)
+            && string.IsNullOrEmpty(command.SelectWorkspaceInvitation)
+            && string.IsNullOrEmpty(command.SelectStatus)
                 ? null
                 : "Notification.Type,Notification.Data"
             : command.Select;
@@ -49,6 +52,7 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
         var issueAuditIdsToLoad = new HashSet<long>();
         var projectMemberInvitationIdsToLoad = new HashSet<ProjectMemberInvitationId>();
         var workspaceInvitationIdsToLoad = new HashSet<WorkspaceInvitationId>();
+        var statusIdsToLoad = new HashSet<StatusId>();
 
         foreach (var un in userNotifications)
         {
@@ -114,6 +118,27 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     }
                     break;
                 }
+                case NotificationType.IssueStatusUpdated:
+                {
+                    if (!string.IsNullOrEmpty(command.SelectStatus))
+                    {
+                        if (
+                            un.Notification.Data.RootElement.TryGetProperty("oldStatusId", out var statusIdElement)
+                            && statusIdElement.TryGetInt64(out var statusIdValue)
+                        )
+                        {
+                            statusIdsToLoad.Add(new StatusId { Value = statusIdValue });
+                        }
+                        if (
+                            un.Notification.Data.RootElement.TryGetProperty("newStatusId", out statusIdElement)
+                            && statusIdElement.TryGetInt64(out statusIdValue)
+                        )
+                        {
+                            statusIdsToLoad.Add(new StatusId { Value = statusIdValue });
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -170,6 +195,15 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     .ConfigureAwait(false)
                 : [];
 
+        var statusesMap =
+            !string.IsNullOrEmpty(command.SelectStatus) && statusIdsToLoad.Count > 0
+                ? await db
+                    .Statuses.Where(inv => statusIdsToLoad.Contains(inv.Id))
+                    .Select(ExpressionHelper.Select<Status, Status>(command.SelectStatus))
+                    .ToDictionaryAsync(inv => inv.Id, ct)
+                    .ConfigureAwait(false)
+                : [];
+
         var finalItems = new List<UserNotification>(userNotifications.Count);
         foreach (var originalUserNotification in userNotifications)
         {
@@ -195,8 +229,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         var projectId = new ProjectId { Value = projGuid };
                         if (projectsMap.TryGetValue(projectId, out var project))
                         {
-                            serializeAttempt = Attempt(
-                                () => JsonSerializer.SerializeToDocument(project, jsonOptions.Value.SerializerOptions)
+                            serializeAttempt = Attempt(() =>
+                                JsonSerializer.SerializeToDocument(project, jsonOptions.Value.SerializerOptions)
                             );
                         }
                     }
@@ -211,8 +245,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         var issueId = new IssueId { Value = issueGuid };
                         if (issuesMap.TryGetValue(issueId, out var issue))
                         {
-                            serializeAttempt = Attempt(
-                                () => JsonSerializer.SerializeToDocument(issue, jsonOptions.Value.SerializerOptions)
+                            serializeAttempt = Attempt(() =>
+                                JsonSerializer.SerializeToDocument(issue, jsonOptions.Value.SerializerOptions)
                             );
                         }
                     }
@@ -226,8 +260,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                     {
                         if (auditsMap.TryGetValue(auditId, out var audit))
                         {
-                            serializeAttempt = Attempt(
-                                () => JsonSerializer.SerializeToDocument(audit, jsonOptions.Value.SerializerOptions)
+                            serializeAttempt = Attempt(() =>
+                                JsonSerializer.SerializeToDocument(audit, jsonOptions.Value.SerializerOptions)
                             );
                         }
                     }
@@ -245,9 +279,8 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         var inviteId = new ProjectMemberInvitationId { Value = inviteIdValue };
                         if (projectMemberInvitationsMap.TryGetValue(inviteId, out var invitation))
                         {
-                            serializeAttempt = Attempt(
-                                () =>
-                                    JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
+                            serializeAttempt = Attempt(() =>
+                                JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
                             );
                         }
                     }
@@ -266,11 +299,53 @@ public sealed class GetUserNotificationsHandler(AppDbContext db, IOptions<JsonOp
                         var id = new WorkspaceInvitationId { Value = idValue };
                         if (workspaceInvitationsMap.TryGetValue(id, out var invitation))
                         {
-                            serializeAttempt = Attempt(
-                                () =>
-                                    JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
+                            serializeAttempt = Attempt(() =>
+                                JsonSerializer.SerializeToDocument(invitation, jsonOptions.Value.SerializerOptions)
                             );
                         }
+                    }
+                    break;
+                }
+                case NotificationType.IssueStatusUpdated:
+                {
+                    if (string.IsNullOrEmpty(command.SelectStatus))
+                    {
+                        break;
+                    }
+                    var jsonObject = new JsonObject();
+                    if (
+                        currentItem.Notification.Data.RootElement.TryGetProperty("oldStatusId", out var idElement)
+                        && idElement.TryGetInt64(out var idValue)
+                    )
+                    {
+                        var id = new StatusId { Value = idValue };
+                        if (statusesMap.TryGetValue(id, out var status))
+                        {
+                            jsonObject["oldStatus"] = JsonSerializer.SerializeToNode(
+                                status,
+                                jsonOptions.Value.SerializerOptions
+                            );
+                        }
+                    }
+                    if (
+                        currentItem.Notification.Data.RootElement.TryGetProperty("newStatusId", out idElement)
+                        && idElement.TryGetInt64(out idValue)
+                    )
+                    {
+                        var id = new StatusId { Value = idValue };
+                        if (statusesMap.TryGetValue(id, out var status))
+                        {
+                            jsonObject["newStatus"] = JsonSerializer.SerializeToNode(
+                                status,
+                                jsonOptions.Value.SerializerOptions
+                            );
+                        }
+                    }
+                    if (jsonObject.Count > 0)
+                    {
+                        serializeAttempt = Attempt(() =>
+                            JsonSerializer.SerializeToDocument(jsonObject, jsonOptions.Value.SerializerOptions)
+                        );
                     }
                     break;
                 }

@@ -8,4 +8,5 @@ public enum NotificationType : byte
     IssueCommentCreated,
     ProjectMemberInvited,
     WorkspaceMemberInvited,
+    IssueStatusUpdated,
 }

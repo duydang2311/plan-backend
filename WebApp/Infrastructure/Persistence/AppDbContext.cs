@@ -18,6 +18,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<WorkspaceFieldDefinition> WorkspaceFieldDefinitions => Set<WorkspaceFieldDefinition>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<WorkspaceMember> WorkspaceMembers => Set<WorkspaceMember>();
+    public DbSet<Status> Statuses => Set<Status>();
     public DbSet<WorkspaceStatus> WorkspaceStatuses => Set<WorkspaceStatus>();
     public DbSet<TeamIssue> TeamIssues => Set<TeamIssue>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();

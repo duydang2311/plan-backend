@@ -81,8 +81,8 @@ public sealed class NotificationHubService(
                 {
                     case NotificationType.ProjectCreated:
                     {
-                        var deserializeAttempt = Attempt(
-                            () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectCreatedEvent)
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectCreatedEvent)
                         );
                         if (deserializeAttempt.TryGetError(out var e, out var data))
                         {
@@ -97,8 +97,8 @@ public sealed class NotificationHubService(
                     }
                     case NotificationType.IssueCreated:
                     {
-                        var deserializeAttempt = Attempt(
-                            () => JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCreatedEvent)
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCreatedEvent)
                         );
                         if (deserializeAttempt.TryGetError(out var e, out var data))
                         {
@@ -113,12 +113,8 @@ public sealed class NotificationHubService(
                     }
                     case NotificationType.IssueCommentCreated:
                     {
-                        var deserializeAttempt = Attempt(
-                            () =>
-                                JsonSerializer.Deserialize(
-                                    msg.Data,
-                                    MessagingJsonContext.Default.IssueCommentCreatedEvent
-                                )
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueCommentCreatedEvent)
                         );
                         if (deserializeAttempt.TryGetError(out var e, out var data))
                         {
@@ -133,12 +129,8 @@ public sealed class NotificationHubService(
                     }
                     case NotificationType.ProjectMemberInvited:
                     {
-                        var deserializeAttempt = Attempt(
-                            () =>
-                                JsonSerializer.Deserialize(
-                                    msg.Data,
-                                    MessagingJsonContext.Default.ProjectMemberInvitedEvent
-                                )
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.ProjectMemberInvitedEvent)
                         );
                         if (deserializeAttempt.TryGetError(out var e, out var data))
                         {
@@ -153,16 +145,31 @@ public sealed class NotificationHubService(
                     }
                     case NotificationType.WorkspaceMemberInvited:
                     {
-                        var deserializeAttempt = Attempt(
-                            () =>
-                                JsonSerializer.Deserialize(
-                                    msg.Data,
-                                    MessagingJsonContext.Default.WorkspaceMemberInvitedEvent
-                                )
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(
+                                msg.Data,
+                                MessagingJsonContext.Default.WorkspaceMemberInvitedEvent
+                            )
                         );
                         if (deserializeAttempt.TryGetError(out var e, out var data))
                         {
                             logger.LogError(e, "Error while deserializing WorkspaceMemberInvitedEvent message");
+                            continue;
+                        }
+                        await mainHubContext
+                            .Clients.User(data.UserId)
+                            .SendAsync("new_notification", data, ct)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+                    case NotificationType.IssueStatusUpdated:
+                    {
+                        var deserializeAttempt = Attempt(() =>
+                            JsonSerializer.Deserialize(msg.Data, MessagingJsonContext.Default.IssueStatusUpdatedEvent)
+                        );
+                        if (deserializeAttempt.TryGetError(out var e, out var data))
+                        {
+                            logger.LogError(e, "Error while deserializing IssueStatusUpdatedEvent message");
                             continue;
                         }
                         await mainHubContext
@@ -193,4 +200,5 @@ public sealed class NotificationHubService(
 [JsonSerializable(typeof(ProjectCreatedEvent))]
 [JsonSerializable(typeof(ProjectMemberInvitedEvent))]
 [JsonSerializable(typeof(WorkspaceMemberInvitedEvent))]
+[JsonSerializable(typeof(IssueStatusUpdatedEvent))]
 internal sealed partial class MessagingJsonContext : JsonSerializerContext;
