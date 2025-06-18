@@ -33,7 +33,7 @@ public sealed class CreateUserHandler(IHasher hasher, AppDbContext dbContext)
             PasswordHash = hasher.Hash(command.Password, salt),
             Salt = salt,
         };
-        var userVerificationToken = new UserVerificationToken { User = user, Token = IdHelper.NewGuid(), };
+        var userVerificationToken = new UserVerificationToken { User = user, Token = IdHelper.NewGuid() };
 
         dbContext.Add(user);
         dbContext.Add(userVerificationToken);

@@ -21,7 +21,7 @@ public sealed class SendUserVerificationMailHandler(IServiceScopeFactory service
                 JsonSerializer.Serialize(
                     new
                     {
-                        From = "Plan <plan.noreply@resend.dev>",
+                        From = "Konekt Application <no-reply@mail.duyda.tech>",
                         To = new string[] { command.Email },
                         Subject,
                         Text = string.Format(

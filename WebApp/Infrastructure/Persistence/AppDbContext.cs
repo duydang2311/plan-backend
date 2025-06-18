@@ -47,6 +47,7 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<UserSocialLink> UserSocialLinks => Set<UserSocialLink>();
     public DbSet<Milestone> Milestones => Set<Milestone>();
     public DbSet<MilestoneStatus> MilestoneStatuses => Set<MilestoneStatus>();
+    public DbSet<UserVerificationToken> UserVerificationTokens => Set<UserVerificationToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
