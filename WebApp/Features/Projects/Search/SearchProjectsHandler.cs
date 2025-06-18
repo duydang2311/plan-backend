@@ -7,11 +7,11 @@ using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Persistence;
 using WebApp.Infrastructure.Persistence.Abstractions;
 
-namespace WebApp.Features.Issues.Search;
+namespace WebApp.Features.Projects.Search;
 
-public sealed class SearchIssuesHandler(AppDbContext db) : ICommandHandler<SearchIssues, PaginatedList<Issue>>
+public sealed class SearchProjectsHandler(AppDbContext db) : ICommandHandler<SearchProjects, PaginatedList<Project>>
 {
-    public async Task<PaginatedList<Issue>> ExecuteAsync(SearchIssues command, CancellationToken ct)
+    public async Task<PaginatedList<Project>> ExecuteAsync(SearchProjects command, CancellationToken ct)
     {
 #pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
         await using var transaction = await db
@@ -26,12 +26,16 @@ public sealed class SearchIssuesHandler(AppDbContext db) : ICommandHandler<Searc
             .ConfigureAwait(false);
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection.
         var searchQuery = db
-            .Issues.Where(a =>
-                a.ProjectId == command.ProjectId
+            .Projects.Where(a =>
+                a.WorkspaceId == command.WorkspaceId
                 && (
                     a.SearchVector.Matches(EF.Functions.PlainToTsQuery("simple_unaccented", command.Query))
                     || EF.Functions.TrigramsAreSimilar(
-                        CustomDbFunctions.ImmutableUnaccent(a.Title),
+                        CustomDbFunctions.ImmutableUnaccent(a.Identifier),
+                        CustomDbFunctions.ImmutableUnaccent(command.Query)
+                    )
+                    || EF.Functions.TrigramsAreSimilar(
+                        CustomDbFunctions.ImmutableUnaccent(a.Name),
                         CustomDbFunctions.ImmutableUnaccent(command.Query)
                     )
                 )
@@ -41,7 +45,11 @@ public sealed class SearchIssuesHandler(AppDbContext db) : ICommandHandler<Searc
                 a.Id,
                 Score = a.SearchVector.Rank(EF.Functions.PlainToTsQuery("simple_unaccented", command.Query))
                     + EF.Functions.TrigramsSimilarity(
-                        CustomDbFunctions.ImmutableUnaccent(a.Title),
+                        CustomDbFunctions.ImmutableUnaccent(a.Identifier),
+                        CustomDbFunctions.ImmutableUnaccent(command.Query)
+                    ) * 2
+                    + EF.Functions.TrigramsSimilarity(
+                        CustomDbFunctions.ImmutableUnaccent(a.Name),
                         CustomDbFunctions.ImmutableUnaccent(command.Query)
                     ) * 2,
             })
@@ -54,23 +62,11 @@ public sealed class SearchIssuesHandler(AppDbContext db) : ICommandHandler<Searc
             .ConfigureAwait(false);
 
         var ids = searchResults.Select(a => a.Value.Id).ToList();
-        var query = db.Issues.Where(a => ids.Contains(a.Id));
-
-        if (command.ExcludeIssueIds is not null)
-        {
-            query = query.Where(a => !command.ExcludeIssueIds.Contains(a.Id));
-        }
-
-        if (command.ExcludeChecklistItemParentIssueId.HasValue)
-        {
-            query = query.Where(a =>
-                a.ParentChecklistItems.All(b => b.ParentIssueId != command.ExcludeChecklistItemParentIssueId)
-            );
-        }
+        var query = db.Projects.Where(a => ids.Contains(a.Id));
 
         if (!string.IsNullOrEmpty(command.Select))
         {
-            query = query.Select(ExpressionHelper.Select<Issue, Issue>(command.Select));
+            query = query.Select(ExpressionHelper.Select<Project, Project>(command.Select));
         }
 
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);

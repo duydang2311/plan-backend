@@ -25,11 +25,12 @@ public sealed class IssueConfiguration : IEntityTypeConfiguration<Issue>
         builder.Property(a => a.PreviewDescription).HasMaxLength(256);
         builder.Property(a => a.StartTime);
         builder.Property(a => a.EndTime);
-        builder.HasGeneratedTsVectorColumn(
-            a => a.SearchVector,
-            "simple_unaccented",
-            a => new { a.Title, a.Description }
-        );
+        builder
+            .Property(a => a.SearchVector)
+            .HasComputedColumnSql(
+                "to_tsvector('simple_unaccented', \"title\" || ' ' || regexp_replace(coalesce(\"description\", ''), '<[^>]*>', ' ', 'g'))",
+                stored: true
+            );
 
         builder.HasKey(a => a.Id);
         builder.HasOne(a => a.Project).WithMany(a => a.Issues).HasForeignKey(a => a.ProjectId);

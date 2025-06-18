@@ -96,10 +96,6 @@ public static partial class DtoMapper
     public static BaseWorkspaceStatusDto? WorkspaceStatusToDto(WorkspaceStatus workspaceStatus) =>
         WorkspaceStatusToDtoInternal(workspaceStatus);
 
-    private static partial BaseIssueDto? IssueToDtoInternal(Issue? issue);
-
-    public static BaseIssueDto? IssueToDto(Issue issue) => IssueToDtoInternal(issue);
-
     private static partial BaseTeamDto? TeamToDtoInternal(Team? team);
 
     public static BaseTeamDto? TeamToDto(Team team) => TeamToDtoInternal(team);
@@ -162,6 +158,11 @@ public static partial class DtoMapper
 
     [UserMapping(Default = true)]
     public static BaseProjectDto ProjectToDto(Project project) => ProjectToDtoInternal(project);
+
+    private static partial BaseIssueDto? IssueToDtoInternal(Issue? issue);
+
+    [UserMapping(Default = true)]
+    public static BaseIssueDto IssueToDto(Issue issue) => IssueToDtoInternal(issue);
 
     public static partial IReadOnlyCollection<BaseMilestoneStatusDto> MilestoneStatusesToDto(
         IReadOnlyCollection<MilestoneStatus> milestoneStatuses
