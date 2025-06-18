@@ -16,6 +16,7 @@ public sealed record Request : Collective
     public string? Select { get; init; }
     public IReadOnlyCollection<IssueId>? ExcludeIssueIds { get; init; }
     public IssueId? ExcludeChecklistItemParentIssueId { get; init; }
+    public float? Threshold { get; init; }
 
     [FromClaim(ClaimTypes.NameIdentifier)]
     public UserId RequestingUserId { get; init; }

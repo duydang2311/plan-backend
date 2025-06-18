@@ -1,4 +1,5 @@
 using NodaTime;
+using NpgsqlTypes;
 using WebApp.Common.Interfaces;
 
 namespace WebApp.Domain.Entities;
@@ -14,6 +15,7 @@ public sealed record class Project : ISoftDelete
     public string Identifier { get; init; } = string.Empty;
     public string? Description { get; init; }
     public Instant? DeletedTime { get; init; }
+    public NpgsqlTsVector SearchVector { get; init; } = null!;
 
     // public ICollection<Status> Statuses { get; init; } = null!;
     public ICollection<Issue> Issues { get; init; } = null!;

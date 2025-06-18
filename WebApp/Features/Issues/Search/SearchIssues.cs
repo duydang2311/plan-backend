@@ -11,4 +11,5 @@ public sealed record SearchIssues : Collective, ICommand<PaginatedList<Issue>>
     public string? Select { get; init; }
     public IReadOnlyCollection<IssueId>? ExcludeIssueIds { get; init; }
     public IssueId? ExcludeChecklistItemParentIssueId { get; init; }
+    public float? Threshold { get; init; }
 }

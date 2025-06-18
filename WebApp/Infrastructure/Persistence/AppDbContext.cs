@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
+using WebApp.Infrastructure.Persistence.Abstractions;
 
 namespace WebApp.Infrastructure.Persistence;
 
@@ -50,6 +51,14 @@ public sealed class AppDbContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasPostgresExtension("pg_trgm");
+        modelBuilder.HasPostgresExtension("unaccent");
+        modelBuilder
+            .HasDbFunction(
+                typeof(CustomDbFunctions).GetMethod(nameof(CustomDbFunctions.ImmutableUnaccent), [typeof(string)])!
+            )
+            .HasName("immutable_unaccent")
+            .HasSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

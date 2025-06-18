@@ -1,4 +1,5 @@
 using NodaTime;
+using NpgsqlTypes;
 using WebApp.Common.Interfaces;
 using WebApp.Domain.Constants;
 
@@ -25,7 +26,7 @@ public sealed record Issue : ISoftDelete
     public Instant? StartTime { get; init; }
     public Instant? EndTime { get; init; }
     public string? TimelineZone { get; init; }
-    public string Trigrams { get; init; } = null!;
+    public NpgsqlTsVector SearchVector { get; init; } = null!;
     public MilestoneId? MilestoneId { get; init; }
     public Milestone? Milestone { get; init; }
     public ICollection<IssueComment> Comments { get; init; } = null!;
