@@ -73,8 +73,14 @@ public sealed class SearchIssuesHandler(AppDbContext db) : ICommandHandler<Searc
             query = query.Select(ExpressionHelper.Select<Issue, Issue>(command.Select));
         }
 
+        query = command.Order.SortOrDefault(query);
+
         var items = await query.Skip(command.Offset).Take(command.Size).ToListAsync(ct).ConfigureAwait(false);
         await transaction.CommitAsync(ct).ConfigureAwait(false);
-        return new() { Items = [.. items.OrderByDescending(a => searchResults[a.Id].Score)], TotalCount = totalCount };
+        return new()
+        {
+            Items = command.Order.Length != 0 ? items : [.. items.OrderByDescending(a => searchResults[a.Id].Score)],
+            TotalCount = totalCount,
+        };
     }
 }
