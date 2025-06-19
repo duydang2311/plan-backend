@@ -20,7 +20,7 @@ public sealed class CreateProjectMemberHandler(AppDbContext db)
         {
             ProjectId = command.ProjectId,
             UserId = command.UserId,
-            RoleId = command.RoleId
+            RoleId = command.RoleId,
         };
 
         db.Add(projectMember);
@@ -39,7 +39,7 @@ public sealed class CreateProjectMemberHandler(AppDbContext db)
                 {
                     nameof(ProjectMember.ProjectId) => ("projectId", "Project does not exist"),
                     nameof(ProjectMember.UserId) => ("userId", "User does not exist"),
-                    _ => (property, $"{property} is invalid")
+                    _ => (property, $"{property} is invalid"),
                 }
             );
         }

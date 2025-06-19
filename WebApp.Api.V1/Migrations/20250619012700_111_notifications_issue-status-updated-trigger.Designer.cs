@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -15,9 +16,11 @@ using WebApp.Infrastructure.Persistence;
 namespace WebApp.Host.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250619012700_111_notifications_issue-status-updated-trigger")]
+    partial class _111_notifications_issuestatusupdatedtrigger
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1884,10 +1887,6 @@ namespace WebApp.Host.Migrations
 
                     b.HasIndex("WorkspaceId")
                         .HasDatabaseName("ix_workspace_members_workspace_id");
-
-                    b.HasIndex("WorkspaceId", "UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_workspace_members_workspace_id_user_id");
 
                     b.ToTable("workspace_members", (string)null);
                 });

@@ -19,5 +19,6 @@ public sealed class WorkspaceMemberConfiguration : IEntityTypeConfiguration<Work
         builder.HasOne(a => a.Workspace).WithMany(a => a.Members).HasForeignKey(a => a.WorkspaceId);
         builder.HasOne(a => a.User).WithMany(a => a.WorkspaceMembers).HasForeignKey(a => a.UserId);
         builder.HasOne(a => a.Role).WithMany().HasForeignKey(a => a.RoleId);
+        builder.HasIndex(a => new { a.WorkspaceId, a.UserId }).IsUnique();
     }
 }
