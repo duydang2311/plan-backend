@@ -10,6 +10,10 @@ public sealed record IssueStatusUpdatedEvent(
     string Title,
     string ProjectIdentifier,
     string WorkspacePath,
-    string OldStatusName,
-    string NewStatusName
+    byte? OldStatusCategory,
+    string? OldStatusColor,
+    string? OldStatusValue,
+    byte? NewStatusCategory,
+    string? NewStatusColor,
+    string? NewStatusValue
 ) { }

@@ -18,7 +18,7 @@ public sealed class Authorize(IPermissionCache permissionCache) : AuthorizePrePr
         var db = context.HttpContext.Resolve<AppDbContext>();
         var issue = await db
             .Issues.Where(a => a.Id == request.IssueId)
-            .Select(a => new { a.ProjectId })
+            .Select(a => new { a.ProjectId, a.Project.WorkspaceId })
             .FirstOrDefaultAsync(ct)
             .ConfigureAwait(false);
         if (issue is null)
@@ -26,9 +26,20 @@ public sealed class Authorize(IPermissionCache permissionCache) : AuthorizePrePr
             return false;
         }
 
-        var projectPermissions = await permissionCache
-            .GetProjectPermissionsAsync(issue.ProjectId, request.RequestingUserId, ct)
+        var canCreate = await permissionCache
+            .HasProjectPermissionAsync(issue.ProjectId, request.RequestingUserId, Permit.CreateIssueAuditComment, ct)
             .ConfigureAwait(false);
-        return projectPermissions.Contains(Permit.CreateIssueAuditComment);
+        if (!canCreate)
+        {
+            canCreate = await permissionCache
+                .HasWorkspacePermissionAsync(
+                    issue.WorkspaceId,
+                    request.RequestingUserId,
+                    Permit.CreateIssueAuditComment,
+                    ct
+                )
+                .ConfigureAwait(false);
+        }
+        return canCreate;
     }
 }

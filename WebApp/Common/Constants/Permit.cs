@@ -7,6 +7,11 @@ public static class Permit
     public const string ReadTeam = "team:read";
     public const string CreateTeam = "team:create";
 
+    public const string CreateWorkspace = "workspace:create";
+    public const string ReadWorkspace = "workspace:read";
+    public const string UpdateWorkspace = "workspace:update";
+    public const string DeleteWorkspace = "workspace:delete";
+
     public const string CreateIssue = "issue:create";
     public const string ReadIssue = "issue:read";
     public const string UpdateIssue = "issue:update";

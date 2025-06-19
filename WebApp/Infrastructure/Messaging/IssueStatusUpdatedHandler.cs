@@ -30,8 +30,12 @@ public static class IssueStatusUpdatedHandler
                             notified.Title,
                             notified.ProjectIdentifier,
                             notified.WorkspacePath,
-                            notified.OldStatusName,
-                            notified.NewStatusName
+                            notified.OldStatusCategory,
+                            notified.OldStatusColor,
+                            notified.OldStatusValue,
+                            notified.NewStatusCategory,
+                            notified.NewStatusColor,
+                            notified.NewStatusValue
                         ),
                         MessagingJsonContext.Default.IssueStatusUpdatedEvent
                     ),

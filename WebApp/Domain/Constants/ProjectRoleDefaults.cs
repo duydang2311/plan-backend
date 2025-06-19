@@ -41,7 +41,13 @@ public sealed record ProjectRoleDefaults
         RoleId.From(14),
         "Member",
         300,
-        [.. Viewer.Permissions, Permit.CreateIssue, Permit.CreateProjectResource, Permit.CreateProjectResourceFile]
+        [
+            .. Viewer.Permissions,
+            Permit.CreateIssue,
+            Permit.CreateIssueAuditComment,
+            Permit.CreateProjectResource,
+            Permit.CreateProjectResourceFile,
+        ]
     );
     public static readonly ProjectRoleDefaults Manager = new(
         RoleId.From(13),
@@ -53,7 +59,6 @@ public sealed record ProjectRoleDefaults
             Permit.CreateProjectMemberInvitation,
             Permit.CreateIssueAssignee,
             Permit.CreateTeamIssue,
-            Permit.CreateIssueAuditComment,
             Permit.UpdateIssue,
             Permit.UpdateProjectResource,
             Permit.UpdateProjectResourceFile,

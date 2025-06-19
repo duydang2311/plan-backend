@@ -17,21 +17,33 @@ public sealed class Authorize(IPermissionCache permissionCache) : IPreProcessor<
 
         var dbContext = context.HttpContext.Resolve<AppDbContext>();
         var canUpdate = await dbContext
-            .Issues.AnyAsync(x => x.Id == context.Request.IssueId && x.AuthorId == context.Request.UserId, ct)
+            .Issues.AnyAsync(a => a.Id == context.Request.IssueId && a.AuthorId == context.Request.UserId, ct)
             .ConfigureAwait(false);
         if (!canUpdate)
         {
             var issue = await dbContext
-                .Issues.Where(x => x.Id == context.Request.IssueId)
-                .Select(x => new { x.ProjectId })
+                .Issues.Where(a => a.Id == context.Request.IssueId)
+                .Select(a => new { a.Project.WorkspaceId, a.ProjectId })
                 .FirstOrDefaultAsync(ct)
                 .ConfigureAwait(false);
             if (issue is not null)
             {
-                var projectPermissions = await permissionCache
-                    .GetProjectPermissionsAsync(issue.ProjectId, context.Request.UserId, ct)
-                    .ConfigureAwait(false);
-                canUpdate = projectPermissions.Contains(Permit.UpdateIssue);
+                canUpdate =
+                    await permissionCache
+                        .HasWorkspacePermissionAsync(issue.WorkspaceId, context.Request.UserId, Permit.UpdateIssue, ct)
+                        .ConfigureAwait(false)
+                    || await permissionCache
+                        .HasProjectPermissionAsync(issue.ProjectId, context.Request.UserId, Permit.UpdateIssue, ct)
+                        .ConfigureAwait(false);
+                if (!canUpdate)
+                {
+                    canUpdate = await dbContext
+                        .IssueAssignees.AnyAsync(
+                            a => a.IssueId == context.Request.IssueId && a.UserId == context.Request.UserId,
+                            ct
+                        )
+                        .ConfigureAwait(false);
+                }
             }
         }
         if (!canUpdate)

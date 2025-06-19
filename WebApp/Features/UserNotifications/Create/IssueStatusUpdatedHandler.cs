@@ -63,7 +63,13 @@ public static class IssueStatusUpdatedHandler
 
         var statuses = await db
             .Statuses.Where(a => statusIds.Contains(a.Id))
-            .Select(a => new { a.Id, a.Value })
+            .Select(a => new
+            {
+                a.Id,
+                a.Value,
+                a.Category,
+                a.Color,
+            })
             .ToDictionaryAsync(a => a.Id, ct)
             .ConfigureAwait(false);
 
@@ -90,10 +96,22 @@ public static class IssueStatusUpdatedHandler
                 Title = issue.Title,
                 ProjectIdentifier = issue.ProjectIdentifier,
                 WorkspacePath = issue.WorkspacePath,
-                OldStatusName = updated.OldStatusId.HasValue
+                OldStatusCategory = updated.OldStatusId.HasValue
+                    ? (byte?)statuses.GetValueOrDefault(updated.OldStatusId.Value)?.Category
+                    : null,
+                OldStatusColor = updated.OldStatusId.HasValue
+                    ? statuses.GetValueOrDefault(updated.OldStatusId.Value)?.Color
+                    : null,
+                OldStatusValue = updated.OldStatusId.HasValue
                     ? statuses.GetValueOrDefault(updated.OldStatusId.Value)?.Value
                     : null,
-                NewStatusName = updated.NewStatusId.HasValue
+                NewStatusCategory = updated.NewStatusId.HasValue
+                    ? (byte?)statuses.GetValueOrDefault(updated.NewStatusId.Value)?.Category
+                    : null,
+                NewStatusColor = updated.NewStatusId.HasValue
+                    ? statuses.GetValueOrDefault(updated.NewStatusId.Value)?.Color
+                    : null,
+                NewStatusValue = updated.NewStatusId.HasValue
                     ? statuses.GetValueOrDefault(updated.NewStatusId.Value)?.Value
                     : null,
             });
